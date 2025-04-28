@@ -1,0 +1,48 @@
+const patients = [
+	{
+		name: 'Rafael Mendes',
+		email: 'rafael.mendes@cliniclife.com',
+		patientStatus: 'Em tratamento',
+		imageUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+		lastSeen: '1h atrás',
+		lastSeenDateTime: '2025-04-28T13:00Z',
+	},
+	{
+		name: 'Mariana Silva',
+		email: 'mariana.silva@cliniclife.com',
+		patientStatus: 'Consulta agendada',
+		imageUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+		lastSeen: '10min atrás',
+		lastSeenDateTime: '2025-04-28T14:50Z',
+	},
+	{
+		name: 'Lucas Almeida',
+		email: 'lucas.almeida@cliniclife.com',
+		patientStatus: 'Alta médica',
+		imageUrl: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+		lastSeen: null,
+	},
+	{
+		name: 'Beatriz Castro',
+		email: 'beatriz.castro@cliniclife.com',
+		patientStatus: 'Aguardando exames',
+		imageUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+		lastSeen: '2h atrás',
+		lastSeenDateTime: '2025-04-28T12:00Z',
+	},
+	{
+		name: 'Felipe Oliveira',
+		email: 'felipe.oliveira@cliniclife.com',
+		patientStatus: 'Em observação',
+		imageUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+		lastSeen: '30min atrás',
+		lastSeenDateTime: '2025-04-28T14:30Z',
+	},
+	{
+		name: 'Isabela Souza',
+		email: 'isabela.souza@cliniclife.com',
+		patientStatus: 'Consulta agendada',
+		imageUrl: 'https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+		lastSeen: null,
+	},
+];
