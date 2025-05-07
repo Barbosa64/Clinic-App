@@ -5,7 +5,7 @@ export default function Home() {
 
 			<div className='grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3'>
 				<div className='flex flex-col items-center justify-center rounded-lg bg-gray-200 p-5'>
-					<span className='text-3xl font-semibold text-gray-700'>Total Patients</span>
+					<span className='text-3xl font-semibold text-gray-700'>Total Pacientes</span>
 					<span className='text-3xl font-semibold text-gray-700'>20</span>
 				</div>
 			</div>
