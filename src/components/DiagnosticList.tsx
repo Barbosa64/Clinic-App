@@ -1,9 +1,9 @@
 import React from 'react';
 
 const diagnostics = [
-	{ problem: 'Hypertension', description: 'Chronic high blood pressure', status: 'Under Observation' },
-	{ problem: 'Type 2 Diabetes', description: 'Insulin resistance', status: 'Cured' },
-	{ problem: 'Asthma', description: 'Bronchial constriction', status: 'Inactive' },
+	{ problem: 'Hipertensão', description: 'Chronic high blood pressure', status: 'Sob observação' },
+	{ problem: 'Type 2 Diabetes', description: 'Resistência à insulina', status: 'Curado' },
+	{ problem: 'Asma', description: 'Broncoconstrição', status: 'Inativo' },
 ];
 
 export default function DiagnosticList() {

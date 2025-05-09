@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { useNavigate } from 'react-router-dom';
@@ -7,41 +7,38 @@ export default function Register() {
 	const [email, setEmail] = useState('');
 	const [senha, setSenha] = useState('');
 	const [confirmarSenha, setConfirmarSenha] = useState('');
-	const [erro, setErro] = useState('');
+	const [erro, setErro] = useState(null);
 	const navigate = useNavigate();
 
-	const handleRegister = async e => {
+	const handleSubmit = async e => {
 		e.preventDefault();
+		setErro(null);
 
 		if (senha !== confirmarSenha) {
-			setErro('As senhas não coincidem');
+			setErro('As senhas não coincidem.');
 			return;
 		}
 
 		try {
 			await createUserWithEmailAndPassword(auth, email, senha);
-			navigate('/dashboard');
+			navigate('/'); // Redireciona para a página principal
 		} catch (err) {
-			setErro('Erro ao criar conta. Tente outro email.');
+			setErro(err.message);
 		}
 	};
 
 	return (
-		<div className='flex items-center justify-center h-screen'>
-			<form onSubmit={handleRegister} className='p-6 bg-white rounded shadow-md space-y-4 max-w-sm w-full'>
-				<h2 className='text-xl font-bold'>Criar Conta</h2>
-
-				<input type='email' placeholder='Email' className='border p-2 w-full' value={email} onChange={e => setEmail(e.target.value)} />
-
-				<input type='password' placeholder='Senha' className='border p-2 w-full' value={senha} onChange={e => setSenha(e.target.value)} />
-
-				<input type='password' placeholder='Confirmar Senha' className='border p-2 w-full' value={confirmarSenha} onChange={e => setConfirmarSenha(e.target.value)} />
-
-				{erro && <p className='text-red-500 text-sm'>{erro}</p>}
-
-				<button type='submit' className='bg-green-600 text-white p-2 w-full rounded hover:bg-green-700 transition'>
-					Registrar
-				</button>
+		<div>
+			<h1>Registrar</h1>
+			<form onSubmit={handleSubmit}>
+				<input type='email' placeholder='Email' value={email} onChange={e => setEmail(e.target.value)} />
+				<br />
+				<input type='password' placeholder='Senha' value={senha} onChange={e => setSenha(e.target.value)} />
+				<br />
+				<input type='password' placeholder='Confirmar senha' value={confirmarSenha} onChange={e => setConfirmarSenha(e.target.value)} />
+				<br />
+				{erro && <p style={{ color: 'red' }}>{erro}</p>}
+				<button type='submit'>Registrar</button>
 			</form>
 		</div>
 	);
