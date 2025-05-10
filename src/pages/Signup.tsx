@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
@@ -27,10 +27,15 @@ const Signup = () => {
 	};
 
 	const signUpWithEmail = async () => {
+		if (password !== confirmPassword) {
+			setError('Passwords do not match.');
+			return;
+		}
+
 		setAuthing(true);
 		setError('');
 
-		signInWithEmailAndPassword(auth, email, password)
+		createUserWithEmailAndPassword(auth, email, password)
 			.then(response => {
 				console.log(response.user.uid);
 				navigate('/');

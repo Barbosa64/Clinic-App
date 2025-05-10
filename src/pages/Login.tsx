@@ -82,8 +82,8 @@ const Login = () => {
 				{/* link login page */}
 				<div className='w-full flex items-center justify-center mt-10'>
 					<p className='text-sm font-normal text-gray-400'>
-						Já tem conta?
-						<span className='text-white ml-1 cursor-pointer' onClick={() => navigate('/login')}>
+						Ainda não tem conta?
+						<span className='text-white ml-1 cursor-pointer' onClick={() => navigate('/signup')}>
 							Entrar
 						</span>
 					</p>
