@@ -1,7 +1,7 @@
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
-
-
+import { getAuth, signOut } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
 
 const navigation = [
 	{ name: 'Dashboard', href: '#', current: true },
@@ -15,6 +15,17 @@ function classNames(...classes) {
 }
 
 const Navbar = () => {
+	const auth = getAuth();
+	const navigate = useNavigate();
+
+	const handleSignOut = async () => {
+		try {
+			await signOut(auth);
+			navigate('/login');
+		} catch (error) {
+			console.error('Error signing out:', error);
+		}
+	};
 	return (
 		<Disclosure as='nav' className='bg-gray-800'>
 			<div className='mx-auto max-w-7xl px-2 sm:px-6 lg:px-8'>
@@ -23,7 +34,7 @@ const Navbar = () => {
 						{/* Mobile menu button*/}
 						<DisclosureButton className='group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-white focus:outline-hidden focus:ring-inset'>
 							<span className='absolute -inset-0.5' />
-							<span className='sr-only'>Open main menu</span>
+							<span className='sr-only'>Abrir main menu</span>
 							<Bars3Icon aria-hidden='true' className='block size-6 group-data-open:hidden' />
 							<XMarkIcon aria-hidden='true' className='hidden size-6 group-data-open:block' />
 						</DisclosureButton>
@@ -53,7 +64,7 @@ const Navbar = () => {
 							className='relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden'
 						>
 							<span className='absolute -inset-1.5' />
-							<span className='sr-only'>View notifications</span>
+							<span className='sr-only'>Ver Notificação</span>
 							<BellIcon aria-hidden='true' className='size-6' />
 						</button>
 
@@ -76,18 +87,18 @@ const Navbar = () => {
 							>
 								<MenuItem>
 									<a href='#' className='block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden'>
-										Your Profile
+										Perfil
 									</a>
 								</MenuItem>
 								<MenuItem>
 									<a href='#' className='block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden'>
-										Settings
+										Configurações
 									</a>
 								</MenuItem>
 								<MenuItem>
-									<a href='#' className='block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden'>
-										Sign out
-									</a>
+									<button onClick={handleSignOut} className='block w-full text-left px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden'>
+										Terminar Sessão
+									</button>
 								</MenuItem>
 							</MenuItems>
 						</Menu>
