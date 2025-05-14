@@ -5,6 +5,8 @@ import ScheduleAppointment from './pages/admin/ScheduleAppointment';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import AuthRoute from './pages/AuthRoute';
+import TeamList from './pages/admin/doctor/data/_TeamList';
+import PatientList from './pages/patient/data/PatientLista';
 
 function App() {
 	const location = useLocation();
@@ -26,10 +28,18 @@ function App() {
 					}
 				/>
 				<Route
+					path='/medicos'
+					element={
+						<AuthRoute>
+							<TeamList />
+						</AuthRoute>
+					}
+				/>
+				<Route
 					path='/pacientes'
 					element={
 						<AuthRoute>
-							<PatientsLista />
+							<PatientList />
 						</AuthRoute>
 					}
 				/>
@@ -42,7 +52,7 @@ function App() {
 					}
 				/>
 
-				{/* fallback 404 */}
+				{/* Erro 404 */}
 				<Route path='*' element={<Navigate to='/' replace />} />
 			</Routes>
 		</>

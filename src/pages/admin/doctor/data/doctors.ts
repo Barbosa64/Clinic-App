@@ -1,4 +1,4 @@
-const doctors = [
+export const doctors = [
 	{
 		name: 'Dr. Ana Silva',
 		email: 'ana.silva@cliniclife.com',

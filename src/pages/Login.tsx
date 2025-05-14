@@ -67,7 +67,7 @@ const Login = () => {
 							onChange={e => setPassword(e.target.value)}
 						/>
 					</div>
-					{/* Error mensagem */}
+					{/* Erro mensagem */}
 					{error && <div className='text-red-500 mb-4'>{error}</div>}
 
 					<div className='w-full flex flex-col mb-4'>

@@ -14,6 +14,7 @@ const Navbar = () => {
 
 	const navigation = [
 		{ name: 'Dashboard', href: '/', current: location.pathname === '/' },
+		{ name: 'Médicos', href: '/medicos', current: location.pathname === '/medicos' },
 		{ name: 'Pacientes', href: '/pacientes', current: location.pathname === '/pacientes' },
 		{ name: 'Marcar consulta', href: '/marcar-consulta', current: location.pathname === '/marcar-consulta' },
 		{ name: 'Calendário', href: '/calendario', current: location.pathname === '/calendario' },
