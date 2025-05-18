@@ -9,6 +9,10 @@ import TeamList from './pages/admin/doctor/data/_TeamList';
 import PatientList from './pages/patient/data/PatientLista';
 import Agenda from './pages/doctor/Agenda';
 
+
+import ProtectedRoute from './routes/ProtectedRoute';
+import { AuthProvider } from './context/AuthContext';
+
 function App() {
 	const location = useLocation();
 

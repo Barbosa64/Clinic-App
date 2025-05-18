@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { doctors as initialDoctors } from '../data/doctors'; // Assuming you might want to use this later or add to it
+import { getAuth, signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
 
 // Define a type for the doctor data, including password for the form
 interface DoctorFormData {
@@ -26,32 +28,48 @@ const initialDoctorFormData: DoctorFormData = {
 export default function TeamList() {
 	// If you plan to actually add doctors to the list, you'd manage 'doctors' with useState
 	// For now, we'll just use the imported list for display
+	const auth = getAuth();
+	const navigate = useNavigate();
 	const [doctors] = useState(initialDoctors);
 	const [showModal, setShowModal] = useState(false);
+	const [email, setEmail] = useState('');
 	const [newDoctor, setNewDoctor] = useState<DoctorFormData>(initialDoctorFormData);
+	const [password, setPassword] = useState('');
+	const [error, setError] = useState('');
+
+	const openModal = () => {
+		//setNewDoctor(initialDoctorFormData); // Reset form when opening
+		setShowModal(true);
+	};
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
 		const { name, value } = e.target;
 		setNewDoctor(prev => ({ ...prev, [name]: value }));
 	};
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		// For UI only, we'll just log the data and close the modal
-		console.log('New Doctor Data:', newDoctor);
-		// Here you would typically send data to a backend or update global state
-		alert(`Doctor ${newDoctor.name} "created" (check console).`);
+	const handleCancel = () => {
 		setShowModal(false);
-		setNewDoctor(initialDoctorFormData); // Reset form
 	};
 
-	const openModal = () => {
-		setNewDoctor(initialDoctorFormData); // Reset form when opening
-		setShowModal(true);
-	};
+	const signUpWithEmail = async () => {
+		if (password !== confirmPassword) {
+			setError('Passwords do not match.');
+			return;
+		}
 
-	const closeModal = () => {
-		setShowModal(false);
+		setAuthing(true);
+		setError('');
+
+		createUserWithEmailAndPassword(auth, email, password)
+			.then(response => {
+				console.log(response.user.uid);
+				navigate('/');
+			})
+			.catch(error => {
+				console.log(error);
+				setError(error.message);
+				setAuthing(false);
+			});
 	};
 
 	return (
@@ -81,7 +99,7 @@ export default function TeamList() {
 				<div className='fixed inset-0 z-40 flex justify-center items-center p-4'>
 					<div className='bg-white p-6 rounded-lg shadow-xl w-full max-w-md z-50'>
 						<h2 className='text-xl font-semibold mb-4'>Adicionar Novo Médico</h2>
-						<form onSubmit={handleSubmit} className='space-y-4'>
+						<form className='space-y-4'>
 							<div>
 								<label htmlFor='name' className='block text-sm font-medium text-gray-700'>
 									Nome
@@ -156,7 +174,7 @@ export default function TeamList() {
 							<div className='flex justify-end space-x-3 pt-4'>
 								<button
 									type='button'
-									onClick={closeModal}
+									onClick={handleCancel}
 									className='px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
 								>
 									Cancelar

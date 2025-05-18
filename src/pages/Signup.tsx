@@ -8,8 +8,8 @@ const Signup = () => {
 
 	const [authing, setAuthing] = useState(false);
 	const [email, setEmail] = useState('');
-	const [confirmPassword, setConfirmPassword] = useState('');
 	const [password, setPassword] = useState('');
+	const [confirmPassword, setConfirmPassword] = useState('');
 	const [error, setError] = useState('');
 
 	const signUpWithGoogle = async () => {
