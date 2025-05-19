@@ -4,7 +4,7 @@ import { patients } from './_PatientList';
 export default function PatientList() {
 	return (
 		<div className='p-6'>
-			<h1 className='text-2xl font-bold mb-4'>Equipa Médica</h1>
+			<h1 className='text-2xl font-bold mb-4'>Total Pacientes</h1>
 			<ul className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
 				{patients.map((patient, index) => (
 					<li key={index} className='bg-white p-4 rounded shadow flex items-center space-x-4'>
