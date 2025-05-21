@@ -1,37 +1,47 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+// src/contexts/AuthContext.tsx
+import { createContext, useEffect, useState, useContext } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { auth, db } from '../lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../lib/firebase';
 
-interface AuthContextType {
+type Role = 'admin' | 'doctor' | 'patient' | null;
+
+type AuthContextType = {
 	user: User | null;
-	role: 'admin' | 'client' | null;
+	role: Role;
+	setUser: React.Dispatch<React.SetStateAction<User | null>>;
+	setRole: React.Dispatch<React.SetStateAction<Role>>;
 	loading: boolean;
-}
+};
 
-const AuthContext = createContext<AuthContextType>({ user: null, role: null, loading: true });
+const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const [user, setUser] = useState<User | null>(null);
-	const [role, setRole] = useState<'admin' | 'client' | null>(null);
+	const [role, setRole] = useState<Role>(null);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		const unsubscribe = onAuthStateChanged(auth, async firebaseUser => {
-			setUser(firebaseUser);
 			if (firebaseUser) {
+				console.log('aqui');
+
+				setUser(firebaseUser);
 				const docRef = doc(db, 'users', firebaseUser.uid);
 				const docSnap = await getDoc(docRef);
-				if (docSnap.exists()) setRole(docSnap.data().role);
+				const data = docSnap.data();
+				setRole(data?.role || null);
 			} else {
+				setUser(null);
 				setRole(null);
 			}
 			setLoading(false);
 		});
+
 		return () => unsubscribe();
 	}, []);
 
-	return <AuthContext.Provider value={{ user, role, loading }}>{children}</AuthContext.Provider>;
+	return <AuthContext.Provider value={{ user, role, setUser, setRole, loading }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => useContext(AuthContext);

@@ -1,19 +1,19 @@
+// App.tsx
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './layouts/Navbar';
+
 import PatientsLista from './pages/admin/Patients';
 import ScheduleAppointment from './pages/admin/ScheduleAppointment';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import AuthRoute from './pages/AuthRoute';
 import TeamList from './pages/admin/doctor/data/_TeamList';
 import PatientList from './pages/patient/data/PatientLista';
 import Agenda from './pages/doctor/Agenda';
 
-
 import ProtectedRoute from './routes/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 
-function App() {
+function AppRoutes() {
 	const location = useLocation();
 
 	return (
@@ -24,56 +24,65 @@ function App() {
 				<Route path='/login' element={<Login />} />
 				<Route path='/signup' element={<Signup />} />
 
+				{/* ADMIN */}
 				<Route
 					path='/'
 					element={
-						<AuthRoute>
+						<ProtectedRoute allowedRoles={['admin']}>
 							<PatientsLista />
-						</AuthRoute>
-					}
-				/>
-				<Route
-					path='/medicos'
-					element={
-						<AuthRoute>
-							<TeamList />
-						</AuthRoute>
-					}
-				/>
-				<Route
-					path='/pacientes'
-					element={
-						<AuthRoute>
-							<PatientList />
-						</AuthRoute>
+						</ProtectedRoute>
 					}
 				/>
 				<Route
 					path='/marcar-consulta'
 					element={
-						<AuthRoute>
+						<ProtectedRoute allowedRoles={['admin']}>
 							<ScheduleAppointment />
-						</AuthRoute>
-					}
-				/>
-				<Route
-					path='/agenda'
-					element={
-						<AuthRoute>
-							<Agenda />
-						</AuthRoute>
+						</ProtectedRoute>
 					}
 				/>
 
-				{/* Erro 404 */}
+				{/* DOCTOR */}
+				<Route
+					path='/agenda'
+					element={
+						<ProtectedRoute allowedRoles={['admin, doctor']}>
+							<Agenda />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path='/medicos'
+					element={
+						<ProtectedRoute allowedRoles={['admin, doctor']}>
+							<TeamList />
+						</ProtectedRoute>
+					}
+				/>
+
+				{/* PATIENT */}
+				<Route
+					path='/pacientes'
+					element={
+						<ProtectedRoute allowedRoles={['patient', 'admin']}>
+							<PatientList />
+						</ProtectedRoute>
+					}
+				/>
+
+				{/* Fallback para rota inexistente */}
 				<Route path='*' element={<Navigate to='/' replace />} />
 			</Routes>
 		</>
 	);
 }
 
-export default () => (
-	<Router>
-		<App />
-	</Router>
-);
+export default function App() {
+	return (
+		<Router>
+			<AuthProvider>
+				<AppRoutes />
+			</AuthProvider>
+		</Router>
+	);
+}

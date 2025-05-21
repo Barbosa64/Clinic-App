@@ -4,7 +4,7 @@ import React from 'react';
 const specialties = ['Cardiologia', 'Dermatologia', 'Pediatria', 'Ortopedia', 'Ginecologia', 'Clinica Geral'];
 
 const doctors = [
-	{ name: 'Dr. Ana Silva', specialty: 'Cardiologia' },
+	{ name: 'Dra. Ana Silva', specialty: 'Cardiologia' },
 	{ name: 'Dr. João Sousa', specialty: 'Dermatologia' },
 	{ name: 'Dra. Paula Lima', specialty: 'Pediatria' },
 	{ name: 'Dr. Marco Castro', specialty: 'Ortopedia' },
