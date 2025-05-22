@@ -12,7 +12,7 @@ import PatientList from './pages/patient/data/PatientList';
 import ProtectedRoute from './routes/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 
-
+import Patients from './pages/admin/Patients';
 
 function AppRoutes() {
 	const location = useLocation();
@@ -47,7 +47,7 @@ function AppRoutes() {
 				<Route
 					path='/agenda'
 					element={
-						<ProtectedRoute allowedRoles={["admin", "doctor"]}>
+						<ProtectedRoute allowedRoles={['admin', 'doctor']}>
 							<Agenda />
 						</ProtectedRoute>
 					}
@@ -55,7 +55,7 @@ function AppRoutes() {
 				<Route
 					path='/medicos'
 					element={
-						<ProtectedRoute allowedRoles={["admin", "doctor"]}>
+						<ProtectedRoute allowedRoles={['admin', 'doctor']}>
 							<TeamList />
 						</ProtectedRoute>
 					}
@@ -70,7 +70,15 @@ function AppRoutes() {
 						</ProtectedRoute>
 					}
 				/>
-				
+
+				<Route
+					path='/pacientes/:id'
+					element={
+						<ProtectedRoute allowedRoles={['admin', 'doctor']}>
+							<Patients />
+						</ProtectedRoute>
+					}
+				/>
 
 				{/* Fallback para rota inexistente */}
 				<Route path='*' element={<Navigate to='/' replace />} />

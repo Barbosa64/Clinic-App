@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Patient } from '../pages/patient/data/types';
@@ -29,9 +29,7 @@ export default function SidebarPatients() {
 
 		fetchPatients();
 	}, []);
-	const handlePatientClick = (id: string) => {
-		navigate(`/patient/${id}`);
-	};
+
 	const filteredPatients = patients.filter(patient => patient.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
 	return (
@@ -42,8 +40,8 @@ export default function SidebarPatients() {
 			<input type='text' placeholder='Procurar...' value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className='mb-4 p-2 w-full border rounded' />
 			<ul className='space-y-4 overflow-y-auto max-h-64 sm:max-h-none'>
 				{filteredPatients.map(patient => (
-					<li key={patient.id} className='flex justify-between gap-x-6 p-5 items-center' onClick={() => handlePatientClick(patient.id)}>
-						<img src={patient.imageUrl || 'https://via.placeholder.com/40'} alt={patient.name} className='h-10 w-10 rounded-full' />
+					<li key={patient.id} className='flex justify-between gap-x-6 p-5 items-center' onClick={() => navigate(`/pacientes/${patient.id}`)}>
+						<img src={patient.imageUrl || 'nao existe'} alt={patient.name} className='h-10 w-10 rounded-full' />
 						<div className='min-w-0 flex-auto'>
 							<p className='text-sm font-semibold leading-6 text-gray-900'>{patient.name}</p>
 							<p className='mt-1 truncate text-xs leading-5 text-gray-500'>

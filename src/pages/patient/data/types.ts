@@ -6,4 +6,5 @@ export type Patient = {
 	imageUrl?: string;
 	phone?: string;
 	insurance?: string;
+	birthDate: string;
 };
