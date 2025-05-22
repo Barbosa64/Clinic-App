@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDocs, collection } from 'firebase/firestore';
 import { db } from '../../../../lib/firebase';
 
 export default function TeamList() {
@@ -14,6 +14,8 @@ export default function TeamList() {
 	const [showModal, setShowModal] = useState(false);
 
 	const [error, setError] = useState('');
+
+	const specialty = ['Cardiologia', 'Dermatologia', 'Endocrinologia', 'Ginecologia', 'Ortopedia', 'Pediatria', 'Urologia'];
 
 	const openModal = () => {
 		setShowModal(true);
@@ -31,6 +33,7 @@ export default function TeamList() {
 			await setDoc(doc(db, 'users', user.uid), {
 				UID: user.uid,
 				role: role,
+				specialty: specialty,
 			});
 
 			navigate('/');
@@ -52,9 +55,9 @@ export default function TeamList() {
 				<li className='bg-white p-4 rounded shadow flex items-center space-x-4'>
 					<img src='https://via.placeholder.com/64' alt='Doctor name' className='h-16 w-16 rounded-full object-cover' />
 					<div>
-						<p className='font-semibold'>Nome</p>
-						<p className='text-sm text-gray-500'>Especialidade</p>
-						<p className='text-xs text-gray-400'>Email</p>
+						<p className='font-semibold'>fwwfwewfewfwe</p>
+						<p className='text-sm text-gray-500'>fwwefwfefwefw</p>
+						<p className='text-xs text-gray-400'>derfwefwe</p>
 					</div>
 					<button className='ml-auto text-red-600 hover:text-white border border-red-600 hover:bg-red-600 rounded px-3 py-1 text-sm font-semibold transition-colors duration-200'>Eliminar</button>
 				</li>
@@ -125,6 +128,11 @@ export default function TeamList() {
 								</label>
 								<select name='specialty' id='specialty' className='border w-full p-2 rounded' required>
 									<option value=''>Selecione uma especialidade</option>
+									{specialty.map((item, index) => (
+										<option key={index} value={item}>
+											{item.charAt(0).toUpperCase() + item.slice(1)}
+										</option>
+									))}
 								</select>
 							</div>
 							<div>
