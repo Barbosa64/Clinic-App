@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // Certifique-se que este path está correto
+import { useAuth } from '../context/AuthContext';
 
 type Props = {
 	children: JSX.Element;

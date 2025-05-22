@@ -12,6 +12,8 @@ import PatientList from './pages/patient/data/PatientList';
 import ProtectedRoute from './routes/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 
+
+
 function AppRoutes() {
 	const location = useLocation();
 
@@ -68,6 +70,7 @@ function AppRoutes() {
 						</ProtectedRoute>
 					}
 				/>
+				
 
 				{/* Fallback para rota inexistente */}
 				<Route path='*' element={<Navigate to='/' replace />} />
