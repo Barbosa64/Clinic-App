@@ -1,54 +1,89 @@
-import { useState } from 'react';
-import React from 'react';
-
-const specialties = ['Cardiologia', 'Dermatologia', 'Pediatria', 'Ortopedia', 'Ginecologia', 'Clinica Geral'];
-
-const doctors = [
-	{ name: 'Dra. Ana Silva', specialty: 'Cardiologia' },
-	{ name: 'Dr. João Sousa', specialty: 'Dermatologia' },
-	{ name: 'Dra. Paula Lima', specialty: 'Pediatria' },
-	{ name: 'Dr. Marco Castro', specialty: 'Ortopedia' },
-	{ name: 'Dra. Anabela Pereira', specialty: 'Ginecologia' },
-	{ name: 'Dr. Roberto Henriques', specialty: 'Clinica Geral' },
-];
+import { useState, useEffect } from 'react';
+import { db } from '../../lib/firebase';
+import { collection, query, where, getDocs, addDoc, Timestamp, doc, getDoc } from 'firebase/firestore';
+import { useAuth } from '../../context/AuthContext';
 
 export default function ScheduleAppointment() {
+	const [specialties, setSpecialties] = useState<string[]>([]);
+	const [doctors, setDoctors] = useState<any[]>([]);
+	const [patients, setPatients] = useState<any[]>([]);
+
+	const [selectedPatientId, setSelectedPatientId] = useState('');
 	const [selectedSpecialty, setSelectedSpecialty] = useState('');
-	const [selectedDoctor, setSelectedDoctor] = useState('');
+	const [selectedDoctorId, setSelectedDoctorId] = useState('');
+	const [appointmentDate, setAppointmentDate] = useState('');
 	const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
-	const availableDoctors = doctors.filter(doc => doc.specialty === selectedSpecialty);
+	const { user } = useAuth();
 
-	const handleSubmit = (e: React.FormEvent) => {
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const doctorQuery = query(collection(db, 'users'), where('role', '==', 'doctor'));
+				const patientQuery = query(collection(db, 'users'), where('role', '==', 'patient'));
+
+				const [doctorSnap, patientSnap] = await Promise.all([getDocs(doctorQuery), getDocs(patientQuery)]);
+
+				const fetchedDoctors = doctorSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+				const fetchedPatients = patientSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+				setDoctors(fetchedDoctors);
+				setPatients(fetchedPatients);
+
+				
+				const specialtiesSet = new Set<string>();
+				fetchedDoctors.forEach(doctor => {
+					if (Array.isArray(doctor.specialty)) {
+						doctor.specialty.forEach((spec: string) => specialtiesSet.add(spec));
+					}
+				});
+				setSpecialties(Array.from(specialtiesSet));
+			} catch (error) {
+				console.error('Erro ao buscar dados:', error);
+			}
+		};
+
+		fetchData();
+	}, []);
+
+	const availableDoctors = doctors.filter(d => Array.isArray(d.specialty) && d.specialty.includes(selectedSpecialty));
+
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-
-		if (!selectedSpecialty || !selectedDoctor) {
-			alert('Por favor, selecione especialidade e médico.');
+		if (!selectedDoctorId || !appointmentDate || !selectedPatientId) {
+			alert('Preencha todos os campos.');
 			return;
 		}
 
 		setStatus('loading');
 
 		try {
-			// Pega nas consultas já salvas, ou cria array vazio
-			const existingAppointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+			// Buscar dados do médico selecionado para pegar o nome e especialidade
+			const doctorDoc = await getDoc(doc(db, 'users', selectedDoctorId));
+			if (!doctorDoc.exists()) {
+				alert('Dados do médico não encontrados!');
+				setStatus('error');
+				return;
+			}
 
-			// Cria nova consulta
-			const newAppointment = {
-				doctor: selectedDoctor,
-				specialty: selectedSpecialty,
-				timestamp: new Date().toISOString(),
-			};
+			const doctorData = doctorDoc.data();
 
-			// Guarda no localStorage
-			localStorage.setItem('appointments', JSON.stringify([...existingAppointments, newAppointment]));
+			await addDoc(collection(db, 'Appointments'), {
+				doctorId: selectedDoctorId,
+				doctorName: doctorData?.name || 'Desconhecido',
+				specialty: Array.isArray(doctorData?.specialty) ? doctorData.specialty[0] : 'N/A',
+				patientId: selectedPatientId,
+				date: Timestamp.fromDate(new Date(appointmentDate)),
+			});
 
 			setStatus('success');
 			alert('Consulta marcada com sucesso!');
 			setSelectedSpecialty('');
-			setSelectedDoctor('');
+			setSelectedDoctorId('');
+			setSelectedPatientId('');
+			setAppointmentDate('');
 		} catch (error) {
-			console.error(error);
+			console.error('Erro ao marcar consulta:', error);
 			setStatus('error');
 			alert('Erro ao marcar consulta.');
 		}
@@ -56,9 +91,21 @@ export default function ScheduleAppointment() {
 
 	return (
 		<div className='p-8'>
-			<h1 className='text-2xl font-bold mb-6'>Marcar Consulta</h1>
+			<h1 className='text-2xl font-bold mb-6'>Marcar Consulta (Admin)</h1>
 
 			<form onSubmit={handleSubmit} className='space-y-4 max-w-md'>
+				<div>
+					<label className='block mb-1 font-medium'>Paciente:</label>
+					<select className='border w-full p-2 rounded' value={selectedPatientId} onChange={e => setSelectedPatientId(e.target.value)}>
+						<option value=''>Selecione um paciente</option>
+						{patients.map(p => (
+							<option key={p.id} value={p.id}>
+								{p.name || p.email}
+							</option>
+						))}
+					</select>
+				</div>
+
 				<div>
 					<label className='block mb-1 font-medium'>Especialidade:</label>
 					<select
@@ -66,7 +113,7 @@ export default function ScheduleAppointment() {
 						value={selectedSpecialty}
 						onChange={e => {
 							setSelectedSpecialty(e.target.value);
-							setSelectedDoctor('');
+							setSelectedDoctorId('');
 						}}
 					>
 						<option value=''>Selecione uma especialidade</option>
@@ -81,19 +128,24 @@ export default function ScheduleAppointment() {
 				{selectedSpecialty && (
 					<div>
 						<label className='block mb-1 font-medium'>Médico:</label>
-						<select className='border w-full p-2 rounded' value={selectedDoctor} onChange={e => setSelectedDoctor(e.target.value)}>
+						<select className='border w-full p-2 rounded' value={selectedDoctorId} onChange={e => setSelectedDoctorId(e.target.value)}>
 							<option value=''>Selecione um médico</option>
 							{availableDoctors.map(doc => (
-								<option key={doc.name} value={doc.name}>
-									{doc.name}
+								<option key={doc.id} value={doc.id}>
+									{doc.name} - {doc.specialty.join(', ')}
 								</option>
 							))}
 						</select>
 					</div>
 				)}
 
-				<button type='submit' className='mt-4 px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600 transition' disabled={!selectedSpecialty || !selectedDoctor || status === 'loading'}>
-					{status === 'loading' ? 'A enviar...' : 'Marcar Consulta'}
+				<div>
+					<label className='block mb-1 font-medium'>Data da Consulta:</label>
+					<input type='datetime-local' className='border w-full p-2 rounded' value={appointmentDate} onChange={e => setAppointmentDate(e.target.value)} />
+				</div>
+
+				<button type='submit' className='mt-4 px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600 transition' disabled={status === 'loading'}>
+					{status === 'loading' ? 'Marcando...' : 'Marcar Consulta'}
 				</button>
 			</form>
 		</div>
