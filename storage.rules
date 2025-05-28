@@ -1,0 +1,75 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
+    }
+
+    function isDoctor() {
+      return request.auth != null &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "doctor";
+    }
+
+    function isPatient() {
+      return request.auth != null &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "patient";
+    }
+
+    match /users/{userId} {
+      allow read, write: if isAdmin() || request.auth != null && request.auth.uid == userId;
+    }
+
+    match /Appointments/{appointmentId} {
+      // Admins podem tudo
+      allow read, write: if isAdmin();
+
+      // Pacientes podem ler apenas suas consultas
+      allow read: if isPatient() && request.auth.uid == resource.data.patientId;
+
+      // Pacientes podem criar consultas para si mesmos
+      allow create: if isPatient() && request.resource.data.patientId == request.auth.uid;
+
+      // Médicos podem ver consultas em que são responsáveis
+      allow read: if isDoctor() && request.auth.uid == resource.data.doctorId;
+
+      // Médicos e pacientes não podem editar nem deletar por padrão
+      allow update, delete: if false;
+    }
+
+    match /LabResults/{resultId} {
+      // Paciente pode visualizar seus próprios exames
+      allow read: if isPatient() && request.auth.uid == resource.data.patientId;
+
+      // Médicos e admins podem ler e escrever
+      allow read, write: if isDoctor() || isAdmin();
+
+      // Apenas admin pode deletar (ou adicione isDoctor() se quiser permitir também)
+      allow delete: if isAdmin();
+    }
+
+    // Bloqueia tudo o que não for definido acima
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /lab_results/{userId}/{fileName} {
+      // Paciente só pode visualizar os seus próprios exames
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // Médico pode visualizar, escrever e deletar exames de pacientes
+      allow read, write, delete: if request.auth != null &&
+        get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'doctor';
+
+      // Admin pode tudo
+      allow read, write, delete: if request.auth != null &&
+        get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+  }
+}

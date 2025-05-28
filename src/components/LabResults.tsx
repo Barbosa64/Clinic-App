@@ -8,12 +8,10 @@ import { useAuth } from '../context/AuthContext';
 interface LabResult {
 	id: string;
 	patientId: string;
-	uploadedBy: string;
 	fileName: string;
 	fileUrl: string;
-	uploadDate: string;
-	labType: string;
-	status: string;
+	uploadAt: string;
+	type: string;
 }
 
 const LabResults: React.FC = () => {
@@ -48,22 +46,41 @@ const LabResults: React.FC = () => {
 	}, [user]);
 
 	const handleUpload = async () => {
-		if (!file || !labType || selectedPatientId === 'SELECIONAR_PACIENTE') return;
-		setLoading(true);
-		try {
-			const fileRef = ref(storage, `${selectedPatientId}/${file.name}`);
-			await uploadBytes(fileRef, file);
-			const url = await getDownloadURL(fileRef);
+		if (!file || !labType || selectedPatientId === '') {
+			console.warn('Falta o arquivo, tipo do exame ou paciente');
+			return;
+		}
 
-			await addDoc(collection(db, 'LabResults'), {
+		setLoading(true);
+
+		try {
+			const timestamp = Date.now();
+			const fileName = `${timestamp}_${file.name}`;
+			const filePath = `${selectedPatientId}/${labType}/${fileName}`;
+			console.log('Iniciando upload para:', filePath);
+
+			const fileRef = ref(storage, filePath);
+
+			
+			const uploadResult = await uploadBytes(fileRef, file);
+			console.log('Upload concluído:', uploadResult);
+
+			
+			const url = await getDownloadURL(fileRef);
+			console.log('URL obtida:', url);
+
+			// Adiciona documento no Firestore
+			const docRef = await addDoc(collection(db, 'LabResults'), {
 				patientId: selectedPatientId,
 				uploadedBy: user?.uid,
-				fileName: file.name,
+				fileName,
 				fileUrl: url,
 				uploadDate: new Date().toISOString(),
 				labType,
 				status: 'Disponível',
 			});
+
+			console.log('Documento Firestore criado com ID:', docRef.id);
 
 			setFile(null);
 			setLabType('');
@@ -74,6 +91,7 @@ const LabResults: React.FC = () => {
 			setLoading(false);
 		}
 	};
+
 
 	const handleDelete = async (result: LabResult) => {
 		try {
@@ -103,7 +121,7 @@ const LabResults: React.FC = () => {
 				{labResults.map(result => (
 					<li key={result.id} className='flex justify-between items-center border p-2 rounded'>
 						<div>
-							<p className='font-semibold'>{result.labType}</p>
+							<p className='font-semibold'>{result.type}</p>
 							<a href={result.fileUrl} target='_blank' rel='noopener noreferrer' className='text-blue-500'>
 								Ver resultado
 							</a>
