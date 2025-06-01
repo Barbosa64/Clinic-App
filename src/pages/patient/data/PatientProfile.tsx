@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
@@ -20,7 +20,7 @@ export default function PatientProfile() {
 		fetchPatient();
 	}, [id]);
 
-	if (!patient) return <p>Carregando ficha do paciente...</p>;
+	if (!patient) return <p>A carregar ficha do paciente...</p>;
 
 	return (
 		<div className='p-6'>

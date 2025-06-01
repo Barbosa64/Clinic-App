@@ -5,6 +5,7 @@ import DiagnosticList from '../../components/DiagnosticList';
 import PatientProfileCard from '../../components/PatientProfileCard';
 import LabResults from '../../components/LabResults';
 import { useParams } from 'react-router-dom';
+import FarmacoTest from '../../components/RecipeDoctor';
 
 export default function PatientsPage() {
 	const { id } = useParams();
@@ -20,6 +21,7 @@ export default function PatientsPage() {
 				<aside className='col-span-1 space-y-4'>
 					{id ? <PatientProfileCard id={id} /> : <p className='text-center'>Selecione um paciente</p>}
 					<LabResults />
+					<FarmacoTest />
 				</aside>
 			</main>
 		</div>
