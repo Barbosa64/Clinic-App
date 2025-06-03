@@ -12,7 +12,6 @@ import PatientList from './pages/patient/data/PatientList';
 import ProtectedRoute from './routes/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import FarmacoTest from './components/RecipeDoctor';
-
 import Patients from './pages/admin/Patients';
 
 function AppRoutes() {

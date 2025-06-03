@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { db } from '../lib/firebase';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { useAuth } from '../context/AuthContext';
 
 const farmacos = ['Paracetamol', 'Ibuprofeno', 'Amoxicilina'];
 
@@ -12,16 +13,27 @@ interface Prescricao {
 }
 
 interface Props {
-	patientId: string; // ID do paciente passado como prop testar
+	patientId: string;
 }
 
 const FarmacoTest = ({ patientId }: Props) => {
+	const { user, role, loading } = useAuth();
 	const [form, setForm] = useState<Prescricao>({
 		farmaco: '',
 		dose: '',
 		frequencia: '',
 		observacoes: '',
 	});
+
+	if (loading) return <p>Carregando...</p>;
+
+	if (!user) {
+		return <p>Você precisa estar logado para prescrever.</p>;
+	}
+
+	if (role !== 'doctor') {
+		return <p>Você precisa ser médico para prescrever.</p>;
+	}
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
 		const { name, value } = e.target;
@@ -35,6 +47,7 @@ const FarmacoTest = ({ patientId }: Props) => {
 			await addDoc(collection(db, 'receitas'), {
 				...form,
 				patientId,
+				doctorId: user.uid,
 				criadoEm: Timestamp.now(),
 			});
 
@@ -90,75 +103,3 @@ const FarmacoTest = ({ patientId }: Props) => {
 };
 
 export default FarmacoTest;
-
-/*import React, { useState } from 'react';
-
-const farmacos = ['Paracetamol', 'Ibuprofeno'];
-
-interface Prescricao {
-	farmaco: string;
-	dose: string;
-	frequencia: string;
-	observacoes: string;
-}
-
-const FarmacoTest = () => {
-	const [form, setForm] = useState<Prescricao>({
-		farmaco: '',
-		dose: '',
-		frequencia: '',
-		observacoes: '',
-	});
-
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-		const { name, value } = e.target;
-		setForm(prev => ({ ...prev, [name]: value }));
-	};
-
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		console.log('Prescrição:', form);
-		// Aqui você pode enviar para um backend, salvar em localStorage, etc.
-		alert('Prescrição registrada com sucesso!');
-	};
-
-	return (
-		<form onSubmit={handleSubmit} className='flex flex-col space-y-4 p-4 bg-gray-800 rounded-xl text-white'>
-			<h2 className='text-xl font-bold'>Prescrever Fármaco</h2>
-
-			<div>
-				<label className='block mb-1'>Fármaco</label>
-				<select name='farmaco' value={form.farmaco} onChange={handleChange} className='w-full p-2 rounded bg-white text-black' required>
-					<option value=''>Selecione</option>
-					{farmacos.map((f, idx) => (
-						<option key={idx} value={f}>
-							{f}
-						</option>
-					))}
-				</select>
-			</div>
-
-			<div>
-				<label className='block mb-1'>Dose</label>
-				<input type='text' name='dose' value={form.dose} onChange={handleChange} placeholder='Ex: 500mg' className='w-full p-2 rounded text-black' required />
-			</div>
-
-			<div>
-				<label className='block mb-1'>Frequência</label>
-				<input type='text' name='frequencia' value={form.frequencia} onChange={handleChange} placeholder='Ex: 2x ao dia' className='w-full p-2 rounded text-black' required />
-			</div>
-
-			<div>
-				<label className='block mb-1'>Observações</label>
-				<textarea name='observacoes' value={form.observacoes} onChange={handleChange} placeholder='Instruções adicionais...' className='w-full p-2 rounded text-black' />
-			</div>
-
-			<button type='submit' className='bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded'>
-				Prescrever
-			</button>
-		</form>
-	);
-};
-
-export default FarmacoTest;
-*/
