@@ -30,7 +30,6 @@ export default function ScheduleAppointment() {
 				setDoctors(fetchedDoctors);
 				setPatients(fetchedPatients);
 
-				
 				const specialtiesSet = new Set<string>();
 				fetchedDoctors.forEach(doctor => {
 					if (Array.isArray(doctor.specialty)) {
@@ -58,21 +57,28 @@ export default function ScheduleAppointment() {
 		setStatus('loading');
 
 		try {
-			// Buscar dados do médico selecionado para pegar o nome e especialidade
 			const doctorDoc = await getDoc(doc(db, 'users', selectedDoctorId));
 			if (!doctorDoc.exists()) {
 				alert('Dados do médico não encontrados!');
 				setStatus('error');
 				return;
 			}
-
 			const doctorData = doctorDoc.data();
+
+			const patientDoc = await getDoc(doc(db, 'users', selectedPatientId));
+			if (!patientDoc.exists()) {
+				alert('Dados do paciente não encontrados!');
+				setStatus('error');
+				return;
+			}
+			const patientData = patientDoc.data();
 
 			await addDoc(collection(db, 'Appointments'), {
 				doctorId: selectedDoctorId,
 				doctorName: doctorData?.name || 'Desconhecido',
-				specialty: Array.isArray(doctorData?.specialty) ? doctorData.specialty[0] : 'N/A',
+				specialty: Array.isArray(doctorData?.specialty) ? selectedSpecialty : 'N/A',
 				patientId: selectedPatientId,
+				patientName: patientData?.name || patientData?.email || 'Desconhecido',
 				date: Timestamp.fromDate(new Date(appointmentDate)),
 			});
 
