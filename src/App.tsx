@@ -11,6 +11,7 @@ import Agenda from './pages/doctor/Agenda';
 import PatientList from './pages/patient/data/PatientList';
 import ProtectedRoute from './routes/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
+import FarmacoTest from './components/RecipeDoctor';
 
 import Patients from './pages/admin/Patients';
 
@@ -29,7 +30,7 @@ function AppRoutes() {
 				<Route
 					path='/'
 					element={
-						<ProtectedRoute allowedRoles={['admin']}>
+						<ProtectedRoute allowedRoles={['admin', 'doctor', 'patient']}>
 							<PatientsLista />
 						</ProtectedRoute>
 					}
@@ -37,8 +38,16 @@ function AppRoutes() {
 				<Route
 					path='/marcar-consulta'
 					element={
-						<ProtectedRoute allowedRoles={['admin']}>
+						<ProtectedRoute allowedRoles={['admin', 'doctor']}>
 							<ScheduleAppointment />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path='/receita'
+					element={
+						<ProtectedRoute allowedRoles={['admin', 'doctor']}>
+							<FarmacoTest />
 						</ProtectedRoute>
 					}
 				/>
@@ -65,7 +74,7 @@ function AppRoutes() {
 				<Route
 					path='/pacientes'
 					element={
-						<ProtectedRoute allowedRoles={['patient', 'admin']}>
+						<ProtectedRoute allowedRoles={['patient', 'doctor', 'admin']}>
 							<PatientList />
 						</ProtectedRoute>
 					}

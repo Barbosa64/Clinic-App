@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { collection, query, where, getDocs, DocumentData } from 'firebase/firestore';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { getAuth } from 'firebase/auth';
 
 type Appointment = {
 	id: string;
@@ -12,7 +13,7 @@ type Appointment = {
 };
 
 type Props = {
-	patientId: string;
+	patientId?: string;
 };
 
 export default function AppointmentsHistory({ patientId }: Props) {
@@ -23,7 +24,37 @@ export default function AppointmentsHistory({ patientId }: Props) {
 	useEffect(() => {
 		const fetchAppointments = async () => {
 			try {
-				const q = query(collection(db, 'Appointments'), where('patientId', '==', patientId));
+				const auth = getAuth();
+				const currentUser = auth.currentUser;
+				if (!currentUser) return;
+
+				// Busca o perfil do usuário para saber o role
+				const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+				if (!userDoc.exists()) throw new Error('Usuário não encontrado');
+				const userData = userDoc.data() as any;
+
+				let q;
+
+				if (userData.role === 'patient') {
+					if (!patientId) {
+						setLoading(false);
+						return;
+					}
+					q = query(collection(db, 'Appointments'), where('patientId', '==', patientId));
+				} else if (userData.role === 'doctor') {
+					q = query(collection(db, 'Appointments'), where('doctorId', '==', currentUser.uid));
+				} else if (userData.role === 'admin') {
+					// Admin vê tudo, pode buscar tudo ou filtrar por paciente se quiser
+					if (patientId) {
+						q = query(collection(db, 'Appointments'), where('patientId', '==', patientId));
+					} else {
+						q = collection(db, 'Appointments'); // Pega todas as consultas
+					}
+				} else {
+					setLoading(false);
+					return;
+				}
+
 				const querySnapshot = await getDocs(q);
 
 				const now = new Date();
@@ -32,9 +63,8 @@ export default function AppointmentsHistory({ patientId }: Props) {
 
 				for (const docSnap of querySnapshot.docs) {
 					const data = docSnap.data() as DocumentData;
-					const apptDate = data.date.toDate(); // CORREÇÃO AQUI
+					const apptDate = data.date.toDate();
 
-					
 					const doctorDoc = await getDoc(doc(db, 'users', data.doctorId));
 					const doctorData = doctorDoc.exists() ? doctorDoc.data() : null;
 
@@ -53,7 +83,6 @@ export default function AppointmentsHistory({ patientId }: Props) {
 					}
 				}
 
-				// Sort by date
 				upcoming.sort((a, b) => a.date.getTime() - b.date.getTime());
 				past.sort((a, b) => b.date.getTime() - a.date.getTime());
 
@@ -66,9 +95,7 @@ export default function AppointmentsHistory({ patientId }: Props) {
 			}
 		};
 
-		if (patientId) {
-			fetchAppointments();
-		}
+		fetchAppointments();
 	}, [patientId]);
 
 	if (loading) return <p className='text-center'>Carregando consultas...</p>;

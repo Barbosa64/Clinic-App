@@ -12,7 +12,7 @@ interface Prescricao {
 }
 
 interface Props {
-	patientId: string; // ID do paciente passado como prop
+	patientId: string; // ID do paciente passado como prop testar
 }
 
 const FarmacoTest = ({ patientId }: Props) => {
@@ -32,7 +32,7 @@ const FarmacoTest = ({ patientId }: Props) => {
 		e.preventDefault();
 
 		try {
-			await addDoc(collection(db, 'prescricoes'), {
+			await addDoc(collection(db, 'receitas'), {
 				...form,
 				patientId,
 				criadoEm: Timestamp.now(),
