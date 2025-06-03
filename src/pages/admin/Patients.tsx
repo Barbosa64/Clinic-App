@@ -9,6 +9,7 @@ import FarmacoTest from '../../components/RecipeDoctor';
 
 export default function PatientsPage() {
 	const { id } = useParams();
+
 	return (
 		<div className='flex'>
 			<SidebarPatients />
@@ -16,7 +17,8 @@ export default function PatientsPage() {
 				<section className='col-span-2 space-y-4'>
 					<AppointmentsHistory patientId={id} />
 					<PatientQuickStats />
-					<DiagnosticList />
+
+					<DiagnosticList patientId={id || ''} />
 				</section>
 				<aside className='col-span-1 space-y-4'>
 					{id ? <PatientProfileCard id={id} /> : <p className='text-center'>Selecione um paciente</p>}

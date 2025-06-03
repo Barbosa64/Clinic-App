@@ -11,7 +11,7 @@ import Agenda from './pages/doctor/Agenda';
 import PatientList from './pages/patient/data/PatientList';
 import ProtectedRoute from './routes/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
-import FarmacoTest from './components/RecipeDoctor';
+
 import Patients from './pages/admin/Patients';
 
 function AppRoutes() {
@@ -24,7 +24,6 @@ function AppRoutes() {
 			<Routes>
 				<Route path='/login' element={<Login />} />
 				<Route path='/signup' element={<Signup />} />
-
 				{/* ADMIN */}
 				<Route
 					path='/'
@@ -42,16 +41,7 @@ function AppRoutes() {
 						</ProtectedRoute>
 					}
 				/>
-				<Route
-					path='/receita'
-					element={
-						<ProtectedRoute allowedRoles={['admin', 'doctor']}>
-							<FarmacoTest />
-						</ProtectedRoute>
-					}
-				/>
-
-				{/* DOCTOR */}
+				«{/* DOCTOR */}
 				<Route
 					path='/agenda'
 					element={
@@ -68,7 +58,6 @@ function AppRoutes() {
 						</ProtectedRoute>
 					}
 				/>
-
 				{/* PATIENT */}
 				<Route
 					path='/pacientes'
@@ -78,7 +67,6 @@ function AppRoutes() {
 						</ProtectedRoute>
 					}
 				/>
-
 				<Route
 					path='/pacientes/:id'
 					element={
@@ -87,7 +75,6 @@ function AppRoutes() {
 						</ProtectedRoute>
 					}
 				/>
-
 				{/* Fallback para rota inexistente */}
 				<Route path='*' element={<Navigate to='/' replace />} />
 			</Routes>

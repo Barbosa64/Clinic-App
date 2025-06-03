@@ -1,4 +1,3 @@
-// ReceitaList.tsx
 import React, { useEffect, useState } from 'react';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -13,7 +12,11 @@ interface Receita {
 	criadoEm: any;
 }
 
-export default function ReceitaList({ patientId }: { patientId: string }) {
+interface Props {
+	patientId: string;
+}
+
+export default function ReceitaList({ patientId }: Props) {
 	const [receitas, setReceitas] = useState<Receita[]>([]);
 	const [error, setError] = useState<string | null>(null);
 
@@ -21,7 +24,6 @@ export default function ReceitaList({ patientId }: { patientId: string }) {
 		if (!patientId) return;
 
 		const q = query(collection(db, 'receitas'), where('patientId', '==', patientId));
-		
 
 		const unsubscribe = onSnapshot(
 			q,
