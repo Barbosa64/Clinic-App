@@ -3,7 +3,6 @@ import { getAuth, createUserWithEmailAndPassword, updateEmail, updatePassword } 
 import { doc, setDoc, getDocs, collection, query, where, deleteDoc } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useNavigate } from 'react-router-dom';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 interface Patient {
 	id: string;
@@ -17,7 +16,6 @@ interface Patient {
 export default function PatientList() {
 	const auth = getAuth();
 	const navigate = useNavigate();
-	const storage = getStorage();
 
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
@@ -135,21 +133,7 @@ export default function PatientList() {
 		}
 	};
 
-	const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (!e.target.files || e.target.files.length === 0) return;
-
-		const file = e.target.files[0];
-		const storageRef = ref(storage, `doctor_images/${file.name}_${Date.now()}`);
-
-		try {
-			await uploadBytes(storageRef, file);
-			const url = await getDownloadURL(storageRef);
-			setImageUrl(url);
-		} catch (error) {
-			console.error('Erro no upload da imagem:', error);
-			setError('Falha no upload da imagem. Tente novamente.');
-		}
-	};
+	const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {};
 
 	return (
 		<div className='p-6'>

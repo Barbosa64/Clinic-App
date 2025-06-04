@@ -46,6 +46,7 @@ const FarmacoTest = ({ patientId }: Props) => {
 		try {
 			await addDoc(collection(db, 'receitas'), {
 				...form,
+				consulta: Date,
 				patientId,
 				doctorId: user.uid,
 				criadoEm: Timestamp.now(),
@@ -80,19 +81,21 @@ const FarmacoTest = ({ patientId }: Props) => {
 				</select>
 			</div>
 
+
+
 			<div>
 				<label className='block mb-1'>Dose</label>
-				<input type='text' name='dose' value={form.dose} onChange={handleChange} placeholder='Ex: 500mg' className='w-full p-2 rounded text-black' required />
+				<input type='text' name='dose' value={form.dose} onChange={handleChange} placeholder='Ex: 500mg' className='w-full p-2 rounded bg-white text-black' required />
 			</div>
 
 			<div>
 				<label className='block mb-1'>Frequência</label>
-				<input type='text' name='frequencia' value={form.frequencia} onChange={handleChange} placeholder='Ex: 2x ao dia' className='w-full p-2 rounded text-black' required />
+				<input type='text' name='frequencia' value={form.frequencia} onChange={handleChange} placeholder='Ex: 2x ao dia' className='w-full p-2 rounded bg-white text-black' required />
 			</div>
 
 			<div>
 				<label className='block mb-1'>Observações</label>
-				<textarea name='observacoes' value={form.observacoes} onChange={handleChange} placeholder='Instruções adicionais...' className='w-full p-2 rounded text-black' />
+				<textarea name='observacoes' value={form.observacoes} onChange={handleChange} placeholder='Instruções adicionais...' className='w-full p-2 rounded bg-white text-black' />
 			</div>
 
 			<button type='submit' className='bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded'>
