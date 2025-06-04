@@ -48,6 +48,9 @@ const ListaPrescricoes = ({ patientId }: Props) => {
 							<strong>Fármaco:</strong> {p.farmaco}
 						</p>
 						<p>
+							<strong>Data da Consulta:</strong> {p.consultaId}
+						</p>
+						<p>
 							<strong>Dose:</strong> {p.dose}
 						</p>
 						<p>
