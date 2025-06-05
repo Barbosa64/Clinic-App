@@ -1,38 +1,65 @@
 import { useState, useEffect } from 'react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Patient } from '../pages/patient/data/types';
 import { useNavigate, useParams } from 'react-router-dom';
-
-// Definindo a estrutura de um paciente
+import { getAuth } from 'firebase/auth';
 
 export default function SidebarPatients() {
 	const [patients, setPatients] = useState<Patient[]>([]);
 	const [searchTerm, setSearchTerm] = useState('');
 	const navigate = useNavigate();
 	const { id: selectedPatientId } = useParams();
+	const auth = getAuth();
 
 	function classNames(...classes: string[]) {
 		return classes.filter(Boolean).join(' ');
 	}
+
 	useEffect(() => {
 		const fetchPatients = async () => {
 			try {
-				const q = query(collection(db, 'users'), where('role', '==', 'patient'));
-				const querySnapshot = await getDocs(q);
-				const fetchedPatients: Patient[] = querySnapshot.docs.map(doc => ({
-					id: doc.id,
-					...doc.data(),
-				})) as Patient[];
+				const user = auth.currentUser;
+				if (!user) {
+					setPatients([]);
+					return;
+				}
 
-				setPatients(fetchedPatients);
+				// Pega o papel do usuário logado
+				const userDocRef = doc(db, 'users', user.uid);
+				const userDocSnap = await getDoc(userDocRef);
+
+				if (!userDocSnap.exists()) {
+					setPatients([]);
+					return;
+				}
+
+				const userData = userDocSnap.data();
+				const role = userData.role;
+
+				if (role === 'patient') {
+					setPatients([
+						{
+							id: user.uid,
+							...userData,
+						},
+					]);
+				} else {
+					const q = query(collection(db, 'users'), where('role', '==', 'patient'));
+					const querySnapshot = await getDocs(q);
+					const fetchedPatients: Patient[] = querySnapshot.docs.map(doc => ({
+						id: doc.id,
+						...doc.data(),
+					})) as Patient[];
+					setPatients(fetchedPatients);
+				}
 			} catch (error) {
-				console.error('Erro ao buscar pacientes:', error);
+				console.error('Erro ao procurar pacientes:', error);
 			}
 		};
 
 		fetchPatients();
-	}, []);
+	}, [auth]);
 
 	const filteredPatients = patients.filter(patient => patient.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
