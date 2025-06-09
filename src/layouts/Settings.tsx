@@ -13,6 +13,8 @@ export default function PatientProfile() {
 	const [newPassword, setNewPassword] = useState('');
 	const [imageUrl, setImageUrl] = useState('');
 	const [currentPassword, setCurrentPassword] = useState('');
+	const [insurance, setInsurance] = useState('');
+	const [insuranceNumber, setInsuranceNumber] = useState('');
 	const [error, setError] = useState('');
 	const [success, setSuccess] = useState('');
 
@@ -32,6 +34,8 @@ export default function PatientProfile() {
 				setEmail(data.email || '');
 				setNewEmail(data.email || '');
 				setImageUrl(data.imageUrl || '');
+				setInsurance(data.insurance || '');
+				setInsuranceNumber(data.insuranceNumber || '');
 			}
 		} catch (err) {
 			console.error('Erro ao carregar dados:', err);
@@ -49,7 +53,7 @@ export default function PatientProfile() {
 			const isPasswordChanged = !!newPassword;
 
 			if ((isEmailChanged || isPasswordChanged) && !currentPassword) {
-				setError('Informe a senha atual para atualizar o e-mail ou senha.');
+				setError('Informe a password atual para atualizar o e-mail ou password.');
 				return;
 			}
 
@@ -67,16 +71,16 @@ export default function PatientProfile() {
 				await updatePassword(user, newPassword);
 			}
 
-			await setDoc(doc(db, 'users', user.uid), { name, email: newEmail, imageUrl }, { merge: true });
+			await setDoc(doc(db, 'users', user.uid), { name, email: newEmail, imageUrl, insurance, insuranceNumber }, { merge: true });
 
 			setSuccess('Dados atualizados com sucesso!');
 		} catch (err: any) {
 			switch (err.code) {
 				case 'auth/wrong-password':
-					setError('Senha atual incorreta.');
+					setError('Password atual incorreta.');
 					break;
 				case 'auth/invalid-credential':
-					setError('Credenciais inválidas. Verifique o e-mail e a senha.');
+					setError('Credenciais inválidas. Verifique o e-mail e a password.');
 					break;
 				case 'auth/requires-recent-login':
 					setError('Você precisa fazer login novamente para atualizar essas informações.');
@@ -93,60 +97,114 @@ export default function PatientProfile() {
 	return (
 		<div className='max-w-xl mx-auto p-6'>
 			<div className='bg-white shadow-md rounded-xl p-6 space-y-6'>
-				<h2 className='text-2xl font-bold text-gray-800'>Alterar Informações</h2>
+				<h2 className='text-2xl font-bold text-gray-800'>Meu Perfil</h2>
 
 				{error && <p className='text-sm text-red-600'>{error}</p>}
 				{success && <p className='text-sm text-green-600'>{success}</p>}
 
-				<form onSubmit={e => e.preventDefault()} className='space-y-4'>
+				<form onSubmit={e => e.preventDefault()} className='space-y-6'>
+					{/* Seção: Dados Pessoais */}
 					<div>
-						<label className='block text-sm font-medium text-gray-700'>Nome</label>
-						<input type='text' value={name} onChange={e => setName(e.target.value)} className='w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none' />
+						<h3 className='text-lg font-semibold text-gray-700 mb-2'>Dados Pessoais</h3>
+
+						<div className='space-y-4'>
+							<div>
+								<label className='block text-sm font-medium text-gray-700'>Nome</label>
+								<input type='text' value={name} onChange={e => setName(e.target.value)} className='w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none' />
+							</div>
+
+							<div>
+								<label className='block text-sm font-medium text-gray-700'>Imagem (URL)</label>
+								<input
+									type='text'
+									value={imageUrl}
+									onChange={e => setImageUrl(e.target.value)}
+									className='w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none'
+								/>
+								{imageUrl && <img src={imageUrl} alt='preview' className='mt-3 h-24 w-24 object-cover rounded-full border' />}
+							</div>
+						</div>
 					</div>
 
+					<hr className='border-t border-gray-200' />
+
+					{/* Seção: Segurança */}
 					<div>
-						<label className='block text-sm font-medium text-gray-700'>Novo Email</label>
-						<input
-							type='email'
-							value={newEmail}
-							onChange={e => setNewEmail(e.target.value)}
-							autoComplete='email'
-							className='w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none'
-						/>
+						<h3 className='text-lg font-semibold text-gray-700 mb-2'>Segurança</h3>
+
+						<div className='space-y-4'>
+							<div>
+								<label className='block text-sm font-medium text-gray-700'>Novo Email</label>
+								<input
+									type='email'
+									value={newEmail}
+									onChange={e => setNewEmail(e.target.value)}
+									autoComplete='email'
+									className='w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none'
+								/>
+							</div>
+
+							<div>
+								<label className='block text-sm font-medium text-gray-700'>Nova Password</label>
+								<input
+									type='password'
+									value={newPassword}
+									onChange={e => setNewPassword(e.target.value)}
+									autoComplete='new-password'
+									placeholder='Deixe vazio para não alterar'
+									className='w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none'
+								/>
+							</div>
+
+							<div>
+								<label className='block text-sm font-medium text-gray-700'>
+									Password Atual <span className='text-gray-500'>(obrigatória p/ mudar email/password)</span>
+								</label>
+								<input
+									type='password'
+									value={currentPassword}
+									onChange={e => setCurrentPassword(e.target.value)}
+									autoComplete='current-password'
+									className='w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none'
+								/>
+							</div>
+						</div>
 					</div>
 
-					<div>
-						<label className='block text-sm font-medium text-gray-700'>Nova Senha</label>
-						<input
-							type='password'
-							value={newPassword}
-							onChange={e => setNewPassword(e.target.value)}
-							autoComplete='new-password'
-							placeholder='Deixe vazio para não mudar'
-							className='w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none'
-						/>
-					</div>
+					<hr className='border-t border-gray-200' />
 
 					<div>
-						<label className='block text-sm font-medium text-gray-700'>
-							Password Atual <span className='text-gray-500'>(obrigatória p/ mudar email/paswword)</span>
-						</label>
-						<input
-							type='password'
-							value={currentPassword}
-							onChange={e => setCurrentPassword(e.target.value)}
-							autoComplete='current-password'
-							className='w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none'
-						/>
+						<h3 className='text-lg font-semibold text-gray-700 mb-2'>Informações do Seguro</h3>
+
+						<div className='space-y-4'>
+							<div>
+								<label className='block text-sm font-medium text-gray-700'>Seguro</label>
+								<input
+									type='text'
+									value={insurance}
+									onChange={e => setInsurance(e.target.value)}
+									placeholder='Ex: ADSE, Multicare, etc.'
+									className='w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none'
+								/>
+							</div>
+
+							<div>
+								<label className='block text-sm font-medium text-gray-700'>Número do Seguro</label>
+								<input
+									type='text'
+									value={insuranceNumber}
+									onChange={e => setInsuranceNumber(e.target.value)}
+									placeholder='Número do Seguro'
+									className='w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none'
+								/>
+							</div>
+						</div>
 					</div>
 
-					<div>
-						<label className='block text-sm font-medium text-gray-700'>Imagem (URL)</label>
-						<input type='text' value={imageUrl} onChange={e => setImageUrl(e.target.value)} className='w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none' />
-						{imageUrl && <img src={imageUrl} alt='preview' className='mt-3 h-24 w-24 object-cover rounded-full border' />}
-					</div>
+					<hr className='border-t border-gray-200' />
 
-					<button onClick={handleSave} className='w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200'>
+					{/* Botão Final */}
+					<button onClick={handleSave} className='w-full bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-200'>
 						Salvar Alterações
 					</button>
 				</form>
