@@ -27,7 +27,7 @@ function AppRoutes() {
 				<Route path='/signup' element={<Signup />} />
 				{/* ADMIN */}
 				<Route
-					path='/'
+					path='/dashboard'
 					element={
 						<ProtectedRoute allowedRoles={['admin', 'doctor', 'patient']}>
 							<PatientsLista />
