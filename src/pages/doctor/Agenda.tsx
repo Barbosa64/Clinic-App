@@ -1,96 +1,82 @@
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { getAuth } from 'firebase/auth';
+import { CalendarCheck, History } from 'lucide-react';
 
 interface Consulta {
 	id: string;
-	paciente: string;
-	medico: string;
-	data: string; // 'yyyy-mm-dd'
-	hora: string; // 'HH:mm'
-	status: 'Confirmada' | 'Pendente' | 'Cancelada';
+	date: Date;
+	patientName: string;
+	doctorName: string;
+	specialty?: string;
 }
 
 const Agenda: React.FC = () => {
-	const [consultas, setConsultas] = useState<Consulta[]>([]);
+	const [upcoming, setUpcoming] = useState<Consulta[]>([]);
+	const [past, setPast] = useState<Consulta[]>([]);
 	const [loading, setLoading] = useState(true);
-	const [role, setRole] = useState<string | null>(null);
-	const [filtros, setFiltros] = useState({ data: '', paciente: '', medico: '', status: '' });
-
-	const auth = getAuth();
-	const currentUser = auth.currentUser;
 
 	useEffect(() => {
-		if (!currentUser) return;
-
-		const fetchUserRole = async () => {
-			try {
-				const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-				if (userDoc.exists()) {
-					setRole(userDoc.data().role);
-				} else {
-					setRole(null);
-				}
-			} catch (error) {
-				console.error('Erro ao buscar role do usuário:', error);
-				setRole(null);
-			}
-		};
-
-		fetchUserRole();
-	}, [currentUser]);
-
-	useEffect(() => {
-		if (!currentUser || role === null) return;
-
 		const fetchConsultas = async () => {
 			try {
-				let q;
+				const auth = getAuth();
+				const currentUser = auth.currentUser;
+				if (!currentUser) return;
 
-				if (role === 'admin') {
+				const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+				if (!userDoc.exists()) throw new Error('Usuário não encontrado');
+				const userData = userDoc.data() as any;
+
+				let q;
+				if (userData.role === 'admin') {
 					q = collection(db, 'Appointments');
-				} else if (role === 'doctor') {
+				} else if (userData.role === 'doctor') {
 					q = query(collection(db, 'Appointments'), where('doctorId', '==', currentUser.uid));
+				} else if (userData.role === 'patient') {
+					q = query(collection(db, 'Appointments'), where('patientId', '==', currentUser.uid));
 				} else {
-					setConsultas([]);
 					setLoading(false);
 					return;
 				}
 
 				const querySnapshot = await getDocs(q);
+				const now = new Date();
 
-				const consultasCompletas: Consulta[] = await Promise.all(
-					querySnapshot.docs.map(async docSnap => {
-						const data = docSnap.data();
-						const dateObj = data.date.toDate();
-						const hora = dateObj.toTimeString().slice(0, 5);
-						const dataFormatada = dateObj.toISOString().split('T')[0];
+				const upcomingAppointments: Consulta[] = [];
+				const pastAppointments: Consulta[] = [];
 
-						let pacienteNome = 'Desconhecido';
-						if (data.patientId) {
-							const pacienteDoc = await getDoc(doc(db, 'users', data.patientId));
-							pacienteNome = pacienteDoc.exists() ? pacienteDoc.data().name || pacienteDoc.data().email : 'Desconhecido';
-						}
+				for (const docSnap of querySnapshot.docs) {
+					const data = docSnap.data();
+					const apptDate: Date = data.date.toDate();
 
-						let medicoNome = 'Desconhecido';
-						if (data.doctorId) {
-							const medicoDoc = await getDoc(doc(db, 'users', data.doctorId));
-							medicoNome = medicoDoc.exists() ? medicoDoc.data().name || medicoDoc.data().email : 'Desconhecido';
-						}
+					// Buscar nomes do paciente e médico
+					const patientDoc = await getDoc(doc(db, 'users', data.patientId));
+					const doctorDoc = await getDoc(doc(db, 'users', data.doctorId));
+					const patientName = patientDoc.exists() ? patientDoc.data().name || 'Desconhecido' : 'Desconhecido';
+					const doctorName = doctorDoc.exists() ? doctorDoc.data().name || 'Desconhecido' : 'Desconhecido';
+					const specialty = doctorDoc.exists() ? doctorDoc.data().specialty || 'N/A' : 'N/A';
 
-						return {
-							id: docSnap.id,
-							paciente: pacienteNome,
-							medico: medicoNome,
-							data: dataFormatada,
-							hora,
-							status: data.status || 'Pendente',
-						};
-					}),
-				);
+					const consulta: Consulta = {
+						id: docSnap.id,
+						date: apptDate,
+						patientName,
+						doctorName,
+						specialty,
+					};
 
-				setConsultas(consultasCompletas);
+					if (apptDate >= now) {
+						upcomingAppointments.push(consulta);
+					} else {
+						pastAppointments.push(consulta);
+					}
+				}
+
+				upcomingAppointments.sort((a, b) => a.date.getTime() - b.date.getTime());
+				pastAppointments.sort((a, b) => b.date.getTime() - a.date.getTime());
+
+				setUpcoming(upcomingAppointments);
+				setPast(pastAppointments);
 			} catch (error) {
 				console.error('Erro ao buscar consultas:', error);
 			} finally {
@@ -99,93 +85,69 @@ const Agenda: React.FC = () => {
 		};
 
 		fetchConsultas();
-	}, [currentUser, role]);
+	}, []);
 
-	// Data de hoje sem hora (00:00)
-	const hoje = new Date();
-	hoje.setHours(0, 0, 0, 0);
+	if (loading) {
+		return <p className='text-center text-gray-500 mt-10'>A carregar consultas...</p>;
+	}
 
-	// Função de filtro reutilizável
-	const aplicarFiltro = (lista: Consulta[]) => {
-		return lista.filter(consulta => {
-			return (
-				(!filtros.data || consulta.data === filtros.data) &&
-				(!filtros.paciente || consulta.paciente.toLowerCase().includes(filtros.paciente.toLowerCase())) &&
-				(!filtros.medico || consulta.medico.toLowerCase().includes(filtros.medico.toLowerCase())) &&
-				(!filtros.status || consulta.status === filtros.status)
-			);
-		});
-	};
-
-	// Separa consultas futuras e passadas
-	const consultasFuturas = aplicarFiltro(consultas.filter(c => new Date(c.data) >= hoje));
-	const consultasPassadas = aplicarFiltro(consultas.filter(c => new Date(c.data) < hoje));
-
-	const renderTabela = (lista: Consulta[], titulo: string) => (
-		<>
-			<h2 className='text-xl font-semibold mt-6 mb-2'>{titulo}</h2>
-			{lista.length === 0 ? (
-				<p className='mb-4 text-gray-600'>Nenhuma consulta {titulo.toLowerCase()}.</p>
-			) : (
-				<table className='min-w-full divide-y divide-gray-200 shadow rounded-lg mb-6'>
-					<thead className='bg-gray-100'>
-						<tr>
-							<th className='px-6 py-3 text-left text-sm font-medium text-gray-600'>Paciente</th>
-							<th className='px-6 py-3 text-left text-sm font-medium text-gray-600'>Médico</th>
-							<th className='px-6 py-3 text-left text-sm font-medium text-gray-600'>Data</th>
-							<th className='px-6 py-3 text-left text-sm font-medium text-gray-600'>Hora</th>
-							<th className='px-6 py-3 text-left text-sm font-medium text-gray-600'>Status</th>
-						</tr>
-					</thead>
-					<tbody className='divide-y divide-gray-200 bg-white'>
-						{lista.map(consulta => (
-							<tr key={consulta.id}>
-								<td className='px-6 py-4'>{consulta.paciente}</td>
-								<td className='px-6 py-4'>{consulta.medico}</td>
-								<td className='px-6 py-4'>{consulta.data}</td>
-								<td className='px-6 py-4'>{consulta.hora}</td>
-								<td className='px-6 py-4'>
-									<span
-										className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-											consulta.status === 'Confirmada' ? 'bg-green-100 text-green-800' : consulta.status === 'Pendente' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
-										}`}
-									>
-										{consulta.status}
-									</span>
-								</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
-			)}
-		</>
-	);
+	const formatDateTime = (date: Date) => date.toLocaleString('pt-PT', { dateStyle: 'medium', timeStyle: 'short' });
 
 	return (
-		<div className='p-6'>
-			<h1 className='text-2xl font-bold mb-4'>Agenda de Consultas</h1>
+		<div className='bg-white p-6 rounded-lg shadow space-y-10 max-w-5xl mx-auto'>
+			{/* Próximas Consultas */}
+			<section>
+				<h2 className='text-xl font-semibold text-teal-700 mb-4 flex items-center gap-2'>
+					<CalendarCheck className='w-6 h-6 text-teal-600' />
+					Próximas Consultas
+				</h2>
+				{upcoming.length === 0 ? (
+					<p className='text-gray-400'>Nenhuma consulta agendada</p>
+				) : (
+					<ul className='grid gap-6 sm:grid-cols-2'>
+						{upcoming.map(({ id, date, doctorName, specialty }) => (
+							<li key={id} className='border border-teal-200 rounded-lg p-4 bg-teal-50 shadow-sm hover:shadow-md transition'>
+								<p>
+									<span className='font-medium'>📅 Data:</span> {formatDateTime(date)}
+								</p>
+								<p>
+									<span className='font-medium'>🩺 Médico:</span> {doctorName}
+								</p>
+								<p>
+									<span className='font-medium'>🏷️ Especialidade:</span> {specialty}
+								</p>
+							</li>
+						))}
+					</ul>
+				)}
+			</section>
 
-			{/* Filtros */}
-			<div className='mb-6 grid grid-cols-1 gap-4 sm:grid-cols-4'>
-				<input type='date' value={filtros.data} onChange={e => setFiltros({ ...filtros, data: e.target.value })} className='border p-2 rounded' />
-				<input type='text' placeholder='Filtrar por paciente' value={filtros.paciente} onChange={e => setFiltros({ ...filtros, paciente: e.target.value })} className='border p-2 rounded' />
-				<input type='text' placeholder='Filtrar por médico' value={filtros.medico} onChange={e => setFiltros({ ...filtros, medico: e.target.value })} className='border p-2 rounded' />
-				<select value={filtros.status} onChange={e => setFiltros({ ...filtros, status: e.target.value })} className='border p-2 rounded'>
-					<option value=''>Todos os status</option>
-					<option value='Confirmada'>Confirmada</option>
-					<option value='Pendente'>Pendente</option>
-					<option value='Cancelada'>Cancelada</option>
-				</select>
-			</div>
-
-			{loading ? (
-				<p className='text-center'>Carregando...</p>
-			) : (
-				<>
-					{renderTabela(consultasFuturas, 'Consultas Futuras')}
-					{renderTabela(consultasPassadas, 'Consultas Passadas')}
-				</>
-			)}
+			{/* Histórico de Consultas */}
+			<section>
+				<h2 className='text-xl font-semibold text-teal-700 mb-4 flex items-center gap-2'>
+					<History className='w-6 h-6 text-teal-600' />
+					Histórico de Consultas
+				</h2>
+				{past.length === 0 ? (
+					<p className='text-gray-400'>Nenhuma consulta realizada</p>
+				) : (
+					<ul className='grid gap-6 sm:grid-cols-2'>
+						{past.map(({ id, date, doctorName, specialty }) => (
+							<li key={id} className='border border-gray-300 rounded-lg p-4 bg-gray-50 shadow-sm hover:shadow-md transition'>
+								<p>
+									<span className='font-medium'>📅 Data:</span> {formatDateTime(date)}
+								</p>
+								<p>
+									<span className='font-medium'>🩺 Médico:</span> {doctorName}
+								</p>
+								<p>
+									<span className='font-medium'>🏷️ Especialidade:</span> {specialty}
+								</p>
+							</li>
+						))}
+					</ul>
+				)}
+			</section>
 		</div>
 	);
 };

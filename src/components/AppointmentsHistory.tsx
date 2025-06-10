@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { collection, query, where, getDocs, DocumentData } from 'firebase/firestore';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, DocumentData, doc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { getAuth } from 'firebase/auth';
+import { CalendarCheck, History } from 'lucide-react';
 
 type Appointment = {
 	id: string;
@@ -28,7 +28,6 @@ export default function AppointmentsHistory({ patientId }: Props) {
 				const currentUser = auth.currentUser;
 				if (!currentUser) return;
 
-				// Busca o perfil do usuário para saber o role
 				const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
 				if (!userDoc.exists()) throw new Error('Usuário não encontrado');
 				const userData = userDoc.data() as any;
@@ -48,11 +47,7 @@ export default function AppointmentsHistory({ patientId }: Props) {
 						q = query(collection(db, 'Appointments'), where('doctorId', '==', currentUser.uid));
 					}
 				} else if (userData.role === 'admin') {
-					if (patientId) {
-						q = query(collection(db, 'Appointments'), where('patientId', '==', patientId));
-					} else {
-						q = collection(db, 'Appointments');
-					}
+					q = patientId ? query(collection(db, 'Appointments'), where('patientId', '==', patientId)) : collection(db, 'Appointments');
 				} else {
 					setLoading(false);
 					return;
@@ -101,26 +96,30 @@ export default function AppointmentsHistory({ patientId }: Props) {
 		fetchAppointments();
 	}, [patientId]);
 
-	if (loading) return <p className='text-center'>Carregando consultas...</p>;
+	if (loading) return <p className='text-center text-gray-500'>A Carregar consultas...</p>;
 
 	return (
-		<div className='bg-white p-4 rounded shadow space-y-6'>
+		<div className='bg-white p-6 rounded-lg shadow space-y-8'>
+			{/* Próximas Consultas */}
 			<section>
-				<h2 className='text-lg font-semibold mb-2'>📅 Próximas Consultas</h2>
+				<h2 className='text-xl font-semibold text-teal-700 mb-3 flex items-center gap-2'>
+					<CalendarCheck className='w-5 h-5 text-teal-600' />
+					Próximas Consultas
+				</h2>
 				{upcomingAppointments.length === 0 ? (
 					<p className='text-gray-400'>Nenhuma consulta agendada</p>
 				) : (
-					<ul className='space-y-3'>
+					<ul className='grid gap-4 sm:grid-cols-2'>
 						{upcomingAppointments.map(appt => (
-							<li key={appt.id} className='border p-3 rounded'>
+							<li key={appt.id} className='border p-4 rounded-lg bg-gray-50 shadow-sm'>
 								<p>
-									<strong>Data:</strong> {appt.date.toLocaleString()}
+									<span className='font-medium'>📅 Data:</span> {appt.date.toLocaleString('pt-BR')}
 								</p>
 								<p>
-									<strong>Médico:</strong> {appt.doctorName}
+									<span className='font-medium'>🩺 Médico:</span> {appt.doctorName}
 								</p>
 								<p>
-									<strong>Especialidade:</strong> {appt.specialty}
+									<span className='font-medium'>🏷️ Especialidade:</span> {appt.specialty}
 								</p>
 							</li>
 						))}
@@ -128,22 +127,26 @@ export default function AppointmentsHistory({ patientId }: Props) {
 				)}
 			</section>
 
+			{/* Histórico de Consultas */}
 			<section>
-				<h2 className='text-lg font-semibold mb-2'>🕓 Histórico de Consultas</h2>
+				<h2 className='text-xl font-semibold text-teal-700 mb-3 flex items-center gap-2'>
+					<History className='w-5 h-5 text-teal-600' />
+					Histórico de Consultas
+				</h2>
 				{pastAppointments.length === 0 ? (
 					<p className='text-gray-400'>Nenhuma consulta realizada</p>
 				) : (
-					<ul className='space-y-3'>
+					<ul className='grid gap-4 sm:grid-cols-2'>
 						{pastAppointments.map(appt => (
-							<li key={appt.id} className='border p-3 rounded'>
+							<li key={appt.id} className='border p-4 rounded-lg bg-gray-50 shadow-sm'>
 								<p>
-									<strong>Data:</strong> {appt.date.toLocaleString()}
+									<span className='font-medium'>📅 Data:</span> {appt.date.toLocaleString('pt-PT')}
 								</p>
 								<p>
-									<strong>Médico:</strong> {appt.doctorName}
+									<span className='font-medium'>🩺 Médico:</span> {appt.doctorName}
 								</p>
 								<p>
-									<strong>Especialidade:</strong> {appt.specialty}
+									<span className='font-medium'>🏷️ Especialidade:</span> {appt.specialty}
 								</p>
 							</li>
 						))}

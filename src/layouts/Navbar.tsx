@@ -4,35 +4,42 @@ import { getAuth, signOut } from 'firebase/auth';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-function classNames(...classes) {
+function classNames(...classes: string[]) {
 	return classes.filter(Boolean).join(' ');
 }
 
 const Navbar = () => {
-	const { user } = useAuth();
+	const { user, role } = useAuth();
 	const auth = getAuth();
 	const navigate = useNavigate();
 	const location = useLocation();
 
-	const navigation = [
-		{ name: 'Dashboard', href: '/dashboard', current: location.pathname === '/dashboard' },
-		{ name: 'Médicos', href: '/medicos', current: location.pathname === '/medicos' },
-		{ name: 'Pacientes', href: '/pacientes', current: location.pathname === '/pacientes' },
-		{ name: 'Consulta Admin', href: '/consulta/admin', current: location.pathname === '/consulta/admin' },
-		{ name: 'Agenda', href: '/agenda', current: location.pathname === '/agenda' },
+	const rawNavigation = [
+		{ name: 'Dashboard', href: '/dashboard', roles: ['admin', 'doctor', 'patient'] },
+		{ name: 'Médicos', href: '/medicos', roles: ['admin'] },
+		{ name: 'Pacientes', href: '/pacientes', roles: ['admin', 'doctor'] },
+		{ name: 'Consulta Admin', href: '/consulta/admin', roles: ['admin'] },
+		{ name: 'Agenda', href: '/agenda', roles: ['admin', 'doctor'] },
 		{
 			name: 'Marcar Consulta',
 			href: user ? `/marcar-consulta/${user.uid}` : '/marcar-consulta',
-			current: location.pathname.startsWith('/marcar-consulta/'),
+			roles: ['patient'],
 		},
 	];
+
+	const navigation = rawNavigation
+		.filter(item => role && item.roles.includes(role))
+		.map(item => ({
+			...item,
+			current: location.pathname === item.href || location.pathname.startsWith(item.href),
+		}));
 
 	const handleSignOut = async () => {
 		try {
 			await signOut(auth);
 			navigate('/login');
 		} catch (error) {
-			console.error('Error signing out:', error);
+			console.error('Erro ao sair:', error);
 		}
 	};
 

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { db } from '../../lib/firebase';
 import { collection, query, where, getDocs, addDoc, Timestamp, doc, getDoc } from 'firebase/firestore';
 import { useAuth } from '../../context/AuthContext';
+import { CalendarDaysIcon, UserIcon } from '@heroicons/react/24/outline';
+import { Stethoscope } from 'lucide-react';
 
 export default function ScheduleAppointment() {
 	const [specialties, setSpecialties] = useState<string[]>([]);
@@ -96,12 +98,15 @@ export default function ScheduleAppointment() {
 	};
 
 	return (
-		<div className='p-8'>
-			<h1 className='text-2xl font-bold mb-6'>Marcar Consulta (Admin)</h1>
+		<div className='p-8 max-w-3xl mx-auto'>
+			<h1 className='text-3xl font-bold mb-6 text-teal-700 flex items-center gap-2'>
+				<CalendarDaysIcon className='w-7 h-7' />
+				Marcar Consulta (Admin)
+			</h1>
 
-			<form onSubmit={handleSubmit} className='space-y-4 max-w-md'>
+			<form onSubmit={handleSubmit} className='space-y-4 bg-white p-6 rounded-lg shadow'>
 				<div>
-					<label className='block mb-1 font-medium'>Paciente:</label>
+					<label className='block mb-1 font-medium text-gray-700'>Paciente:</label>
 					<select className='border w-full p-2 rounded' value={selectedPatientId} onChange={e => setSelectedPatientId(e.target.value)}>
 						<option value=''>Selecione um paciente</option>
 						{patients.map(p => (
@@ -113,7 +118,7 @@ export default function ScheduleAppointment() {
 				</div>
 
 				<div>
-					<label className='block mb-1 font-medium'>Especialidade:</label>
+					<label className='block mb-1 font-medium text-gray-700'>Especialidade:</label>
 					<select
 						className='border w-full p-2 rounded'
 						value={selectedSpecialty}
@@ -133,7 +138,7 @@ export default function ScheduleAppointment() {
 
 				{selectedSpecialty && (
 					<div>
-						<label className='block mb-1 font-medium'>Médico:</label>
+						<label className='block mb-1 font-medium text-gray-700'>Médico:</label>
 						<select className='border w-full p-2 rounded' value={selectedDoctorId} onChange={e => setSelectedDoctorId(e.target.value)}>
 							<option value=''>Selecione um médico</option>
 							{availableDoctors.map(doc => (
@@ -146,12 +151,12 @@ export default function ScheduleAppointment() {
 				)}
 
 				<div>
-					<label className='block mb-1 font-medium'>Data da Consulta:</label>
+					<label className='block mb-1 font-medium text-gray-700'>Data da Consulta:</label>
 					<input type='datetime-local' className='border w-full p-2 rounded' value={appointmentDate} onChange={e => setAppointmentDate(e.target.value)} />
 				</div>
 
-				<button type='submit' className='mt-4 px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600 transition' disabled={status === 'loading'}>
-					{status === 'loading' ? 'Marcando...' : 'Marcar Consulta'}
+				<button type='submit' className='mt-4 w-full px-4 py-2 bg-teal-600 text-white font-medium rounded hover:bg-teal-700 transition' disabled={status === 'loading'}>
+					{status === 'loading' ? 'A marcar...' : 'Marcar Consulta'}
 				</button>
 			</form>
 		</div>
