@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Patient } from '../pages/patient/data/types';
+import { CalendarIcon, PhoneIcon, ShieldCheckIcon } from 'lucide-react'; // ✅ Novos ícones
 
 type Props = {
 	id: string;
@@ -53,15 +54,24 @@ export default function PatientProfileCard({ id }: Props) {
 			<p className='text-gray-500 text-sm'>
 				{patient.gender} {patient.age ?? 'Idade desconhecida'}
 			</p>
-			<div className='mt-4 space-y-2 text-sm text-gray-600 text-left w-full px-6'>
-				<p>
-					📅 Nascimento: <span className='font-medium'>{formatBirthDate(patient.birthDate)}</span>
+			<div className='mt-4 space-y-3 text-sm text-gray-700 text-left w-full px-6'>
+				<p className='flex items-center gap-2'>
+					<CalendarIcon className='w-4 h-4 text-teal-600' />
+					<span>
+						Nascimento: <span className='font-medium'>{formatBirthDate(patient.birthDate)}</span>
+					</span>
 				</p>
-				<p>
-					📞 Contacto: <span className='font-medium'>{patient.phone || 'N/A'}</span>
+				<p className='flex items-center gap-2'>
+					<PhoneIcon className='w-4 h-4 text-teal-600' />
+					<span>
+						Contacto: <span className='font-medium'>{patient.phone || 'N/A'}</span>
+					</span>
 				</p>
-				<p>
-					🏥 Seguro: <span className='font-medium'>{patient.insurance || 'N/A'}</span>
+				<p className='flex items-center gap-2'>
+					<ShieldCheckIcon className='w-4 h-4 text-teal-600' />
+					<span>
+						Seguro: <span className='font-medium'>{patient.insurance || 'N/A'}</span>
+					</span>
 				</p>
 			</div>
 			<button className='mt-6 px-5 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 transition'>Mostrar toda a informação</button>
