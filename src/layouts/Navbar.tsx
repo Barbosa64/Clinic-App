@@ -16,7 +16,7 @@ const Navbar = () => {
 
 	if (loading) {
 		console.log('A carregar autenticação...');
-		return null; // ou podes aqui colocar um spinner ou placeholder se quiseres
+		return null;
 	}
 
 	const rawNavigation = [
@@ -81,7 +81,7 @@ const Navbar = () => {
 					<div className='absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0'>
 						<Menu as='div' className='relative ml-3'>
 							<MenuButton className='relative flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden'>
-								<img className='size-8 rounded-full' src={imageUrl || 'https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff'} alt='Avatar do usuário' />
+								<img className='size-8 rounded-full' src={imageUrl || 'https://placehold.co/100x100?text=Avatar'} alt='Avatar do usuário' />
 							</MenuButton>
 							<MenuItems className='absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 focus:outline-hidden'>
 								<MenuItem>

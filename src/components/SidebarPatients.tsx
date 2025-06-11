@@ -79,11 +79,11 @@ export default function SidebarPatients() {
 							'flex justify-between gap-x-6 p-5 items-center rounded-md cursor-pointer',
 						)}
 					>
-						<img src={patient.imageUrl || 'nao existe'} alt={patient.name} className='h-10 w-10 rounded-full' />
+						<img src={patient.imageUrl || 'https://placehold.co/100x100?text=Avatar'} alt={patient.name} className='h-10 w-10 rounded-full' />
 						<div className='min-w-0 flex-auto'>
 							<p className='text-sm font-semibold leading-6'>{patient.name}</p>
 							<p className='mt-1 truncate text-xs leading-5'>
-								{patient.gender}, {patient.age}
+								{patient.gender} {patient.age}
 							</p>
 						</div>
 					</li>
