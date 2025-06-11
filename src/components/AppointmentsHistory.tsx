@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { collection, query, where, getDocs, DocumentData, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, DocumentData, doc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { getAuth } from 'firebase/auth';
 import { CalendarCheck, History } from 'lucide-react';
@@ -20,6 +20,7 @@ export default function AppointmentsHistory({ patientId }: Props) {
 	const [pastAppointments, setPastAppointments] = useState<Appointment[]>([]);
 	const [upcomingAppointments, setUpcomingAppointments] = useState<Appointment[]>([]);
 	const [loading, setLoading] = useState(true);
+	const [userRole, setUserRole] = useState<string | null>(null);
 
 	useEffect(() => {
 		const fetchAppointments = async () => {
@@ -31,6 +32,8 @@ export default function AppointmentsHistory({ patientId }: Props) {
 				const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
 				if (!userDoc.exists()) throw new Error('Usuário não encontrado');
 				const userData = userDoc.data() as any;
+
+				setUserRole(userData.role);
 
 				let q;
 
@@ -96,6 +99,17 @@ export default function AppointmentsHistory({ patientId }: Props) {
 		fetchAppointments();
 	}, [patientId]);
 
+	const handleCancelAppointment = async (id: string) => {
+		try {
+			await deleteDoc(doc(db, 'Appointments', id));
+			setUpcomingAppointments(prev => prev.filter(appt => appt.id !== id));
+			alert('Consulta cancelada com sucesso.');
+		} catch (error) {
+			console.error('Erro ao cancelar consulta:', error);
+			alert('Erro ao cancelar a consulta.');
+		}
+	};
+
 	if (loading) return <p className='text-center text-gray-500'>A Carregar consultas...</p>;
 
 	return (
@@ -121,6 +135,11 @@ export default function AppointmentsHistory({ patientId }: Props) {
 								<p>
 									<span className='font-medium'>🏷️ Especialidade:</span> {appt.specialty}
 								</p>
+								{(userRole === 'doctor' || userRole === 'admin') && (
+									<button onClick={() => handleCancelAppointment(appt.id)} className='mt-2 px-3 py-1 bg-red-100 text-red-700 text-sm rounded hover:bg-red-200'>
+										Cancelar
+									</button>
+								)}
 							</li>
 						))}
 					</ul>

@@ -173,7 +173,7 @@ const Agenda: React.FC = () => {
 					Próximas Consultas
 				</h2>
 				<ul className='grid gap-6 sm:grid-cols-2'>
-					{filteredUpcoming.map(({ id, date, doctorName, specialty }) => (
+					{filteredUpcoming.map(({ id, date, doctorName, patientName, specialty }) => (
 						<li key={id} className='border border-teal-200 rounded-lg p-4 bg-teal-50 shadow-sm hover:shadow-md transition'>
 							<p>
 								<strong>📅 Data:</strong> {formatDateTime(date)}
@@ -184,9 +184,41 @@ const Agenda: React.FC = () => {
 							<p>
 								<strong>🏷️ Especialidade:</strong> {specialty}
 							</p>
+							<p>
+								<strong>🧑 Paciente:</strong> {patientName}
+							</p>
 						</li>
 					))}
 				</ul>
+			</section>
+
+			<section>
+				<h2 className='text-xl font-semibold text-gray-700 mb-4 flex items-center gap-2'>
+					<History className='w-6 h-6 text-gray-600' />
+					Consultas Passadas
+				</h2>
+				{filteredPast.length > 0 ? (
+					<ul className='grid gap-6 sm:grid-cols-2'>
+						{filteredPast.map(({ id, date, doctorName, patientName, specialty }) => (
+							<li key={id} className='border border-gray-300 rounded-lg p-4 bg-gray-50 shadow-sm hover:shadow-md transition'>
+								<p>
+									<strong>📅 Data:</strong> {formatDateTime(date)}
+								</p>
+								<p>
+									<strong>🧑 Paciente:</strong> {patientName}
+								</p>
+								<p>
+									<strong>🩺 Médico:</strong> {doctorName}
+								</p>
+								<p>
+									<strong>🏷️ Especialidade:</strong> {specialty}
+								</p>
+							</li>
+						))}
+					</ul>
+				) : (
+					<p className='text-gray-500'>Nenhuma consulta passada encontrada com os filtros atuais.</p>
+				)}
 			</section>
 		</div>
 	);
