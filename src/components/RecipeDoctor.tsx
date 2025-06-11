@@ -3,7 +3,7 @@ import { db } from '../lib/firebase';
 import { collection, getDocs, query, where, orderBy, addDoc, Timestamp } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 
-const farmacos = ['Paracetamol', 'Ibuprofeno', 'Amoxicilina'];
+const farmacos = ['Ben-u-ron', 'Nolotil', 'Brufen', 'Aspirina', 'Voltaren', 'Naprosyn', 'Zitromax', 'Aerius', 'Ativan', 'Prozac', 'Ziloric', 'Pantoprazol'];
 
 interface Prescricao {
 	farmaco: string;
