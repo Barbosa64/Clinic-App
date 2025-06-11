@@ -8,8 +8,10 @@ type Role = 'admin' | 'doctor' | 'patient' | null;
 type AuthContextType = {
 	user: User | null;
 	role: Role;
+	imageUrl: string | null;
 	setUser: React.Dispatch<React.SetStateAction<User | null>>;
 	setRole: React.Dispatch<React.SetStateAction<Role>>;
+	setImageUrl: React.Dispatch<React.SetStateAction<string | null>>;
 	loading: boolean;
 };
 
@@ -18,6 +20,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const [user, setUser] = useState<User | null>(null);
 	const [role, setRole] = useState<Role>(null);
+	const [imageUrl, setImageUrl] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
@@ -29,14 +32,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 					const docRef = doc(db, 'users', firebaseUser.uid);
 					const docSnap = await getDoc(docRef);
 					const data = docSnap.data();
+
+					// Atualiza o estado com a imagem do utilizador
+					setImageUrl(data?.imageUrl || null);
 					setRole(data?.role || null);
 				} catch (error) {
-					console.error('Erro ao buscar dados do usuário:', error);
+					console.error('Erro ao buscar dados do utilizador:', error);
 					setRole(null);
+					setImageUrl(null);
 				}
 			} else {
 				setUser(null);
 				setRole(null);
+				setImageUrl(null);
 			}
 			setLoading(false);
 		});
@@ -44,7 +52,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		return () => unsubscribe();
 	}, []);
 
-	return <AuthContext.Provider value={{ user, role, setUser, setRole, loading }}>{children}</AuthContext.Provider>;
+	return <AuthContext.Provider value={{ user, role, imageUrl, setUser, setRole, setImageUrl, loading }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = (): AuthContextType => {

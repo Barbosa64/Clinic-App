@@ -4,6 +4,7 @@ import { doc, setDoc, getDocs, collection, query, where, deleteDoc } from 'fireb
 import { db } from '../../../lib/firebase';
 import { useNavigate } from 'react-router-dom';
 
+
 interface Patient {
 	id: string;
 	UID: string;

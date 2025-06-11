@@ -37,20 +37,15 @@ const FarmacoTest = ({ patientId }: Props) => {
 
 	useEffect(() => {
 		const fetchConsultas = async () => {
-			console.log('estou ANTES 1');
-
 			const consultasRef = collection(db, 'Appointments');
 			const q = query(consultasRef, where('patientId', '==', patientId), orderBy('date', 'desc'));
-			console.log('estou ANTES 2');
 
 			const snapshot = await getDocs(q);
-			console.log('estou ANTES 3');
 
 			const lista = snapshot.docs.map(doc => {
 				const date = doc.data().date?.toDate(); // Timestamp -> Date
 				return { id: doc.id, date: date };
 			});
-			console.log('estou ANTES 4');
 
 			setConsultas(lista);
 		};
