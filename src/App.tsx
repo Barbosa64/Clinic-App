@@ -78,7 +78,7 @@ function AppRoutes() {
 					}
 				/>
 				<Route
-					path='/pacientes/:id'
+					path='/dashboard/:id'
 					element={
 						<ProtectedRoute allowedRoles={['admin', 'doctor', 'patient']}>
 							<Patients />

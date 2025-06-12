@@ -36,7 +36,7 @@ const Login = () => {
 			setRole(role);
 
 			if (role === 'patient') {
-				navigate(`/pacientes/${user.uid}`);
+				navigate(`/dashboard/${user.uid}`);
 			} else if (role === 'doctor') {
 				navigate('/agenda');
 			} else if (role === 'admin') {

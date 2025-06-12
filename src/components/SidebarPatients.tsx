@@ -73,7 +73,7 @@ export default function SidebarPatients() {
 				{filteredPatients.map(patient => (
 					<li
 						key={patient.id}
-						onClick={() => navigate(`/pacientes/${patient.id}`)}
+						onClick={() => navigate(`/dashboard/${patient.id}`)}
 						className={classNames(
 							patient.id === selectedPatientId ? 'bg-teal-600 text-white' : 'text-gray-900 hover:bg-gray-100',
 							'flex justify-between gap-x-6 p-5 items-center rounded-md cursor-pointer',
