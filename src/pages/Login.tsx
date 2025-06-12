@@ -96,7 +96,7 @@ const Login = () => {
 			<div className='w-1/2 h-full bg-teal-600 flex flex-col p-20 justify-center'>
 				<div className='w-full flex flex-col max-w-[450px] mx-auto'>
 					<div className='w-full flex flex-col mb-10 text-white'>
-						<h3 className='text-lg mb-4'>Bem vindo à myClinic*! Por favor insira os seus dados para começar.</h3>
+						<h3 className='text-lg mb-4'>Bem vindo à Clinica*! Por favor insira os seus dados para começar.</h3>
 					</div>
 					<form
 						onSubmit={e => {
