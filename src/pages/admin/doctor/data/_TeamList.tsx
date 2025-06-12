@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc, getDocs, collection, query, where, deleteDoc } from 'firebase/firestore';
 import { db } from '../../../../lib/firebase';
-import { useNavigate } from 'react-router-dom';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { Search, UserPlus } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
 
 interface Doctor {
 	id: string;
@@ -18,7 +17,6 @@ interface Doctor {
 
 export default function TeamList() {
 	const auth = getAuth();
-	const navigate = useNavigate();
 	const storage = getStorage();
 
 	const [email, setEmail] = useState('');
@@ -38,10 +36,10 @@ export default function TeamList() {
 	const fetchDoctors = async () => {
 		try {
 			const q = query(collection(db, 'users'), where('role', '==', 'doctor'));
-			const querySnapshot = await getDocs(q);
+			const databaseDoctorsResult = await getDocs(q);
 			const doctorList: Doctor[] = [];
-			querySnapshot.forEach(doc => {
-				doctorList.push({ id: doc.id, ...(doc.data() as Doctor) });
+			databaseDoctorsResult.forEach(doc => {
+				doctorList.push({ ...(doc.data() as Doctor) });
 			});
 			setDoctors(doctorList);
 		} catch (err) {

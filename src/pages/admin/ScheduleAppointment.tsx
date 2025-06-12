@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { db } from '../../lib/firebase';
 import { collection, query, where, getDocs, addDoc, Timestamp, doc, getDoc } from 'firebase/firestore';
-import { useAuth } from '../../context/AuthContext';
 import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 
 export default function ScheduleAppointment() {
@@ -14,8 +13,6 @@ export default function ScheduleAppointment() {
 	const [selectedDoctorId, setSelectedDoctorId] = useState('');
 	const [appointmentDate, setAppointmentDate] = useState('');
 	const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-
-	const { user } = useAuth();
 
 	useEffect(() => {
 		const fetchData = async () => {

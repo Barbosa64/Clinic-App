@@ -2,12 +2,10 @@ import { useState, useEffect } from 'react';
 import { db } from '../../../lib/firebase';
 import { collection, query, where, getDocs, addDoc, Timestamp, doc, getDoc } from 'firebase/firestore';
 import { useAuth } from '../../../context/AuthContext';
-import { useParams } from 'react-router-dom';
 import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 import { Stethoscope } from 'lucide-react';
 
 export default function PatientAppointment() {
-	const { id } = useParams();
 	const [specialties, setSpecialties] = useState<string[]>([]);
 	const [doctors, setDoctors] = useState<any[]>([]);
 	const [selectedSpecialty, setSelectedSpecialty] = useState('');

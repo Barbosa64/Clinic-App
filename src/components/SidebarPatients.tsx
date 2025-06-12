@@ -42,7 +42,7 @@ export default function SidebarPatients() {
 						{
 							id: user.uid,
 							...userData,
-						},
+						} as Patient,
 					]);
 				} else {
 					const q = query(collection(db, 'users'), where('role', '==', 'patient'));
@@ -61,7 +61,7 @@ export default function SidebarPatients() {
 		fetchPatients();
 	}, [auth]);
 
-	const filteredPatients = patients.filter(patient => patient.name.toLowerCase().includes(searchTerm.toLowerCase()));
+	const filteredPatients = patients.filter(patient => patient.name!.toLowerCase().includes(searchTerm.toLowerCase()));
 
 	return (
 		<ul role='list' className='rounded-3xl bg-white divide-y divide-gray-100'>

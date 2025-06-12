@@ -18,7 +18,6 @@ interface Patient {
 
 export default function PatientList() {
 	const auth = getAuth();
-	const navigate = useNavigate();
 
 	const role = 'patient';
 	const [email, setEmail] = useState('');
@@ -40,7 +39,7 @@ export default function PatientList() {
 			const querySnapshot = await getDocs(q);
 			const patientList: Patient[] = [];
 			querySnapshot.forEach(doc => {
-				patientList.push({ id: doc.id, ...(doc.data() as Patient) });
+				patientList.push({ ...(doc.data() as Patient) });
 			});
 			setPatients(patientList);
 		} catch (err) {
