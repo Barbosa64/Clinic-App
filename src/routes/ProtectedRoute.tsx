@@ -2,7 +2,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 type Props = {
-	children: JSX.Element;
+	children: React.ReactNode;
 	allowedRoles: string[];
 };
 
@@ -16,7 +16,6 @@ export default function ProtectedRoute({ children, allowedRoles }: Props) {
 
 	const { user, role, loading } = authContext;
 
-	
 	if (loading) {
 		return <p>A carregar autenticação...</p>;
 	}
@@ -27,7 +26,7 @@ export default function ProtectedRoute({ children, allowedRoles }: Props) {
 
 	if (!allowedRoles.includes(role || '')) {
 		console.warn(`Acesso negado para o role: ${role}. Rota requer: ${allowedRoles.join(', ')}`);
-		return <Navigate to='/' replace />; 
+		return <Navigate to='/' replace />;
 	}
 
 	return children;

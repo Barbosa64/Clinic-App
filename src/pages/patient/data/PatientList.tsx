@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc, getDocs, collection, query, where, deleteDoc } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
-import { useNavigate } from 'react-router-dom';
 import { Search, UserPlus } from 'lucide-react';
 
 interface Patient {
