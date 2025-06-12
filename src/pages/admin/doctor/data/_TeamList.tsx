@@ -4,6 +4,7 @@ import { doc, setDoc, getDocs, collection, query, where, deleteDoc } from 'fireb
 import { db } from '../../../../lib/firebase';
 import { useNavigate } from 'react-router-dom';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { Search, UserPlus } from 'lucide-react';
 
 interface Doctor {
 	id: string;
@@ -161,8 +162,11 @@ export default function TeamList() {
 	return (
 		<div className='p-6'>
 			<div className='flex justify-between items-center mb-4'>
-				<h1 className='text-2xl font-bold'>Equipa Médica</h1>
-				<button onClick={openModal} className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out'>
+				<h1 className='text-3xl font-bold text-teal-700 flex items-center gap-2 mb-6'>
+					<UserPlus className='w-7 h-7' />
+					Gestão de Médicos
+				</h1>
+				<button onClick={openModal} className='bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-4 rounded shadow'>
 					Adicionar Médico
 				</button>
 			</div>
@@ -227,7 +231,7 @@ export default function TeamList() {
 									onChange={e => setEmail(e.target.value)}
 									required
 									className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300 sm:text-sm'
-									disabled={!!editingDoctor} // desabilita edição do email se editando
+									disabled={!!editingDoctor}
 								/>
 							</div>
 							<div>
@@ -239,10 +243,10 @@ export default function TeamList() {
 									id='password'
 									value={password}
 									onChange={e => setPassword(e.target.value)}
-									required={!editingDoctor} // obrigatório só ao criar
+									required={!editingDoctor}
 									placeholder={editingDoctor ? 'Deixe vazio para manter a senha' : ''}
 									className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300 sm:text-sm'
-									disabled={!!editingDoctor} // desabilita edição de senha para simplicidade
+									disabled={!!editingDoctor}
 								/>
 							</div>
 							<div>
@@ -282,7 +286,7 @@ export default function TeamList() {
 								<button type='button' onClick={handleCancel} className='px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-md shadow-sm'>
 									Cancelar
 								</button>
-								<button onClick={handleSignup} type='submit' className='px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 border border-transparent rounded-md shadow-sm'>
+								<button onClick={handleSignup} type='submit' className='px-4 py-2 text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-md'>
 									{editingDoctor ? 'Salvar Alterações' : 'Criar Médico'}
 								</button>
 							</div>

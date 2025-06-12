@@ -3,7 +3,7 @@ import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc, getDocs, collection, query, where, deleteDoc } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Search, UserPlus } from 'lucide-react';
 
 interface Patient {
 	id: string;
@@ -150,7 +150,10 @@ export default function PatientList() {
 	return (
 		<div className='p-6'>
 			<div className='flex justify-between items-center mb-4'>
-				<h1 className='text-2xl font-bold'>Pacientes</h1>
+				<h1 className='text-3xl font-bold text-teal-700 flex items-center gap-2 mb-6'>
+					<UserPlus className='w-7 h-7' />
+					Gestão de Pacientes
+				</h1>
 
 				<div className='mb-6 w-full max-w-md relative'>
 					<Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' />
@@ -164,7 +167,7 @@ export default function PatientList() {
 						}}
 					/>
 				</div>
-				<button onClick={openModal} className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out'>
+				<button onClick={openModal} className='bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-4 rounded shadow'>
 					Adicionar Paciente
 				</button>
 			</div>
@@ -172,7 +175,7 @@ export default function PatientList() {
 			<ul className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2'>
 				{patients.map((patient, index) => (
 					<li key={index} className='bg-white p-4 rounded shadow flex items-center space-x-4 flex-wrap sm:flex-nowrap'>
-						<img src={patient.imageUrl || 'https://via.placeholder.com/64'} alt={patient.name} className='h-16 w-16 rounded-full object-cover flex-shrink-0' />
+						<img src={patient.imageUrl || 'https://placehold.co/100x100?text=Avatar'} alt={patient.name} className='h-16 w-16 rounded-full object-cover flex-shrink-0' />
 
 						<div className='flex-1 min-w-0'>
 							<p className='font-semibold truncate'>{patient.name || 'Nome não disponível'}</p>
@@ -228,7 +231,7 @@ export default function PatientList() {
 									onChange={e => setEmail(e.target.value)}
 									required
 									className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300 sm:text-sm'
-									disabled={!!editingPatient} // desabilita edição do email se editando
+									disabled={!!editingPatient}
 								/>
 							</div>
 							<div>
@@ -240,10 +243,10 @@ export default function PatientList() {
 									id='password'
 									value={password}
 									onChange={e => setPassword(e.target.value)}
-									required={!editingPatient} // obrigatório só ao criar
+									required={!editingPatient}
 									placeholder={editingPatient ? 'Deixe vazio para manter a senha' : ''}
 									className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300 sm:text-sm'
-									disabled={!!editingPatient} // desabilita edição de senha para simplicidade
+									disabled={!!editingPatient}
 								/>
 							</div>
 							<div className='space-y-4'>
@@ -294,7 +297,7 @@ export default function PatientList() {
 								<button type='button' onClick={handleCancel} className='px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-md shadow-sm'>
 									Cancelar
 								</button>
-								<button onClick={handleSignup} type='submit' className='px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 border border-transparent rounded-md shadow-sm'>
+								<button onClick={handleSignup} type='submit' className='px-4 py-2 text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-md'>
 									{editingPatient ? 'Salvar Alterações' : 'Criar Paciente'}
 								</button>
 							</div>
