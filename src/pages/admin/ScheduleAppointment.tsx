@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { db } from '../../lib/firebase';
 import { collection, query, where, getDocs, addDoc, Timestamp, doc, getDoc } from 'firebase/firestore';
 import { CalendarDaysIcon } from '@heroicons/react/24/outline';
+import { Doctor } from '../doctor/doctorType';
 
 export default function ScheduleAppointment() {
 	const [specialties, setSpecialties] = useState<string[]>([]);
@@ -22,7 +23,7 @@ export default function ScheduleAppointment() {
 
 				const [doctorSnap, patientSnap] = await Promise.all([getDocs(doctorQuery), getDocs(patientQuery)]);
 
-				const fetchedDoctors = doctorSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+				const fetchedDoctors = doctorSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Doctor));
 				const fetchedPatients = patientSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
 				setDoctors(fetchedDoctors);

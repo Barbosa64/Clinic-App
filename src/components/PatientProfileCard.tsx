@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { Patient } from '../pages/patient/data/types';
+import { Patient } from '../pages/patient/data/typesPatient';
 import { CalendarIcon, PhoneIcon, ShieldCheckIcon } from 'lucide-react'; // ✅ Novos ícones
 
 type Props = {

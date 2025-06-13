@@ -4,16 +4,7 @@ import { doc, setDoc, getDocs, collection, query, where, deleteDoc } from 'fireb
 import { db } from '../../../../lib/firebase';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { UserPlus } from 'lucide-react';
-
-interface Doctor {
-	id: string;
-	UID: string;
-	role: string;
-	name: string;
-	email: string;
-	imageUrl?: string;
-	specialty?: string[];
-}
+import { Doctor } from '../../../doctor/doctorType';
 
 export default function TeamList() {
 	const auth = getAuth();

@@ -29,7 +29,6 @@ export default function PatientList() {
 	const [showModal, setShowModal] = useState(false);
 	const [patients, setPatients] = useState<Patient[]>([]);
 
-	// Estado para armazenar o médico que está sendo editado (null se criando novo)
 	const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
 
 	const fetchPatients = async () => {
@@ -62,7 +61,6 @@ export default function PatientList() {
 		setShowModal(true);
 	};
 
-	// Função para abrir modal para edição, preenchendo campos
 	const openEditModal = (patient: Patient) => {
 		setEditingPatient(patient);
 		setName(patient.name);
@@ -70,7 +68,7 @@ export default function PatientList() {
 		setInsurance(patient.insurance || '');
 		setInsuranceNumber(patient.insuranceNumber || '');
 		setImageUrl(patient.imageUrl || '');
-		setPassword(''); // password vazio, não vamos mostrar senha atual por segurança
+		setPassword('');
 		setError('');
 		setShowModal(true);
 	};
@@ -90,7 +88,6 @@ export default function PatientList() {
 	const handleSignup = async () => {
 		setError('');
 
-		// Validação
 		if (!name || !email || (!editingPatient && !password)) {
 			setError('Por favor preencha todos os campos obrigatórios.');
 			return;
@@ -98,7 +95,6 @@ export default function PatientList() {
 
 		try {
 			if (editingPatient) {
-				// Atualiza o documento do paciente
 				await setDoc(
 					doc(db, 'users', editingPatient.id),
 					{
@@ -113,7 +109,6 @@ export default function PatientList() {
 					{ merge: true },
 				);
 			} else {
-				// Criar novo usuário com email e password
 				const { user } = await createUserWithEmailAndPassword(auth, email, password);
 
 				await setDoc(doc(db, 'users', user.uid), {
@@ -142,8 +137,6 @@ export default function PatientList() {
 			console.error('Erro ao eliminar paciente:', err.message);
 		}
 	};
-
-	const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {};
 
 	return (
 		<div className='p-6'>
@@ -279,7 +272,6 @@ export default function PatientList() {
 									type='file'
 									id='imageUpload'
 									accept='image/*'
-									onChange={handleImageUpload}
 									className='mt-1 block w-full text-sm text-gray-500
                     file:mr-4 file:py-2 file:px-4
                     file:rounded file:border-0

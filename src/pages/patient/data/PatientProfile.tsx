@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
-import { Patient } from '../data/types';
+import { Patient } from './typesPatient';
 
 export default function PatientProfile() {
 	const { id } = useParams<{ id: string }>();
@@ -27,7 +27,6 @@ export default function PatientProfile() {
 			<h1 className='text-3xl font-bold'>{patient.name}</h1>
 			<p className='text-gray-600'>Idade: {patient.age}</p>
 			<p className='text-gray-600'>Gênero: {patient.gender}</p>
-			
 		</div>
 	);
 }
