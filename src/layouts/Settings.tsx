@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { getAuth, updateEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from './../lib/firebase';
+import { Timestamp } from 'firebase/firestore';
 
 export default function PatientProfile() {
 	const auth = getAuth();
@@ -11,6 +12,7 @@ export default function PatientProfile() {
 	const [email, setEmail] = useState('');
 	const [newEmail, setNewEmail] = useState('');
 	const [newPassword, setNewPassword] = useState('');
+	const [birthDate, setBirthDate] = useState<string>('');
 	const [imageUrl, setImageUrl] = useState('');
 	const [currentPassword, setCurrentPassword] = useState('');
 	const [insurance, setInsurance] = useState('');
@@ -36,6 +38,18 @@ export default function PatientProfile() {
 				setImageUrl(data.imageUrl || '');
 				setInsurance(data.insurance || '');
 				setInsuranceNumber(data.insuranceNumber || '');
+				if (data.birthDate) {
+					let date: Date;
+					if (data.birthDate.toDate) {
+						date = data.birthDate.toDate();
+					} else {
+						date = new Date(data.birthDate);
+					}
+					const yyyy = date.getFullYear();
+					const mm = String(date.getMonth() + 1).padStart(2, '0');
+					const dd = String(date.getDate()).padStart(2, '0');
+					setBirthDate(`${yyyy}-${mm}-${dd}`);
+				}
 			}
 		} catch (err) {
 			console.error('Erro ao carregar dados:', err);
@@ -71,7 +85,7 @@ export default function PatientProfile() {
 				await updatePassword(user, newPassword);
 			}
 
-			await setDoc(doc(db, 'users', user.uid), { name, email: newEmail, imageUrl, insurance, insuranceNumber }, { merge: true });
+			await setDoc(doc(db, 'users', user.uid), { name, email: newEmail, imageUrl, insurance, insuranceNumber, birthDate: birthDate ? Timestamp.fromDate(new Date(birthDate)) : null }, { merge: true });
 
 			setSuccess('Dados atualizados com sucesso!');
 		} catch (err: any) {
@@ -111,6 +125,16 @@ export default function PatientProfile() {
 							<div>
 								<label className='block text-sm font-medium text-gray-700'>Nome</label>
 								<input type='text' value={name} onChange={e => setName(e.target.value)} className='w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none' />
+							</div>
+
+							<div>
+								<label className='block text-sm font-medium text-gray-700'>Data de Nascimento</label>
+								<input
+									type='date'
+									value={birthDate}
+									onChange={e => setBirthDate(e.target.value)}
+									className='w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none'
+								/>
 							</div>
 
 							<div>
