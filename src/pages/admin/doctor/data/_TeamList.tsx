@@ -5,6 +5,7 @@ import { db } from '../../../../lib/firebase';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { UserPlus } from 'lucide-react';
 import { Doctor } from '../../../doctor/doctorType';
+import toast from 'react-hot-toast';
 
 export default function TeamList() {
 	const auth = getAuth();
@@ -18,10 +19,8 @@ export default function TeamList() {
 	const [error, setError] = useState('');
 	const [showModal, setShowModal] = useState(false);
 	const [doctors, setDoctors] = useState<Doctor[]>([]);
-
 	const specialty = ['Cardiologia', 'Dermatologia', 'Endocrinologia', 'Ginecologia', 'Ortopedia', 'Pediatria', 'Urologia'];
 	const [selectedSpecialty, setSelectedSpecialty] = useState('');
-
 	const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(null);
 
 	const fetchDoctors = async () => {
@@ -35,6 +34,7 @@ export default function TeamList() {
 			setDoctors(doctorList);
 		} catch (err) {
 			console.error('Erro ao buscar médicos:', err);
+			toast.error('Erro ao carregar médicos');
 		}
 	};
 
@@ -53,14 +53,13 @@ export default function TeamList() {
 		setShowModal(true);
 	};
 
-	// Função para abrir modal para edição, preenchendo campos
 	const openEditModal = (doctor: Doctor) => {
 		setEditingDoctor(doctor);
 		setName(doctor.name);
 		setEmail(doctor.email);
 		setImageUrl(doctor.imageUrl || '');
 		setSelectedSpecialty(doctor.specialty?.[0] || '');
-		setPassword(''); // password vazio, não vamos mostrar senha atual por segurança
+		setPassword('');
 		setError('');
 		setShowModal(true);
 	};
@@ -79,15 +78,14 @@ export default function TeamList() {
 	const handleSignup = async () => {
 		setError('');
 
-		// Validação
 		if (!name || !email || (!editingDoctor && !password) || !selectedSpecialty) {
 			setError('Por favor preencha todos os campos obrigatórios.');
+			toast.error('Preencha todos os campos obrigatórios.');
 			return;
 		}
 
 		try {
 			if (editingDoctor) {
-				// Atualiza o documento do médico
 				await setDoc(
 					doc(db, 'users', editingDoctor.id),
 					{
@@ -100,12 +98,9 @@ export default function TeamList() {
 					},
 					{ merge: true },
 				);
-
-				// falta implementar atualização de email e senha no auth  (requer reautenticação)
+				toast.success('Médico atualizado com sucesso!');
 			} else {
-				// Criar novo doutor com email e password
 				const { user } = await createUserWithEmailAndPassword(auth, email, password);
-
 				await setDoc(doc(db, 'users', user.uid), {
 					UID: user.uid,
 					role: role,
@@ -114,12 +109,15 @@ export default function TeamList() {
 					imageUrl,
 					specialty: selectedSpecialty ? [selectedSpecialty] : [],
 				});
+				toast.success('Médico criado com sucesso!');
 			}
 
 			handleCancel();
 			await fetchDoctors();
 		} catch (err: any) {
+			console.error(err);
 			setError('Falhou: ' + err.message);
+			toast.error('Erro: ' + err.message);
 		}
 	};
 
@@ -127,8 +125,10 @@ export default function TeamList() {
 		try {
 			await deleteDoc(doc(db, 'users', userId));
 			setDoctors(doctors.filter(doctor => doctor.id !== userId));
+			toast.success('Médico removido com sucesso!');
 		} catch (err: any) {
 			console.error('Erro ao eliminar médico:', err.message);
+			toast.error('Erro ao eliminar médico.');
 		}
 	};
 
@@ -142,9 +142,11 @@ export default function TeamList() {
 			await uploadBytes(storageRef, file);
 			const url = await getDownloadURL(storageRef);
 			setImageUrl(url);
+			toast.success('Imagem enviada com sucesso!');
 		} catch (error) {
 			console.error('Erro no upload da imagem:', error);
 			setError('Falha no upload da imagem. Tente novamente.');
+			toast.error('Erro ao fazer upload da imagem');
 		}
 	};
 

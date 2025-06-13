@@ -3,6 +3,7 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { getAuth, signOut } from 'firebase/auth';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import logo from '../assets/logo.svg';
 
 function classNames(...classes: string[]) {
 	return classes.filter(Boolean).join(' ');
@@ -61,7 +62,7 @@ const Navbar = () => {
 
 					<div className='flex flex-1 items-center justify-center sm:items-stretch sm:justify-start'>
 						<div className='flex shrink-0 items-center'>
-							<img className='h-8 w-auto' src='/logo.svg' alt='Logo' />
+							<img className='h-8 w-auto' src={logo} alt='Logo' />
 						</div>
 						<div className='hidden sm:ml-6 sm:block'>
 							<div className='flex space-x-4'>

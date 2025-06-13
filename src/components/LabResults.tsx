@@ -120,7 +120,7 @@ const LabResults: React.FC<Props> = ({ patientId }) => {
 						disabled={loading || !file || !labType || !selectedPatientId}
 						className={`px-4 py-2 rounded text-white ${loading || !file || !labType || !selectedPatientId ? 'bg-gray-300 cursor-not-allowed' : 'bg-teal-500 hover:bg-teal-600'}`}
 					>
-						{loading ? 'Enviando...' : 'Fazer upload'}
+						{loading ? 'A enviar...' : 'Fazer upload'}
 					</button>
 				</div>
 			)}
@@ -141,7 +141,7 @@ const LabResults: React.FC<Props> = ({ patientId }) => {
 						)}
 					</li>
 				))}
-				{labResults.length === 0 && <p className='text-gray-500'>Nenhum resultado disponível.</p>}
+				{labResults.length === 0 && <p className='text-gray-500'>Brevemente disponivel.</p>}
 			</ul>
 		</div>
 	);

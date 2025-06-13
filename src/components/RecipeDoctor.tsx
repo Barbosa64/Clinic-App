@@ -3,6 +3,7 @@ import { db } from '../lib/firebase';
 import { collection, getDocs, query, where, orderBy, addDoc, Timestamp } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import { Syringe } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 const farmacos = ['Ben-u-ron', 'Nolotil', 'Brufen', 'Aspirina', 'Voltaren', 'Naprosyn', 'Zitromax', 'Aerius', 'Ativan', 'Prozac', 'Ziloric', 'Pantoprazol'];
 
@@ -38,20 +39,36 @@ const FarmacoTest = ({ patientId }: Props) => {
 
 	useEffect(() => {
 		const fetchConsultas = async () => {
+			if (!user) return;
+
 			const consultasRef = collection(db, 'Appointments');
-			const q = query(consultasRef, where('patientId', '==', patientId), orderBy('date', 'desc'));
 
-			const snapshot = await getDocs(q);
-			const lista = snapshot.docs.map(doc => {
-				const date = doc.data().date?.toDate();
-				return { id: doc.id, date };
-			});
+			let q;
 
-			setConsultas(lista);
+			if (role === 'doctor') {
+				q = query(consultasRef, where('patientId', '==', patientId), where('doctorId', '==', user.uid), orderBy('date', 'desc'));
+			} else if (role === 'admin') {
+				q = query(consultasRef, where('patientId', '==', patientId), orderBy('date', 'desc'));
+			} else {
+				return;
+			}
+
+			try {
+				const snapshot = await getDocs(q);
+				const lista = snapshot.docs.map(doc => {
+					const date = doc.data().date?.toDate();
+					return { id: doc.id, date };
+				});
+				setConsultas(lista);
+			} catch (err) {
+				console.error('Erro ao buscar consultas:', err);
+			}
 		};
 
-		if (user) fetchConsultas();
-	}, [user, patientId]);
+		if (!loading) {
+			fetchConsultas();
+		}
+	}, [user, patientId, role, loading]);
 
 	if (loading) return <p className='text-center text-gray-500'>A carregar...</p>;
 	if (!user) return <p className='text-red-600'>Precisa de fazer login para prescrever.</p>;
@@ -80,10 +97,10 @@ const FarmacoTest = ({ patientId }: Props) => {
 				consulta: Timestamp.fromDate(consultaSelecionada.date),
 				patientId,
 				doctorId: user.uid,
-				criadoEm: Timestamp.now(),
+				criadoEm: Timestamp.fromDate(consultaSelecionada.date),
 			});
 
-			alert('Prescrição registada com sucesso!');
+			toast.success('Prescrição registada com sucesso!');
 			setForm({
 				farmaco: '',
 				dose: '',
@@ -93,7 +110,7 @@ const FarmacoTest = ({ patientId }: Props) => {
 			});
 		} catch (error) {
 			console.error('Erro ao gravar prescrição:', error);
-			alert('Erro ao registar prescrição.');
+			toast.error('Erro ao registar prescrição.');
 		}
 	};
 

@@ -1,22 +1,16 @@
+import React from 'react';
 import { useEffect, useState } from 'react';
 import { db } from '../lib/firebase';
 import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
 
-interface Prescricao {
-	id: string;
-	farmaco: string;
-	dose: string;
-	frequencia: string;
-	observacoes: string;
-	criadoEm: any; // Timestamp do Firestore
-}
+import { ListaPrescricao } from './ListaPrescricoes';
 
 interface Props {
 	patientId: string;
 }
 
 const ListaPrescricoes = ({ patientId }: Props) => {
-	const [prescricoes, setPrescricoes] = useState<Prescricao[]>([]);
+	const [prescricoes, setPrescricoes] = useState<ListaPrescricao[]>([]);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
@@ -26,7 +20,7 @@ const ListaPrescricoes = ({ patientId }: Props) => {
 			const lista = snapshot.docs.map(doc => ({
 				id: doc.id,
 				...doc.data(),
-			})) as Prescricao[];
+			})) as ListaPrescricao[];
 
 			setPrescricoes(lista);
 			setLoading(false);

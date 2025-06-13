@@ -15,6 +15,7 @@ import { AuthProvider } from './context/AuthContext';
 import Patients from './pages/admin/Patients';
 import PatientAppointment from './pages/patient/data/PatientAppointment.tsx';
 import Settings from './layouts/Settings';
+import { Toaster } from 'react-hot-toast';
 
 function AppRoutes() {
 	const location = useLocation();
@@ -112,6 +113,7 @@ export default function App() {
 		<Router>
 			<AuthProvider>
 				<AppRoutes />
+				<Toaster position='bottom-right' />
 			</AuthProvider>
 		</Router>
 	);

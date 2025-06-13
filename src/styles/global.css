@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+.my-logo {
+  background-image: url('../assets/logo.svg');
+}
+
 :root {
 	--foreground-rgb: 0, 0, 0;
 	--background-start-rgb: 214, 219, 220;
