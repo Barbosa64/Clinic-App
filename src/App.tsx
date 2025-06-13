@@ -94,7 +94,14 @@ function AppRoutes() {
 					}
 				/>
 				{/* Fallback para rota inexistente */}
-				<Route path='*' element={<Navigate to='/' replace />} />
+				<Route
+					path='*'
+					element={
+						<ProtectedRoute allowedRoles={['admin', 'doctor', 'patient']}>
+							<Navigate to='/dashboard' replace />
+						</ProtectedRoute>
+					}
+				/>
 			</Routes>
 		</>
 	);
