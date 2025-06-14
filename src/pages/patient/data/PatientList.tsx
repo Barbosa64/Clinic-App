@@ -3,17 +3,8 @@ import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc, getDocs, collection, query, where, deleteDoc } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { Search, UserPlus } from 'lucide-react';
-
-interface Patient {
-	id: string;
-	UID: string;
-	role: string;
-	name: string;
-	email: string;
-	insurance: string;
-	insuranceNumber: string;
-	imageUrl?: string;
-}
+import { Patient } from './typesPatient';
+import toast from 'react-hot-toast';
 
 export default function PatientList() {
 	const auth = getAuth();
@@ -37,7 +28,8 @@ export default function PatientList() {
 			const querySnapshot = await getDocs(q);
 			const patientList: Patient[] = [];
 			querySnapshot.forEach(doc => {
-				patientList.push({ ...(doc.data() as Patient) });
+				const data = doc.data() as Omit<Patient, 'id'>;
+				patientList.push({ id: doc.id, ...data });
 			});
 			setPatients(patientList);
 		} catch (err) {
@@ -89,7 +81,7 @@ export default function PatientList() {
 		setError('');
 
 		if (!name || !email || (!editingPatient && !password)) {
-			setError('Por favor preencha todos os campos obrigatórios.');
+			toast.error('Por favor preencha todos os campos obrigatórios.');
 			return;
 		}
 
@@ -108,6 +100,7 @@ export default function PatientList() {
 					},
 					{ merge: true },
 				);
+				toast.success('Paciente atualizado com sucesso!');
 			} else {
 				const { user } = await createUserWithEmailAndPassword(auth, email, password);
 
@@ -120,12 +113,13 @@ export default function PatientList() {
 					insuranceNumber,
 					imageUrl,
 				});
+				toast.success('Paciente criado com sucesso!');
 			}
 
 			handleCancel();
 			await fetchPatients();
 		} catch (err: any) {
-			setError('Falhou: ' + err.message);
+			toast.error('Falhou: ' + err.message);
 		}
 	};
 
@@ -133,8 +127,9 @@ export default function PatientList() {
 		try {
 			await deleteDoc(doc(db, 'users', userId));
 			setPatients(patients.filter(patient => patient.id !== userId));
+			toast.success('Paciente eliminado com sucesso!');
 		} catch (err: any) {
-			console.error('Erro ao eliminar paciente:', err.message);
+			toast.error('Erro ao eliminar paciente:', err.message);
 		}
 	};
 

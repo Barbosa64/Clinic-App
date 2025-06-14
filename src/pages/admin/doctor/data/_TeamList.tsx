@@ -28,8 +28,17 @@ export default function TeamList() {
 			const q = query(collection(db, 'users'), where('role', '==', 'doctor'));
 			const databaseDoctorsResult = await getDocs(q);
 			const doctorList: Doctor[] = [];
-			databaseDoctorsResult.forEach(doc => {
-				doctorList.push({ ...(doc.data() as Doctor) });
+			databaseDoctorsResult.forEach(docSnapshot => {
+				const data = docSnapshot.data();
+				doctorList.push({
+					id: docSnapshot.id,
+					UID: data.UID,
+					role: data.role,
+					name: data.name,
+					email: data.email,
+					imageUrl: data.imageUrl,
+					specialty: data.specialty,
+				});
 			});
 			setDoctors(doctorList);
 		} catch (err) {
