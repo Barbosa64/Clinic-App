@@ -2,8 +2,7 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import { db } from '../lib/firebase';
 import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
-
-import { ListaPrescricao } from './ListaPrescricoes';
+import { ListaPrescricao } from '../../utils/ListaPrescricoes';
 
 interface Props {
 	patientId: string;

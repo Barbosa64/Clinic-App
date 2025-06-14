@@ -3,6 +3,7 @@ import { db } from '../../lib/firebase';
 import { collection, query, where, getDocs, addDoc, Timestamp, doc, getDoc } from 'firebase/firestore';
 import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 import { Doctor } from '../doctor/doctorType';
+import toast from 'react-hot-toast';
 
 export default function ScheduleAppointment() {
 	const [specialties, setSpecialties] = useState<string[]>([]);
@@ -49,7 +50,7 @@ export default function ScheduleAppointment() {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!selectedDoctorId || !appointmentDate || !selectedPatientId) {
-			alert('Preencha todos os campos.');
+			toast.error('Preencha todos os campos.');
 			return;
 		}
 
@@ -58,7 +59,7 @@ export default function ScheduleAppointment() {
 		try {
 			const doctorDoc = await getDoc(doc(db, 'users', selectedDoctorId));
 			if (!doctorDoc.exists()) {
-				alert('Dados do médico não encontrados!');
+				toast.error('Dados do médico não encontrados!');
 				setStatus('error');
 				return;
 			}
@@ -66,7 +67,7 @@ export default function ScheduleAppointment() {
 
 			const patientDoc = await getDoc(doc(db, 'users', selectedPatientId));
 			if (!patientDoc.exists()) {
-				alert('Dados do paciente não encontrados!');
+				toast.error('Dados do paciente não encontrados!');
 				setStatus('error');
 				return;
 			}
@@ -82,7 +83,7 @@ export default function ScheduleAppointment() {
 			});
 
 			setStatus('success');
-			alert('Consulta marcada com sucesso!');
+			toast.success('Consulta marcada com sucesso!');
 			setSelectedSpecialty('');
 			setSelectedDoctorId('');
 			setSelectedPatientId('');
@@ -90,7 +91,7 @@ export default function ScheduleAppointment() {
 		} catch (error) {
 			console.error('Erro ao marcar consulta:', error);
 			setStatus('error');
-			alert('Erro ao marcar consulta.');
+			toast.error('Erro ao marcar consulta.');
 		}
 	};
 
