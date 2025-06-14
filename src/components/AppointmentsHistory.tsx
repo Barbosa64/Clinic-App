@@ -3,6 +3,7 @@ import { collection, query, where, getDocs, DocumentData, doc, getDoc, deleteDoc
 import { db } from '../lib/firebase';
 import { getAuth } from 'firebase/auth';
 import { CalendarCheck, History } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 type Appointment = {
 	id: string;
@@ -103,10 +104,10 @@ export default function AppointmentsHistory({ patientId }: Props) {
 		try {
 			await deleteDoc(doc(db, 'Appointments', id));
 			setUpcomingAppointments(prev => prev.filter(appt => appt.id !== id));
-			alert('Consulta cancelada com sucesso.');
+			toast.success('Consulta cancelada com sucesso.');
 		} catch (error) {
 			console.error('Erro ao cancelar consulta:', error);
-			alert('Erro ao cancelar a consulta.');
+			toast.error('Erro ao cancelar a consulta.');
 		}
 	};
 
