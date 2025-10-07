@@ -1,5 +1,5 @@
 {
-	"name": "my-clinic-app",
+	"name": "clinic-app",
 	"private": true,
 	"version": "0.0.0",
 	"type": "module",
@@ -14,7 +14,13 @@
 		"@headlessui/react": "^2.2.2",
 		"@heroicons/react": "^2.2.0",
 		"@tailwindcss/vite": "^4.1.4",
+		"bcryptjs": "^3.0.2",
+		"cors": "^2.8.5",
+		"dotenv": "^17.2.3",
+		"express": "^5.1.0",
+		"jsonwebtoken": "^9.0.2",
 		"lucide-react": "^0.513.0",
+		"prisma": "^6.17.0",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"react-hot-toast": "^2.5.2",
@@ -34,5 +40,18 @@
 		"typescript": "~5.7.2",
 		"typescript-eslint": "^8.24.1",
 		"vite": "^6.2.0"
-	}
+	},
+	"description": "Projeto Final Back-End Flag",
+	"main": "eslint.config.js",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Barbosa64/Clinic-App.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/Barbosa64/Clinic-App/issues"
+	},
+	"homepage": "https://github.com/Barbosa64/Clinic-App#readme"
 }
