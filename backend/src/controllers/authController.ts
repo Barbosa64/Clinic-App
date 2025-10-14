@@ -4,16 +4,16 @@ import prisma from '../lib/prisma';
 import bcrypt from 'bcryptjs';
 
 export const register = async (req: Request, res: Response) => {
-	// 1. Obter os dados do corpo do pedido
+	// 1. Obter dados do corpo do pedido
 	const { email, password, name, role } = req.body;
 
-	// 2. Validação básica (pode ser melhorada mais tarde)
+	//  A verficar melhorias
 	if (!email || !password || !name) {
 		return res.status(400).json({ message: 'Email, password e nome são obrigatórios.' });
 	}
 
 	try {
-		// 3. Verificar se o utilizador já existe
+		// Verifica se o utilizador já existe
 		const existingUser = await prisma.user.findUnique({
 			where: { email: email },
 		});
@@ -22,10 +22,10 @@ export const register = async (req: Request, res: Response) => {
 			return res.status(409).json({ message: 'Este email já está em uso.' });
 		}
 
-		// 4. Fazer o hash da password
+		// Fazer o hash da password
 		const hashedPassword = await bcrypt.hash(password, 10); // O '10' é o "salt rounds" - um bom valor padrão
 
-		// 5. Criar o novo utilizador na base de dados
+		// Criar o novo utilizador na base de dados
 		const newUser = await prisma.user.create({
 			data: {
 				email: email,
