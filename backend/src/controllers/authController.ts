@@ -2,6 +2,7 @@
 import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 export const register = async (req: Request, res: Response) => {
 	// 1. Obter dados do corpo do pedido
@@ -36,7 +37,7 @@ export const register = async (req: Request, res: Response) => {
 		});
 
 		// 6. Enviar uma resposta de sucesso (sem a password!)
-		// (Mais tarde, aqui também vamos gerar e enviar um token JWT)
+		// (Mais tardegerar e enviar um token JWT)
 		res.status(201).json({
 			message: 'Utilizador criado com sucesso!',
 			user: {
@@ -48,6 +49,58 @@ export const register = async (req: Request, res: Response) => {
 		});
 	} catch (error) {
 		console.error('Erro no registo:', error);
+		res.status(500).json({ message: 'Erro interno do servidor.' });
+	}
+};
+
+// controller indentificar o utilizador
+export const login = async (req: Request, res: Response) => {
+	const { email, password } = req.body;
+
+	if (!email || !password) {
+		return res.status(400).json({ message: 'Email e password obrigatórios.' });
+	}
+
+	// 1. Encontrar o utilizador na base de dados pelo email
+	try {
+		const user = await prisma.user.findUnique({
+			where: { email },
+		});
+
+		if (!user) {
+			return res.status(401).json({ message: 'Credenciais inválidas.' });
+		}
+
+		const isPasswordCorrect = await bcrypt.compare(password, user.password);
+		if (!isPasswordCorrect) {
+			return res.status(401).json({ message: 'Credenciais inválidas.' });
+		}
+
+		if (!process.env.JWT_SECRET) {
+			throw new Error('JWT_SECRET não está definido no .env');
+		}
+
+		const token = jwt.sign(
+			{
+				userId: user.id,
+				role: user.role,
+			},
+			process.env.JWT_SECRET,
+			{ expiresIn: '1h' },
+		);
+
+		res.status(200).json({
+			message: 'Login bem sucedido!',
+			token,
+			user: {
+				id: user.id,
+				email: user.email,
+				name: user.name,
+				role: user.role,
+			},
+		});
+	} catch (error) {
+		console.error('Erro no login:', error);
 		res.status(500).json({ message: 'Erro interno do servidor.' });
 	}
 };
