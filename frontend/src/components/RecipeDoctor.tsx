@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../lib/firebase';
-import { collection, getDocs, query, where, orderBy, addDoc, Timestamp } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import { Syringe } from 'lucide-react';
 import { toast } from 'react-hot-toast';

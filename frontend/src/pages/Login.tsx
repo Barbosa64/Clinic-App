@@ -1,8 +1,5 @@
 import { useState } from 'react';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { db } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {

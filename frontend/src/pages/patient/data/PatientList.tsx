@@ -1,7 +1,4 @@
 import { useEffect, useState } from 'react';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc, getDocs, collection, query, where, deleteDoc } from 'firebase/firestore';
-import { db } from '../../../lib/firebase';
 import { Search, UserPlus } from 'lucide-react';
 import { Patient } from './typesPatient';
 import toast from 'react-hot-toast';

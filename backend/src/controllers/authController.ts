@@ -104,3 +104,35 @@ export const login = async (req: Request, res: Response) => {
 		res.status(500).json({ message: 'Erro interno do servidor.' });
 	}
 };
+
+//getMe
+
+export const getMe = async (req: Request, res: Response) => {
+	const userId = req.user?.userId;
+
+	if (!userId) {
+		return res.status(401).json({ message: 'Utilizador não autenticado.' });
+	}
+
+	try {
+		const user = await prisma.user.findUnique({
+			where: { id: userId },
+			select: {
+				id: true,
+				email: true,
+				name: true,
+				role: true,
+				imageUrl: true,
+			},
+		});
+
+		if (!user) {
+			return res.status(404).json({ message: 'Utilizador nao encontrado.' });
+		}
+
+		res.status(200).json(user);
+	} catch (error) {
+		console.error('Erro ao obter o utilizador:', error);
+		res.status(500).json({ message: 'Erro interno do servidor.' });
+	}
+};

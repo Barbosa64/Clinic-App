@@ -1,8 +1,4 @@
 import { useEffect, useState } from 'react';
-import { collection, query, where, onSnapshot, getDoc, doc } from 'firebase/firestore';
-import { db } from '../lib/firebase';
-import { FileText } from 'lucide-react';
-import { Timestamp } from 'firebase/firestore';
 
 interface Receita {
 	id: string;

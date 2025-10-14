@@ -1,7 +1,4 @@
 import { useEffect, useState } from 'react';
-import { db } from '../lib/firebase';
-import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
-import { ListaPrescricao } from '../lib/ListaPrescricoes';
 
 interface Props {
 	patientId: string;

@@ -1,8 +1,4 @@
 import { useEffect, useState } from 'react';
-import { getAuth, updateEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from './../lib/firebase';
-import { Timestamp } from 'firebase/firestore';
 
 export default function PatientProfile() {
 	const auth = getAuth();

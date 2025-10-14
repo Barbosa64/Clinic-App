@@ -1,8 +1,5 @@
 // src/components/LabResults.tsx
 import React, { useEffect, useState } from 'react';
-import { db, storage } from '../lib/firebase';
-import { collection, query, where, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { useAuth } from '../context/AuthContext';
 
 interface LabResult {

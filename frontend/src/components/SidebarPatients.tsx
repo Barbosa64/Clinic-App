@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react';
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
-import { db } from '../lib/firebase';
 import { Patient } from '../pages/patient/data/typesPatient';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getAuth } from 'firebase/auth';
 import { calcularIdade } from '../lib/utilsIdade';
 
 export default function SidebarPatients() {

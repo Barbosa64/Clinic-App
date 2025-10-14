@@ -1,6 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { db } from '../../../lib/firebase';
-import { collection, query, where, getDocs, addDoc, Timestamp, doc, getDoc } from 'firebase/firestore';
 import { useAuth } from '../../../context/AuthContext';
 import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 import { Stethoscope } from 'lucide-react';

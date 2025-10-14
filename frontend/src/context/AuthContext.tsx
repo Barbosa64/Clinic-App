@@ -1,7 +1,4 @@
 import { createContext, useEffect, useState, useContext } from 'react';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '../lib/firebase';
 
 type Role = 'admin' | 'doctor' | 'patient' | null;
 

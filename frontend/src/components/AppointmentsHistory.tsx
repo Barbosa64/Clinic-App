@@ -1,7 +1,4 @@
 import { useEffect, useState } from 'react';
-import { collection, query, where, getDocs, DocumentData, doc, getDoc, deleteDoc } from 'firebase/firestore';
-import { db } from '../lib/firebase';
-import { getAuth } from 'firebase/auth';
 import { CalendarCheck, History } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 

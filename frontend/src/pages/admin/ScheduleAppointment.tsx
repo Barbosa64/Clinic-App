@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react';
-import { db } from '../../lib/firebase';
-import { collection, query, where, getDocs, addDoc, Timestamp, doc, getDoc } from 'firebase/firestore';
 import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 import { Doctor } from '../doctor/doctorType';
 import toast from 'react-hot-toast';
