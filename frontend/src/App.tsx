@@ -10,7 +10,7 @@ import TeamList from './pages/admin/doctor/data/_TeamList';
 import Agenda from './pages/doctor/Agenda';
 import PatientList from './pages/patient/data/PatientList';
 import ProtectedRoute from './routes/ProtectedRoute';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext.tsx';
 
 import Patients from './pages/admin/Patients';
 import PatientAppointment from './pages/patient/data/PatientAppointment.tsx';
@@ -44,7 +44,7 @@ function AppRoutes() {
 						</ProtectedRoute>
 					}
 				/>
-				«{/* DOCTOR */}
+				{/* DOCTOR */}
 				<Route
 					path='/agenda'
 					element={

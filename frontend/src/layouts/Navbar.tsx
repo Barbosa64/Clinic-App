@@ -2,14 +2,14 @@ import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuIt
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import logo from '../assets/logo.svg';
 
 function classNames(...classes: string[]) {
 	return classes.filter(Boolean).join(' ');
 }
 
 const Navbar = () => {
-	const { user, role, loading, imageUrl } = useAuth();
-	const auth = getAuth();
+	const { user, role, loading, imageUrl, logout } = useAuth();
 	const navigate = useNavigate();
 	const location = useLocation();
 
@@ -26,7 +26,7 @@ const Navbar = () => {
 		{ name: 'Agenda', href: '/agenda', roles: ['admin', 'doctor'] },
 		{
 			name: 'Marcar Consulta',
-			href: user ? `/marcar-consulta/${user.uid}` : '/marcar-consulta',
+			href: user ? `/marcar-consulta/${user.id}` : '/marcar-consulta',
 			roles: ['patient'],
 		},
 	];
@@ -38,13 +38,9 @@ const Navbar = () => {
 			current: location.pathname === item.href || location.pathname.startsWith(item.href),
 		}));
 
-	const handleSignOut = async () => {
-		try {
-			await signOut(auth);
-			navigate('/login');
-		} catch (error) {
-			console.error('Erro ao sair:', error);
-		}
+	const handleSignOut = () => {
+		logout();
+		navigate('/login');
 	};
 
 	return (

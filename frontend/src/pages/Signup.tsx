@@ -1,46 +1,64 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Signup = () => {
+	const navigate = useNavigate();
+	const { register } = useAuth(); // (rever) usa o método centralizado do contexto
+
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
-	const [insurance, setInsurance] = useState('');
-	const [insuranceNumber, setInsuranceNumber] = useState('');
-	const [imageUrl, setImageUrl] = useState('');
-	const [gender, setGender] = useState<'Masculino' | 'Feminino' | 'Outro'>('Outro');
 	const [phone, setPhone] = useState('');
 	const [birthDate, setBirthDate] = useState('');
-	const role = 'patient';
+	const [gender, setGender] = useState<'Masculino' | 'Feminino' | 'Outro'>('Outro');
+	const [insurance, setInsurance] = useState('');
+	const [insuranceNumber, setInsuranceNumber] = useState('');
 	const [error, setError] = useState('');
-	const navigate = useNavigate();
-	const auth = getAuth();
+	const [imageUrl, setImageUrl] = useState('');
+	const [loading, setLoading] = useState(false);
+
+	const role = 'patient';
 
 	const handleSignup = async () => {
 		setError('');
+
 		if (!name || !email || !password || !phone || !birthDate || !gender) {
 			setError('Por favor, preencha todos os campos obrigatórios.');
 			return;
 		}
+
+		setLoading(true);
+
 		try {
-			const { user } = await createUserWithEmailAndPassword(auth, email, password);
+			const res = await fetch('http://localhost:3000/api/register', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
 
-			await setDoc(doc(db, 'users', user.uid), {
-				UID: user.uid,
-				role: role,
-				name,
-				email,
-				insurance,
-				insuranceNumber,
-				imageUrl,
-				gender,
-				phone,
-				birthDate,
+				body: JSON.stringify({
+					name,
+					email,
+					password,
+					phone,
+					birthDate,
+					gender,
+					role,
+					insurance,
+					insuranceNumber,
+					imageUrl,
+				}),
 			});
+			const data = await res.json();
 
-			navigate('/dashboard/' + user.uid);
+			if (!res.ok) {
+				throw new Error(data.message || 'Erro no registo');
+			}
+
+			navigate('/dashboard/${data.user.id}');
 		} catch (err: any) {
 			setError('Falhou o registo: ' + err.message);
+		} finally {
+			setLoading(false);
 		}
 	};
 
