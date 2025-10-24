@@ -1,33 +1,33 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-type Props = {
-	children: React.ReactNode;
+interface ProtectedRouteProps {
 	allowedRoles: string[];
-};
+	children: React.ReactNode;
+}
 
-export default function ProtectedRoute({ children, allowedRoles }: Props) {
-	// 'loading'
-	const authContext = useAuth();
-
-	if (!authContext) {
-		return <Navigate to='/login' replace />;
-	}
-
-	const { user, role, loading } = authContext;
+export default function ProtectedRoute({ allowedRoles, children }: ProtectedRouteProps) {
+	const { user, role, loading } = useAuth();
 
 	if (loading) {
-		return <p>A carregar autenticação...</p>;
+		return (
+			<div className='flex items-center justify-center min-h-screen'>
+				<p className='text-gray-600 text-lg'>A carregar autenticação...</p>
+			</div>
+		);
 	}
 
+	// Se não há utilizador autenticado → redireciona para login
 	if (!user) {
 		return <Navigate to='/login' replace />;
 	}
 
-	if (!allowedRoles.includes(role || '')) {
-		console.warn(`Acesso negado para o role: ${role}. Rota requer: ${allowedRoles.join(', ')}`);
-		return <Navigate to='/' replace />;
+	// Se há restrição de role e o utilizador não tem acesso
+	if (allowedRoles && !allowedRoles.includes(role || '')) {
+		console.warn(`Acesso negado: role atual "${role}", requerido: ${allowedRoles.join(', ')}`);
+		return <Navigate to='/dashboard' replace />;
 	}
 
-	return children;
+	// Suporte tanto a children diretos como rotas aninhadas
+	return children ? <>{children}</> : <Outlet />;
 }
