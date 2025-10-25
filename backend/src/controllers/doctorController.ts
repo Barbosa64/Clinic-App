@@ -105,3 +105,30 @@ export const getDoctorById = async (req: Request, res: Response) => {
 		res.status(500).json({ message: 'Erro ao procurar médico.' });
 	}
 };
+
+// Atualizar um médico, REVER ADMIN TAMBÉM PODER ATUALIZAR PASSWORD
+export const updateDoctor = async (req: Request, res: Response) => {
+	const { id } = req.params; // id URL
+	const { name, email, specialty, imageUrl } = req.body;
+
+	try {
+		const doctor = await prisma.user.findUnique({
+			where: { id },
+		});
+	
+		if (!doctor) {
+			return res.status(404).json({ message: 'Médico não encontrado.' });
+		}
+
+		if (email && email !== doctor.email) {
+			const emailExists = await prisma.user.findUnique({ where: { email } });
+			if (emailExists) {
+				return res.status(409).json({ message: 'Este email ja esta em uso.' });
+			}
+		}
+
+		// Atualizar dados do médico
+
+		const updatedDoctor = await prisma.user.update({
+			
+		})

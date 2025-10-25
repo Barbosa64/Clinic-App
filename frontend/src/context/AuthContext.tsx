@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 
-type Role = 'admin' | 'doctor' | 'patient' | null;
+type Role = 'ADMIN' | 'doctor' | 'patient' | null;
 
 interface User {
 	id: string;
@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 		const fetchUser = async () => {
 			try {
-				const res = await fetch('http://localhost:3000/api/me', {
+				const res = await fetch('http://localhost:3000/auth/me', {
 					headers: {
 						Authorization: `Bearer ${token}`,
 					},
@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	// 🔑 Login (recebe email e password)
 	const login = async (email: string, password: string) => {
 		try {
-			const res = await fetch('http://localhost:3000/api/login', {
+			const res = await fetch('http://localhost:3001/api/auth/login', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ email, password }),
@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	// 🧾 Registo de utilizador
 	const register = async (data: { name: string; email: string; password: string; role?: Role }) => {
 		try {
-			const res = await fetch('http://localhost:3000/api/register', {
+			const res = await fetch('http://localhost:3001/api/auth/register', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(data),

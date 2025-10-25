@@ -25,3 +25,14 @@ export const protect = (req: Request, res: Response, next: NextFunction) => {
 		return res.status(401).json({ message: 'Não autorizado, o token falhou a verificação.' });
 	}
 };
+
+// Middleware para verificar papéis específicos
+
+export const authorize =
+	(...roles: string[]) =>
+	(req: Request, res: Response, next: NextFunction) => {
+		if (!req.user || !roles.includes(req.user.role)) {
+			return res.status(403).json({ message: 'Não autorizado, papel insuficiente.' });
+		}
+		next();
+	};
