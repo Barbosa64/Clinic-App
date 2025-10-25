@@ -115,7 +115,7 @@ export const updateDoctor = async (req: Request, res: Response) => {
 		const doctor = await prisma.user.findUnique({
 			where: { id },
 		});
-	
+
 		if (!doctor) {
 			return res.status(404).json({ message: 'Médico não encontrado.' });
 		}
@@ -130,5 +130,52 @@ export const updateDoctor = async (req: Request, res: Response) => {
 		// Atualizar dados do médico
 
 		const updatedDoctor = await prisma.user.update({
-			
-		})
+			where: { id },
+			data: {
+				name: name || doctor.name,
+				email: email || doctor.email,
+				specialty: specialty || doctor.specialty,
+				imageUrl: imageUrl || doctor.imageUrl,
+			},
+			select: {
+				id: true,
+				name: true,
+				email: true,
+				role: true,
+				specialty: true,
+				imageUrl: true,
+			},
+		});
+
+		res.status(200).json(updatedDoctor);
+	} catch (error) {
+		res.status(500).json({ message: 'Erro ao atualizar médico.' });
+	}
+};
+
+// Apagar um médico
+
+export const deleteDoctor = async (req: Request, res: Response) => {
+	const { id } = req.params; // id URL
+
+	try {
+		//verifica se médico existe
+		const doctor = await prisma.user.findUnique({
+			where: { id },
+		});
+
+		if (!doctor || doctor.role !== 'DOCTOR') {
+			return res.status(404).json({ message: 'Médico nao encontrado.' });
+		}
+
+		//apaga Médico
+
+		await prisma.user.delete({
+			where: { id },
+		});
+
+		res.status(200).json({ message: 'Médico apagado com sucesso.' });
+	} catch (error) {
+		res.status(500).json({ message: 'Erro ao apagar médico.' });
+	}
+};
