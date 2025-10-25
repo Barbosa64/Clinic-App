@@ -64,7 +64,6 @@ export const createDoctor = async (req: Request, res: Response) => {
 				email: true,
 				specialty: true,
 				role: true,
-				imageUrl: true,
 			},
 		});
 

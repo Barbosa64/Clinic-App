@@ -7,26 +7,21 @@ interface JwtPayload {
 }
 
 export const protect = (req: Request, res: Response, next: NextFunction) => {
-	let token;
+	const authHeader = req.headers.authorization;
 
-	if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-		try {
-			token = req.headers.authorization.split(' ')[1];
-
-			const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-
-			req.user = {
-				userId: decoded.userId,
-				role: decoded.role,
-			};
-
-			next();
-		} catch (error) {
-			res.status(401).json({ message: 'Not authorized, token failed' });
-		}
+	if (!authHeader || !authHeader.startsWith('Bearer ')) {
+		return res.status(401).json({ message: 'Não autorizado, token não fornecido ou mal formatado.' });
 	}
+	try {
+		const token = authHeader.split(' ')[1];
 
-	if (!token) {
-		res.status(401).json({ message: 'Not authorized, no token' });
+		const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+		req.user = {
+			userId: decoded.userId,
+			role: decoded.role,
+		};
+		next();
+	} catch (error) {
+		return res.status(401).json({ message: 'Não autorizado, o token falhou a verificação.' });
 	}
 };
