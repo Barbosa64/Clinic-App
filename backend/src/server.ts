@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes';
 import doctorRoutes from './routes/doctorRoutes';
 import patientRoutes from './routes/patientRoutes';
+import appointmentRoutes from './routes/appointmentRoutes';
 
 // Carrega as variáveis de ambiente do ficheiro .env
 dotenv.config();
@@ -20,6 +21,7 @@ app.use(express.json()); // Permite que o servidor entenda JSON no corpo dos ped
 app.use('/api/auth', authRoutes);
 app.use('/api/doctors', doctorRoutes);
 app.use('/api/patients', patientRoutes);
+app.use('/api/appointments', appointmentRoutes);
 
 // Uma rota de teste
 app.get('/api/test', (req, res) => {
