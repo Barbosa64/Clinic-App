@@ -5,6 +5,7 @@ import authRoutes from './routes/authRoutes';
 import doctorRoutes from './routes/doctorRoutes';
 import patientRoutes from './routes/patientRoutes';
 import appointmentRoutes from './routes/appointmentRoutes';
+import prescriptionRoutes from './routes/prescriptionRoutes';
 
 // Carrega as variáveis de ambiente do ficheiro .env
 dotenv.config();
@@ -12,8 +13,8 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middlewares essenciais
-app.use(cors()); // Permite pedidos de outros domínios (o seu frontend)
+// Middlewares
+app.use(cors()); // Permite pedidos de outros domínios do seu frontend)
 app.use(express.json()); // Permite que o servidor entenda JSON no corpo dos pedidos
 
 // Rotas
@@ -22,6 +23,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/doctors', doctorRoutes);
 app.use('/api/patients', patientRoutes);
 app.use('/api/appointments', appointmentRoutes);
+app.use('/api/prescriptions', prescriptionRoutes);
 
 // Uma rota de teste
 app.get('/api/test', (req, res) => {
