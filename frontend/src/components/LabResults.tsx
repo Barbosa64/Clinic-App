@@ -1,123 +1,77 @@
 // src/components/LabResults.tsx
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-
-interface LabResult {
-	id: string;
-	patientId: string;
-	fileName: string;
-	fileUrl: string;
-	uploadAt: string;
-	type: string;
-}
+import { LabResult } from '../types';
+import { getLabResultsByPatient, uploadLabResult } from '../services/apiService';
+import { toast } from 'react-hot-toast';
 
 interface Props {
 	patientId?: string;
 }
 
 const LabResults: React.FC<Props> = ({ patientId }) => {
-	const { user, role } = useAuth();
+	const { role } = useAuth();
 	const [labResults, setLabResults] = useState<LabResult[]>([]);
 	const [file, setFile] = useState<File | null>(null);
 	const [labType, setLabType] = useState('');
-	const [selectedPatientId, setSelectedPatientId] = useState('');
 	const [loading, setLoading] = useState(false);
-
-	useEffect(() => {
-		if (role === 'patient' && user?.uid) {
-			setSelectedPatientId(user.uid);
-		} else if ((role === 'doctor' || role === 'admin') && patientId) {
-			setSelectedPatientId(patientId);
-		}
-	}, [user?.uid, role, patientId]);
+	const [uploading, setUploading] = useState(false);
 
 	const fetchResults = async () => {
-		if (!user || !selectedPatientId) return;
+		if (!patientId) return;
+		setLoading(true);
 		try {
-			const q = query(collection(db, 'LabResults'), where('patientId', '==', selectedPatientId));
-			const snapshot = await getDocs(q);
-			const results: LabResult[] = snapshot.docs.map(doc => ({
-				id: doc.id,
-				...(doc.data() as Omit<LabResult, 'id'>),
-			}));
+			const results = await getLabResultsByPatient(patientId);
 			setLabResults(results);
 		} catch (err) {
-			console.error('Erro ao buscar resultados:', err);
-		}
-	};
-
-	useEffect(() => {
-		if (selectedPatientId) {
-			fetchResults();
-		}
-	}, [selectedPatientId]);
-
-	const handleUpload = async () => {
-		if (!file || !labType || selectedPatientId === '') {
-			console.warn('Falta o arquivo, tipo do exame ou paciente selecionado');
-			return;
-		}
-
-		setLoading(true);
-
-		try {
-			const timestamp = Date.now();
-			const fileName = `${timestamp}_${file.name}`;
-			const filePath = `${selectedPatientId}/${labType}/${fileName}`;
-			const fileRef = ref(storage, filePath);
-
-			await uploadBytes(fileRef, file);
-			const url = await getDownloadURL(fileRef);
-
-			const docRef = await addDoc(collection(db, 'LabResults'), {
-				patientId: selectedPatientId,
-				fileName,
-				fileUrl: url,
-				uploadAt: new Date().toISOString(),
-				type: labType,
-			});
-
-			console.log('Arquivo salvo com ID:', docRef.id);
-			setFile(null);
-			setLabType('');
-			fetchResults();
-		} catch (err) {
-			console.error('Erro ao fazer upload:', err);
+			console.error('Erro ao carregar resultados:', err);
 		} finally {
 			setLoading(false);
 		}
 	};
 
-	const handleDelete = async (result: LabResult) => {
+	useEffect(() => {
+		fetchResults();
+	}, [patientId]);
+
+	const handleUpload = async () => {
+		if (!file || !labType || !patientId) {
+			toast.error('Por favor, selecione um arquivo e um tipo de exame.');
+			return;
+		}
+		setUploading(true);
 		try {
-			await deleteDoc(doc(db, 'LabResults', result.id));
-			const filePath = `${result.patientId}/${result.type}/${result.fileName}`;
-			await deleteObject(ref(storage, filePath));
+			await uploadLabResult(patientId, labType, file);
+			toast.success('Resultados enviados com sucesso!');
+			setFile(null);
+			setLabType('');
+			// Recarregar a lista após o upload
 			fetchResults();
 		} catch (err) {
-			console.error('Erro ao apagar:', err);
+			toast.error('Erro ao enviar resultados.');
+		} finally {
+			setUploading(false);
 		}
+	};
+
+	const handleDelete = async (resultId: string) => {
+		alert(`Funcionalidade para apagar o resultado ${resultId} ainda a ser implementada.`);
 	};
 
 	return (
 		<div className='p-4 bg-white rounded shadow'>
 			<h2 className='text-lg font-bold mb-4'>Resultados de Laboratório</h2>
 
-			{(role === 'doctor' || role === 'admin') && (
+			{(role === 'DOCTOR' || role === 'ADMIN') && (
 				<div className='mb-6'>
 					<input type='text' placeholder='Tipo de exame' value={labType} onChange={e => setLabType(e.target.value)} className='border p-2 mr-2 rounded' />
 					<input type='file' onChange={e => setFile(e.target.files?.[0] || null)} className='mr-2' />
-					{process.env.NODE_ENV === 'development' && (
-						<pre className='text-xs text-gray-500'>
-							file: {file?.name ?? 'null'} | labType: {labType || 'vazio'} | selectedPatientId: {selectedPatientId || 'vazio'}
-						</pre>
-					)}
 					<button
 						onClick={handleUpload}
-						disabled={loading || !file || !labType || !selectedPatientId}
-						className={`px-4 py-2 rounded text-white ${loading || !file || !labType || !selectedPatientId ? 'bg-gray-300 cursor-not-allowed' : 'bg-teal-500 hover:bg-teal-600'}`}
+						disabled={loading || !file || !labType || !patientId}
+						className={`px-4 py-2 rounded text-white ${loading || !file || !labType || !patientId ? 'bg-gray-300 cursor-not-allowed' : 'bg-teal-500 hover:bg-teal-600'}`}
 					>
-						{loading ? 'A enviar...' : 'Fazer upload'}
+						{uploading ? 'A enviar...' : 'Fazer upload'}
 					</button>
 				</div>
 			)}
@@ -131,8 +85,8 @@ const LabResults: React.FC<Props> = ({ patientId }) => {
 								Ver resultado
 							</a>
 						</div>
-						{(role === 'doctor' || role === 'admin') && (
-							<button onClick={() => handleDelete(result)} className='text-red-500'>
+						{(role === 'DOCTOR' || role === 'ADMIN') && (
+							<button onClick={() => handleDelete(result.id)} className='text-red-500'>
 								🗑️
 							</button>
 						)}

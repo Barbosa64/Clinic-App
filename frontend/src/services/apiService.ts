@@ -81,3 +81,30 @@ export const createPrescription = async (data: CreatePrescriptionData): Promise<
 	const response = await apiClient.post('/prescriptions', data);
 	return response.data;
 };
+
+// Resultados laboratório paciente
+
+export const getLabResultsByPatient = async (patientId: string): Promise<LabResult[]> => {
+	try {
+		const response = await apiClient.get(`/lab-results?patientId=${patientId}`);
+		return response.data;
+	} catch (error) {
+		console.error('Erro ao buscar resultados:', error);
+		return [];
+	}
+};
+
+export const uploadLabResult = async (patientId: string, type: string, file: File): Promise<LabResult> => {
+	const formData = new FormData();
+	formData.append('patientId', patientId);
+	formData.append('type', type);
+	formData.append('file', file);
+
+	const response = await apiClient.post('/lab-results', formData, {
+		headers: {
+			'Content-Type': 'multipart/form-data',
+		},
+	});
+
+	return response.data;
+};

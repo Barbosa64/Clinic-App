@@ -6,6 +6,7 @@ import doctorRoutes from './routes/doctorRoutes';
 import patientRoutes from './routes/patientRoutes';
 import appointmentRoutes from './routes/appointmentRoutes';
 import prescriptionRoutes from './routes/prescriptionRoutes';
+import labResultsRoutes from './routes/labResultsRoutes';
 
 // Carrega as variáveis de ambiente do ficheiro .env
 dotenv.config();
@@ -24,6 +25,7 @@ app.use('/api/doctors', doctorRoutes);
 app.use('/api/patients', patientRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
+app.use('/api/lab-results', labResultsRoutes);
 
 // Uma rota de teste
 app.get('/api/test', (req, res) => {

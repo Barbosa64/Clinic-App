@@ -26,6 +26,7 @@ model User {
   appointmentsAsPatient  Appointment[]  @relation("PatientAppointments")
   prescriptionsAsDoctor  Prescription[] @relation("DoctorPrescriptions")
   prescriptionsAsPatient Prescription[] @relation("PatientPrescriptions")
+  labResults LabResult[]
 }
 
 model Appointment {
@@ -60,4 +61,16 @@ enum Role {
   ADMIN
   DOCTOR
   PATIENT
+}
+
+model LabResult {
+  id        String   @id @default(cuid())
+  fileName  String
+  fileUrl   String
+  type      String
+  
+  patientId String
+  patient   User     @relation(fields: [patientId], references: [id])
+
+  uploadAt  DateTime @default(now())
 }
