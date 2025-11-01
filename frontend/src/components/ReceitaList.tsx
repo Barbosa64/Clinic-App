@@ -1,15 +1,11 @@
-import { useEffect, useState } from 'react';
+// frontend/src/components/ReceitaList.tsx
 
-interface Receita {
-	id: string;
-	farmaco: string;
-	dose: string;
-	frequencia: string;
-	observacoes: string;
-	patientId: string;
-	doctorId: string;
-	criadoEm: Timestamp | Date;
-}
+import { useEffect, useState } from 'react';
+import { FileText } from 'lucide-react';
+
+// 1. Importar a função da nossa API e o tipo
+import { getPrescriptionsByPatient } from '../services/apiService';
+import { Receita } from '../types';
 
 interface Props {
 	patientId: string;
@@ -17,46 +13,36 @@ interface Props {
 
 export default function ReceitaList({ patientId }: Props) {
 	const [receitas, setReceitas] = useState<Receita[]>([]);
-	const [doctorNames, setDoctorNames] = useState<{ [key: string]: string }>({});
+	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
+	// 2. Reescrever o useEffect para usar a nossa API
 	useEffect(() => {
-		if (!patientId) return;
+		if (!patientId) {
+			setLoading(false);
+			return;
+		}
 
-		const q = query(collection(db, 'receitas'), where('patientId', '==', patientId));
-
-		const unsubscribe = onSnapshot(
-			q,
-			async snapshot => {
-				const lista: Receita[] = snapshot.docs.map(doc => ({
-					id: doc.id,
-					...(doc.data() as Omit<Receita, 'id'>),
-				}));
-				setReceitas(lista);
-
-				const doctorIds = [...new Set(lista.map(receita => receita.doctorId))];
-				const doctorNameMap: { [key: string]: string } = {};
-
-				await Promise.all(
-					doctorIds.map(async doctorId => {
-						const docRef = doc(db, 'users', doctorId);
-						const docSnap = await getDoc(docRef);
-						doctorNameMap[doctorId] = docSnap.exists() ? docSnap.data().name : 'Desconhecido';
-					}),
-				);
-
-				setDoctorNames(doctorNameMap);
-			},
-			err => {
-				console.error('Erro ao carregar receitas:', err);
+		const fetchPrescriptions = async () => {
+			setLoading(true);
+			setError(null);
+			try {
+				const data = await getPrescriptionsByPatient(patientId);
+				setReceitas(data);
+			} catch (err) {
 				setError('Ocorreu um erro ao carregar as receitas.');
-			},
-		);
+				console.error(err);
+			} finally {
+				setLoading(false);
+			}
+		};
 
-		return () => unsubscribe();
-	}, [patientId]);
+		fetchPrescriptions();
+	}, [patientId]); // O efeito depende apenas do patientId
 
-	if (error) return <p className='text-red-500'>{error}</p>;
+	// 3. Adicionar um estado de loading para melhor feedback ao utilizador
+	if (loading) return <p className='text-center p-4'>A carregar receitas...</p>;
+	if (error) return <p className='text-red-500 text-center p-4'>{error}</p>;
 
 	return (
 		<div className='bg-white p-6 rounded-lg shadow overflow-x-auto'>
@@ -80,14 +66,15 @@ export default function ReceitaList({ patientId }: Props) {
 						</tr>
 					</thead>
 					<tbody>
-						{receitas.map(({ id, farmaco, dose, frequencia, observacoes, doctorId, criadoEm }, i) => (
+						{/* 4. Adaptar o .map() para a nova estrutura de dados */}
+						{receitas.map(({ id, farmaco, dose, frequencia, observacoes, doctor, criadoEm }, i) => (
 							<tr key={id} className={`text-sm ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-100`}>
 								<td className='p-2'>{farmaco}</td>
 								<td className='p-2'>{dose}</td>
 								<td className='p-2'>{frequencia}</td>
 								<td className='p-2'>{observacoes}</td>
-								<td className='p-2'>{doctorNames[doctorId] || <span className='text-gray-400'>A carregar...</span>}</td>
-								<td className='p-2'>{criadoEm instanceof Date ? criadoEm.toLocaleDateString('pt-PT') : criadoEm.toDate().toLocaleDateString('pt-PT')}</td>
+								<td className='p-2'>{doctor.name || 'Desconhecido'}</td>
+								<td className='p-2'>{new Date(criadoEm).toLocaleDateString('pt-PT')}</td>
 							</tr>
 						))}
 					</tbody>

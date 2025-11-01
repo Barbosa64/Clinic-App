@@ -21,9 +21,10 @@ export default function ProtectedRoute({ allowedRoles, children }: ProtectedRout
 	if (!user) {
 		return <Navigate to='/login' replace />;
 	}
+	const userRole = (role || '').toUpperCase();
 
 	// Se há restrição de role e o utilizador não tem acesso
-	if (allowedRoles && !allowedRoles.includes(role || '')) {
+	if (allowedRoles && !allowedRoles.includes(userRole || '')) {
 		console.warn(`Acesso negado: role atual "${role}", requerido: ${allowedRoles.join(', ')}`);
 		return <Navigate to='/dashboard' replace />;
 	}

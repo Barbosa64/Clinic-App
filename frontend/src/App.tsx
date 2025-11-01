@@ -31,7 +31,7 @@ function AppRoutes() {
 				<Route
 					path='/dashboard'
 					element={
-						<ProtectedRoute allowedRoles={['admin', 'doctor', 'patient']}>
+						<ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'PATIENT']}>
 							<PatientsLista />
 						</ProtectedRoute>
 					}
@@ -39,7 +39,7 @@ function AppRoutes() {
 				<Route
 					path='/consulta/admin'
 					element={
-						<ProtectedRoute allowedRoles={['admin']}>
+						<ProtectedRoute allowedRoles={['ADMIN']}>
 							<ScheduleAppointment />
 						</ProtectedRoute>
 					}
@@ -48,7 +48,7 @@ function AppRoutes() {
 				<Route
 					path='/agenda'
 					element={
-						<ProtectedRoute allowedRoles={['admin', 'doctor', 'patient']}>
+						<ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'PATIENT']}>
 							<Agenda />
 						</ProtectedRoute>
 					}
@@ -56,7 +56,7 @@ function AppRoutes() {
 				<Route
 					path='/medicos'
 					element={
-						<ProtectedRoute allowedRoles={['admin']}>
+						<ProtectedRoute allowedRoles={['ADMIN']}>
 							<TeamList />
 						</ProtectedRoute>
 					}
@@ -65,7 +65,7 @@ function AppRoutes() {
 				<Route
 					path='/pacientes'
 					element={
-						<ProtectedRoute allowedRoles={['doctor', 'admin']}>
+						<ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR']}>
 							<PatientList />
 						</ProtectedRoute>
 					}
@@ -73,7 +73,7 @@ function AppRoutes() {
 				<Route
 					path='/marcar-consulta/:id'
 					element={
-						<ProtectedRoute allowedRoles={['admin', 'patient']}>
+						<ProtectedRoute allowedRoles={['ADMIN', 'PATIENT']}>
 							<PatientAppointment />
 						</ProtectedRoute>
 					}
@@ -81,7 +81,7 @@ function AppRoutes() {
 				<Route
 					path='/dashboard/:id'
 					element={
-						<ProtectedRoute allowedRoles={['admin', 'doctor', 'patient']}>
+						<ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'PATIENT']}>
 							<Patients />
 						</ProtectedRoute>
 					}
@@ -89,7 +89,7 @@ function AppRoutes() {
 				<Route
 					path='/configuracoes'
 					element={
-						<ProtectedRoute allowedRoles={['admin', 'doctor', 'patient']}>
+						<ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'PATIENT']}>
 							<Settings />
 						</ProtectedRoute>
 					}
@@ -98,7 +98,7 @@ function AppRoutes() {
 				<Route
 					path='*'
 					element={
-						<ProtectedRoute allowedRoles={['admin', 'doctor', 'patient']}>
+						<ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'PATIENT']}>
 							<Navigate to='/dashboard' replace />
 						</ProtectedRoute>
 					}

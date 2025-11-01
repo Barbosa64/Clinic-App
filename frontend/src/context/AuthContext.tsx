@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 		const fetchUser = async () => {
 			try {
-				const res = await fetch('http://localhost:3000/auth/me', {
+				const res = await fetch('http://localhost:3001/api/auth/me', {
 					headers: {
 						Authorization: `Bearer ${token}`,
 					},
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 				const data = await res.json();
 				setUser(data);
-				setRole(data.role);
+				setRole(data.role?.toUpperCase() || null);
 				setImageUrl(data.imageUrl || null);
 			} catch (error) {
 				console.error('Erro ao carregar utilizador:', error);

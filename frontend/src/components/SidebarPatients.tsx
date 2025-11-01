@@ -1,64 +1,50 @@
+// frontend/src/components/SidebarPatients.tsx
+
 import { useState, useEffect } from 'react';
-import { Patient } from '../pages/patient/data/typesPatient';
 import { useNavigate, useParams } from 'react-router-dom';
-import { calcularIdade } from '../lib/utilsIdade';
+import { Patient } from '../pages/patient/data/typesPatient';
+import { useAuth } from '../context/AuthContext';
+import { calcularIdade } from '../lib/utilsIdade'; // Certifique-se que este caminho está correto
+
+// 1. Importar as nossas novas funções de API
+import { getPatients, getMe } from '../services/apiService';
 
 export default function SidebarPatients() {
 	const [patients, setPatients] = useState<Patient[]>([]);
 	const [searchTerm, setSearchTerm] = useState('');
 	const navigate = useNavigate();
 	const { id: selectedPatientId } = useParams();
-	const auth = getAuth();
+	const { user, role } = useAuth(); // Usamos o user e o role do nosso contexto
 
 	function classNames(...classes: string[]) {
 		return classes.filter(Boolean).join(' ');
 	}
 
+	// 2. Reescrever o useEffect para usar a nossa API
 	useEffect(() => {
-		const fetchPatients = async () => {
+		const fetchPatientsData = async () => {
+			if (!user) return; // Se não há utilizador, não fazer nada
+
 			try {
-				const user = auth.currentUser;
-				if (!user) {
-					setPatients([]);
-					return;
-				}
-
-				const userDocRef = doc(db, 'users', user.uid);
-				const userDocSnap = await getDoc(userDocRef);
-
-				if (!userDocSnap.exists()) {
-					setPatients([]);
-					return;
-				}
-
-				const userData = userDocSnap.data();
-				const role = userData.role;
-
-				if (role === 'patient') {
-					setPatients([
-						{
-							id: user.uid,
-							...userData,
-						} as Patient,
-					]);
-				} else {
-					const q = query(collection(db, 'users'), where('role', '==', 'patient'));
-					const querySnapshot = await getDocs(q);
-					const fetchedPatients: Patient[] = querySnapshot.docs.map(doc => ({
-						id: doc.id,
-						...doc.data(),
-					})) as Patient[];
+				if (role === 'ADMIN' || role === 'DOCTOR') {
+					// Se for Admin ou Médico, busca todos os pacientes
+					const fetchedPatients = await getPatients();
 					setPatients(fetchedPatients);
+				} else if (role === 'PATIENT') {
+					// Se for Paciente, busca apenas os seus próprios dados
+					const myData = await getMe();
+					setPatients([myData]); // Coloca o resultado num array para manter o tipo de estado
 				}
 			} catch (error) {
 				console.error('Erro ao procurar pacientes:', error);
+				// Opcional: Mostrar uma mensagem de erro ao utilizador
 			}
 		};
 
-		fetchPatients();
-	}, [auth]);
+		fetchPatientsData();
+	}, [user, role]); // 3. A dependência agora é o user e o role do contexto
 
-	const filteredPatients = patients.filter(patient => patient.name!.toLowerCase().includes(searchTerm.toLowerCase()));
+	const filteredPatients = patients.filter(patient => patient.name?.toLowerCase().includes(searchTerm.toLowerCase()));
 
 	return (
 		<ul role='list' className='rounded-3xl bg-white divide-y divide-gray-100'>
