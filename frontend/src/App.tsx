@@ -6,7 +6,7 @@ import PatientsLista from './pages/admin/Patients';
 import ScheduleAppointment from './pages/admin/ScheduleAppointment';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import TeamList from './pages/admin/doctor/data/_TeamList';
+import TeamList from './pages/admin/doctor/data/teamList.tsx';
 import Agenda from './pages/doctor/Agenda';
 import PatientList from './pages/patient/data/PatientList';
 import ProtectedRoute from './routes/ProtectedRoute';

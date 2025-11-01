@@ -74,3 +74,13 @@ model LabResult {
 
   uploadAt  DateTime @default(now())
 }
+
+
+model Doctor {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  password  String
+  specialty String[]
+  imageUrl  String?
+}

@@ -125,3 +125,35 @@ export const updatePatient = async (id: string, data: Partial<Patient>): Promise
 export const deletePatient = async (id: string): Promise<void> => {
 	await apiClient.delete(`/patients/${id}`);
 };
+
+// Buscar todos os médicos
+export const getDoctors = async (): Promise<Doctor[]> => {
+	const response = await apiClient.get('/doctors');
+	return response.data;
+};
+
+// Criar médico
+export const createDoctor = async (data: { name: string; email: string; password: string; imageUrl?: string; specialty: [] }): Promise<Doctor> => {
+	const response = await apiClient.post('/doctors', data);
+	return response.data;
+};
+
+// Atualizar médico
+export const updateDoctor = async (
+	id: string,
+	data: {
+		name: string;
+		email: string;
+		password?: string;
+		imageUrl?: string;
+		specialty: string[];
+	},
+): Promise<Doctor> => {
+	const response = await apiClient.put(`/doctors/${id}`, data);
+	return response.data;
+};
+
+// Deletar médico
+export const deleteDoctor = async (id: string): Promise<void> => {
+	await apiClient.delete(`/doctors/${id}`);
+};
