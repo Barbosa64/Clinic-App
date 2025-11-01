@@ -2,6 +2,7 @@ import axios from 'axios';
 import { Patient } from '../pages/patient/data/typesPatient';
 import { Receita } from '../types';
 import { Appointment } from '../types';
+import { LabResult } from '../types';
 
 const apiClient = axios.create({
 	baseURL: 'http://localhost:3001/api',

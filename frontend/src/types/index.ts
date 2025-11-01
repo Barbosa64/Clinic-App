@@ -20,3 +20,10 @@ export interface Appointment {
 		name: string;
 	};
 }
+export interface LabResult {
+	id: string;
+	fileName: string;
+	fileUrl: string;
+	type: string;
+	uploadAt: string;
+}
