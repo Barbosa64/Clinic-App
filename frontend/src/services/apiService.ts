@@ -108,3 +108,20 @@ export const uploadLabResult = async (patientId: string, type: string, file: Fil
 
 	return response.data;
 };
+
+// Criar paciente
+export const createPatient = async (data: { name: string; email: string; password: string; imageUrl?: string; insurance?: string; insuranceNumber?: string }): Promise<Patient> => {
+	const response = await apiClient.post('/patients', data);
+	return response.data;
+};
+
+// Atualizar paciente
+export const updatePatient = async (id: string, data: Partial<Patient>): Promise<Patient> => {
+	const response = await apiClient.put(`/patients/${id}`, data);
+	return response.data;
+};
+
+// Deletar paciente
+export const deletePatient = async (id: string): Promise<void> => {
+	await apiClient.delete(`/patients/${id}`);
+};

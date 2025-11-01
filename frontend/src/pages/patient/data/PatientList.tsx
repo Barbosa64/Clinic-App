@@ -2,132 +2,97 @@ import { useEffect, useState } from 'react';
 import { Search, UserPlus } from 'lucide-react';
 import { Patient } from './typesPatient';
 import toast from 'react-hot-toast';
+import { getPatients, createPatient, updatePatient, deletePatient } from '../../../services/apiService';
 
 export default function PatientList() {
-	const auth = getAuth();
+	const [patients, setPatients] = useState<Patient[]>([]);
+	const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
 
-	const role = 'patient';
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [name, setName] = useState('');
 	const [imageUrl, setImageUrl] = useState('');
 	const [insurance, setInsurance] = useState('');
 	const [insuranceNumber, setInsuranceNumber] = useState('');
-	const [error, setError] = useState('');
 	const [showModal, setShowModal] = useState(false);
-	const [patients, setPatients] = useState<Patient[]>([]);
-
 	const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
 
 	const fetchPatients = async () => {
 		try {
-			const q = query(collection(db, 'users'), where('role', '==', 'patient'));
-			const querySnapshot = await getDocs(q);
-			const patientList: Patient[] = [];
-			querySnapshot.forEach(doc => {
-				const data = doc.data() as Omit<Patient, 'id'>;
-				patientList.push({ id: doc.id, ...data });
-			});
-			setPatients(patientList);
+			const data = await getPatients();
+			setPatients(data);
+			setFilteredPatients(data);
 		} catch (err) {
-			console.error('Erro ao buscar pacientes:', err);
+			toast.error('Erro ao buscar pacientes.');
+			console.error(err);
 		}
 	};
-
 	useEffect(() => {
 		fetchPatients();
 	}, []);
 
-	const openModal = () => {
-		setEditingPatient(null);
-		setEmail('');
-		setPassword('');
-		setName('');
-		setImageUrl('');
-		setInsurance('');
-		setInsuranceNumber('');
-		setError('');
-		setShowModal(true);
-	};
-
-	const openEditModal = (patient: Patient) => {
-		setEditingPatient(patient);
-		setName(patient.name);
-		setEmail(patient.email);
-		setInsurance(patient.insurance || '');
-		setInsuranceNumber(patient.insuranceNumber || '');
-		setImageUrl(patient.imageUrl || '');
-		setPassword('');
-		setError('');
-		setShowModal(true);
-	};
-
-	const handleCancel = () => {
-		setShowModal(false);
-		setEditingPatient(null);
-		setEmail('');
-		setPassword('');
-		setName('');
-		setInsurance('');
-		setInsuranceNumber('');
-		setImageUrl('');
-		setError('');
-	};
-
-	const handleSignup = async () => {
-		setError('');
-
-		if (!name || !email || (!editingPatient && !password)) {
-			toast.error('Por favor preencha todos os campos obrigatórios.');
-			return;
+	const openModal = (patient?: Patient) => {
+		if (patient) {
+			setEditingPatient(patient);
+			setName(patient.name);
+			setEmail(patient.email);
+			setInsurance(patient.insurance || '');
+			setInsuranceNumber(patient.insuranceNumber || '');
+			setImageUrl(patient.imageUrl || '');
+		} else {
+			setEditingPatient(null);
+			setName('');
+			setEmail('');
+			setPassword('');
+			setInsurance('');
+			setInsuranceNumber('');
+			setImageUrl('');
 		}
+		setShowModal(true);
+	};
 
+	const handleCancel = () => setShowModal(false);
+
+	// 🔹 Criar ou atualizar paciente
+	const handleSave = async () => {
 		try {
+			if (!name || !email || (!editingPatient && !password)) {
+				toast.error('Preencha todos os campos obrigatórios.');
+				return;
+			}
+
 			if (editingPatient) {
-				await setDoc(
-					doc(db, 'users', editingPatient.id),
-					{
-						UID: editingPatient.id,
-						role: role,
-						name,
-						email,
-						imageUrl,
-						insurance,
-						insuranceNumber,
-					},
-					{ merge: true },
-				);
+				await updatePatient(editingPatient.id, { name, email, insurance, insuranceNumber, imageUrl });
 				toast.success('Paciente atualizado com sucesso!');
 			} else {
-				const { user } = await createUserWithEmailAndPassword(auth, email, password);
-
-				await setDoc(doc(db, 'users', user.uid), {
-					UID: user.uid,
-					role: role,
-					name,
-					email,
-					insurance,
-					insuranceNumber,
-					imageUrl,
-				});
+				await createPatient({ name, email, password, insurance, insuranceNumber, imageUrl });
 				toast.success('Paciente criado com sucesso!');
 			}
 
-			handleCancel();
+			setShowModal(false);
 			await fetchPatients();
 		} catch (err: any) {
-			toast.error('Falhou: ' + err.message);
+			console.error(err);
+			toast.error('Erro ao salvar paciente.');
 		}
 	};
 
-	const handleDeletePatient = async (userId: string) => {
+	// 🔹 Deletar paciente
+	const handleDelete = async (id: string) => {
+		if (!confirm('Tem certeza que deseja eliminar este paciente?')) return;
 		try {
-			await deleteDoc(doc(db, 'users', userId));
-			setPatients(patients.filter(patient => patient.id !== userId));
+			await deletePatient(id);
 			toast.success('Paciente eliminado com sucesso!');
+			await fetchPatients();
 		} catch (err: any) {
-			toast.error('Erro ao eliminar paciente:', err.message);
+			toast.error('Erro ao eliminar paciente.');
 		}
+	};
+
+	// 🔹 Pesquisar
+	const handleSearch = (value: string) => {
+		const search = value.toLowerCase();
+		setFilteredPatients(patients.filter(p => p.name.toLowerCase().includes(search) || p.email.toLowerCase().includes(search)));
 	};
 
 	return (
@@ -144,20 +109,17 @@ export default function PatientList() {
 						type='text'
 						placeholder='Pesquisar por nome ou email...'
 						className='pl-10 pr-4 py-2 w-full rounded-md border border-gray-300 bg-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none'
-						onChange={e => {
-							const value = e.target.value.toLowerCase();
-							setPatients(value ? patients.filter(p => p.name.toLowerCase().includes(value) || p.email.toLowerCase().includes(value)) : [...patients]);
-						}}
+						onChange={e => handleSearch(e.target.value)}
 					/>
 				</div>
-				<button onClick={openModal} className='bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-4 rounded shadow'>
+				<button onClick={() => openModal()} className='bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-4 rounded shadow'>
 					Adicionar Paciente
 				</button>
 			</div>
 
 			<ul className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2'>
-				{patients.map((patient, index) => (
-					<li key={index} className='bg-white p-4 rounded shadow flex items-center space-x-4 flex-wrap sm:flex-nowrap'>
+				{filteredPatients.map(patient => (
+					<li key={patient.id} className='bg-white p-4 rounded shadow flex items-center space-x-4 flex-wrap sm:flex-nowrap'>
 						<img src={patient.imageUrl || 'https://placehold.co/100x100?text=Avatar'} alt={patient.name} className='h-16 w-16 rounded-full object-cover flex-shrink-0' />
 
 						<div className='flex-1 min-w-0'>
@@ -167,14 +129,14 @@ export default function PatientList() {
 
 						<div className='flex space-x-2 flex-shrink-0'>
 							<button
-								onClick={() => openEditModal(patient)}
+								onClick={() => openModal(patient)}
 								className='text-green-600 hover:text-white border border-green-600 hover:bg-green-600 rounded px-3 py-1 text-sm font-semibold transition-colors duration-200 whitespace-nowrap'
 							>
 								Editar
 							</button>
 
 							<button
-								onClick={() => handleDeletePatient(patient.id)}
+								onClick={() => handleDelete(patient.id)}
 								className='text-red-600 hover:text-white border border-red-600 hover:bg-red-600 rounded px-3 py-1 text-sm font-semibold transition-colors duration-200 whitespace-nowrap'
 							>
 								Eliminar
@@ -188,7 +150,6 @@ export default function PatientList() {
 				<div className='fixed inset-0 z-40 flex justify-center items-center p-4 bg-black bg-opacity-50'>
 					<div className='bg-white p-6 rounded-lg shadow-xl w-full max-w-md z-50'>
 						<h2 className='text-xl font-semibold mb-4'>{editingPatient ? 'Editar Paciente' : 'Adicionar Novo Paciente'}</h2>
-						{error && <p className='text-red-600 mb-2 text-sm font-medium'>{error}</p>}
 						<form onSubmit={e => e.preventDefault()} className='space-y-4'>
 							<div>
 								<label htmlFor='name' className='block text-sm font-medium text-gray-700'>
@@ -279,7 +240,7 @@ export default function PatientList() {
 								<button type='button' onClick={handleCancel} className='px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-md shadow-sm'>
 									Cancelar
 								</button>
-								<button onClick={handleSignup} type='submit' className='px-4 py-2 text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-md'>
+								<button onClick={handleSave} type='submit' className='px-4 py-2 text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-md'>
 									{editingPatient ? 'Salvar Alterações' : 'Criar Paciente'}
 								</button>
 							</div>

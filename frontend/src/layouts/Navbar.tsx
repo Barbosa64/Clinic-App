@@ -19,15 +19,15 @@ const Navbar = () => {
 	}
 
 	const rawNavigation = [
-		{ name: 'Dashboard', href: '/dashboard', roles: ['admin', 'doctor', 'patient'] },
-		{ name: 'Médicos', href: '/medicos', roles: ['admin'] },
-		{ name: 'Pacientes', href: '/pacientes', roles: ['admin', 'doctor'] },
-		{ name: 'Consulta Admin', href: '/consulta/admin', roles: ['admin'] },
-		{ name: 'Agenda', href: '/agenda', roles: ['admin', 'doctor'] },
+		{ name: 'Dashboard', href: '/dashboard', roles: ['ADMIN', 'DOCTOR', 'PATIENT'] },
+		{ name: 'Médicos', href: '/medicos', roles: ['ADMIN'] },
+		{ name: 'Pacientes', href: '/pacientes', roles: ['ADMIN', 'DOCTOR'] },
+		{ name: 'Consulta Admin', href: '/consulta/admin', roles: ['ADMIN'] },
+		{ name: 'Agenda', href: '/agenda', roles: ['ADMIN', 'DOCTOR'] },
 		{
 			name: 'Marcar Consulta',
 			href: user ? `/marcar-consulta/${user.id}` : '/marcar-consulta',
-			roles: ['patient'],
+			roles: ['PATIENT'],
 		},
 	];
 
