@@ -17,18 +17,15 @@ export default function ProtectedRoute({ allowedRoles, children }: ProtectedRout
 		);
 	}
 
-	// Se não há utilizador autenticado → redireciona para login
 	if (!user) {
 		return <Navigate to='/login' replace />;
 	}
 	const userRole = (role || '').toUpperCase();
 
-	// Se há restrição de role e o utilizador não tem acesso
 	if (allowedRoles && !allowedRoles.includes(userRole || '')) {
 		console.warn(`Acesso negado: role atual "${role}", requerido: ${allowedRoles.join(', ')}`);
 		return <Navigate to='/dashboard' replace />;
 	}
 
-	// Suporte tanto a children diretos como rotas aninhadas
 	return children ? <>{children}</> : <Outlet />;
 }

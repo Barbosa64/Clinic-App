@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Patient } from '../pages/patient/data/typesPatient';
 import { CalendarIcon, PhoneIcon, ShieldCheckIcon } from 'lucide-react';
 import { calcularIdade } from '../lib/utilsIdade';
+import { getPatientById } from '../services/apiService';
 
 type Props = {
 	id: string;
@@ -12,22 +13,19 @@ export default function PatientProfileCard({ id }: Props) {
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		const fetchPatient = async () => {
-			if (!id) {
-				setLoading(false);
-				return;
-			}
-			try {
-				const docRef = doc(db, 'users', id);
-				const docSnap = await getDoc(docRef);
+		if (!id) {
+			setLoading(false);
+			setPatient(null);
+			return;
+		}
 
-				if (docSnap.exists()) {
-					setPatient({ id: docSnap.id, ...docSnap.data() } as Patient);
-				} else {
-					console.warn('Paciente não encontrado.');
-				}
+		const fetchPatient = async () => {
+			setLoading(true);
+			try {
+				const fetchedPatient = await getPatientById(id);
+				setPatient(fetchedPatient);
 			} catch (error) {
-				console.error('Erro ao buscar paciente:', error);
+				console.error('Falha ao carregar os dados do paciente');
 			} finally {
 				setLoading(false);
 			}
@@ -39,11 +37,9 @@ export default function PatientProfileCard({ id }: Props) {
 	if (loading) return <p className='text-center mt-10'>A carregar...</p>;
 	if (!patient) return <p className='text-center mt-10 text-red-600 font-semibold'>Paciente não encontrado</p>;
 
-	const formatBirthDate = (date: any) => {
-		if (!date) return 'N/A';
-		if (date instanceof Date) return date.toLocaleDateString('pt-PT');
-		if (date.toDate) return date.toDate().toLocaleDateString('pt-PT');
-		return 'N/A';
+	const formatBirthDate = (dateString: string | undefined) => {
+		if (!dateString) return 'N/A';
+		return new Date(dateString).toLocaleDateString('pt-PT');
 	};
 
 	return (

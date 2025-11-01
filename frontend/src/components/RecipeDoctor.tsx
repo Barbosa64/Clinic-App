@@ -2,75 +2,52 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Syringe } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-
-const farmacos = ['Ben-u-ron', 'Nolotil', 'Brufen', 'Aspirina', 'Voltaren', 'Naprosyn', 'Zitromax', 'Aerius', 'Ativan', 'Prozac', 'Ziloric', 'Pantoprazol'];
-
-interface Prescricao {
-	farmaco: string;
-	dose: string;
-	frequencia: string;
-	observacoes: string;
-	consultaId: string;
-}
-
-interface Consulta {
-	id: string;
-	date: Date;
-}
+import { createPrescription, CreatePrescriptionData, getAppointments } from '../services/apiService';
+import { Appointment } from '../types';
 
 interface Props {
 	patientId: string;
 }
 
-const FarmacoTest = ({ patientId }: Props) => {
+const RecipeDoctor = ({ patientId }: Props) => {
 	const { user, role, loading } = useAuth();
 
-	const [form, setForm] = useState<Prescricao>({
+	const [form, setForm] = useState<CreatePrescriptionData>({
+		patientId: patientId,
 		farmaco: '',
 		dose: '',
 		frequencia: '',
 		observacoes: '',
-		consultaId: '',
+		appointmentId: '',
 	});
 
-	const [consultas, setConsultas] = useState<Consulta[]>([]);
+	const [consultas, setConsultas] = useState<Appointment[]>([]);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+
+	const farmacos = ['Ben-u-ron', 'Nolotil', 'Brufen', 'Aspirina', 'Voltaren', 'Naprosyn', 'Zitromax', 'Aerius', 'Ativan', 'Prozac', 'Ziloric', 'Pantoprazol'];
 
 	useEffect(() => {
 		const fetchConsultas = async () => {
-			if (!user) return;
-
-			const consultasRef = collection(db, 'Appointments');
-
-			let q;
-
-			if (role === 'doctor') {
-				q = query(consultasRef, where('patientId', '==', patientId), where('doctorId', '==', user.uid), orderBy('date', 'desc'));
-			} else if (role === 'admin') {
-				q = query(consultasRef, where('patientId', '==', patientId), orderBy('date', 'desc'));
-			} else {
-				return;
-			}
-
+			if (!patientId) return;
 			try {
-				const snapshot = await getDocs(q);
-				const lista = snapshot.docs.map(doc => {
-					const date = doc.data().date?.toDate();
-					return { id: doc.id, date };
-				});
-				setConsultas(lista);
+				const appointmentsData = await getAppointments({ patientId: patientId });
+
+				setConsultas(appointmentsData);
 			} catch (err) {
-				console.error('Erro ao buscar consultas:', err);
+				toast.error('Erro ao carregar as consultas do paciente.');
 			}
 		};
 
-		if (!loading) {
+		if (user && (role === 'ADMIN' || role === 'DOCTOR')) {
 			fetchConsultas();
 		}
-	}, [user, patientId, role, loading]);
+
+		// Resetar o patientId no formulário se a prop mudar
+		setForm(prev => ({ ...prev, patientId: patientId }));
+	}, [patientId, user, role]);
 
 	if (loading) return <p className='text-center text-gray-500'>A carregar...</p>;
-	if (!user) return <p className='text-red-600'>Precisa de fazer login para prescrever.</p>;
-	if (role !== 'doctor' && role !== 'admin') return;
+	if (role !== 'DOCTOR' && role !== 'ADMIN') return null;
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
 		const { name, value } = e.target;
@@ -79,36 +56,30 @@ const FarmacoTest = ({ patientId }: Props) => {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-
-		const consultaSelecionada = consultas.find(c => c.id === form.consultaId);
-		if (!consultaSelecionada) {
-			alert('Consulta inválida.');
+		if (!form.appointmentId) {
+			toast.error('Por favor, selecione uma consulta associada.');
 			return;
 		}
+		setIsSubmitting(true);
 
 		try {
-			await addDoc(collection(db, 'receitas'), {
-				farmaco: form.farmaco,
-				dose: form.dose,
-				frequencia: form.frequencia,
-				observacoes: form.observacoes,
-				consulta: Timestamp.fromDate(consultaSelecionada.date),
-				patientId,
-				doctorId: user.uid,
-				criadoEm: Timestamp.fromDate(consultaSelecionada.date),
-			});
+			await createPrescription(form);
 
 			toast.success('Prescrição registada com sucesso!');
+			// Limpar o formulário
 			setForm({
+				patientId: patientId,
 				farmaco: '',
 				dose: '',
 				frequencia: '',
 				observacoes: '',
-				consultaId: '',
+				appointmentId: '',
 			});
 		} catch (error) {
 			console.error('Erro ao gravar prescrição:', error);
 			toast.error('Erro ao registar prescrição.');
+		} finally {
+			setIsSubmitting(false);
 		}
 	};
 
@@ -133,14 +104,16 @@ const FarmacoTest = ({ patientId }: Props) => {
 				</div>
 
 				<div>
-					<label className='block mb-1 font-medium'>Consulta</label>
-					<select name='consultaId' value={form.consultaId} onChange={handleChange} required className='w-full bg-gray-50 border border-gray-300 rounded p-2'>
+					<label className='block mb-1 font-medium'>Consulta Associada</label>
+					<select name='appointmentId' value={form.appointmentId} onChange={handleChange} required className='w-full bg-gray-50 border border-gray-300 rounded p-2'>
 						<option value=''>Selecione a consulta</option>
+						{}
 						{consultas.map(consulta => (
 							<option key={consulta.id} value={consulta.id}>
-								{consulta.date.toLocaleString()}
+								{new Date(consulta.date).toLocaleString('pt-PT')} - Dr. {consulta.doctor.name}
 							</option>
 						))}
+						{consultas.length === 0 && <option disabled>Nenhuma consulta encontrada para este paciente</option>}
 					</select>
 				</div>
 
@@ -160,8 +133,8 @@ const FarmacoTest = ({ patientId }: Props) => {
 				</div>
 
 				<div className='text-right'>
-					<button type='submit' className='bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition'>
-						Prescrever
+					<button type='submit' disabled={isSubmitting} className='bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition disabled:bg-gray-400'>
+						{isSubmitting ? 'A prescrever...' : 'Prescrever'}
 					</button>
 				</div>
 			</form>
@@ -169,4 +142,4 @@ const FarmacoTest = ({ patientId }: Props) => {
 	);
 };
 
-export default FarmacoTest;
+export default RecipeDoctor;

@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 
-type Role = 'ADMIN' | 'doctor' | 'patient' | null;
+type Role = 'ADMIN' | 'DOCTOR' | 'PATIENT' | null;
 
 interface User {
 	id: string;
