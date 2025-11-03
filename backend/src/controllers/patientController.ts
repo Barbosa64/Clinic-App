@@ -2,6 +2,70 @@ import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
 import bcrypt from 'bcryptjs';
 
+// ✅ FUNÇÃO ADICIONADA AQUI
+// @desc    Criar um novo paciente
+// @route   POST /api/patients
+// @access  Privado (Admin)
+export const createPatient = async (req: Request, res: Response) => {
+	// Nota: Os seus campos eram 'phoneNumber', mas o resto do código usa 'phone'. Ajustei para 'phone' para consistência.
+	const { name, email, password, phone, birthDate, gender, insurance, insuranceNumber, imageUrl } = req.body;
+
+	// Validação básica
+	if (!name || !email || !password) {
+		return res.status(400).json({ message: 'Nome, e-mail e password são obrigatórios.' });
+	}
+
+	try {
+		// Verificar se o e-mail já existe na base de dados
+		const userExists = await prisma.user.findUnique({
+			where: { email },
+		});
+
+		if (userExists) {
+			return res.status(400).json({ message: 'Este e-mail já está em uso.' });
+		}
+
+		// Encriptar a password antes de a guardar
+		const hashedPassword = await bcrypt.hash(password, 10);
+
+		// Criar o novo utilizador com o papel de 'PATIENT'
+		const newPatient = await prisma.user.create({
+			data: {
+				name,
+				email,
+				password: hashedPassword,
+				role: 'PATIENT',
+				phone,
+				birthDate: birthDate ? new Date(birthDate) : null,
+				gender,
+				insurance,
+				insuranceNumber,
+				imageUrl,
+			},
+			// Selecionar os campos a devolver (para não expor a password)
+			select: {
+				id: true,
+				name: true,
+				email: true,
+				phone: true,
+				birthDate: true,
+				gender: true,
+				insurance: true,
+				insuranceNumber: true,
+				imageUrl: true,
+			},
+		});
+
+		res.status(201).json(newPatient);
+	} catch (error) {
+		console.error('Erro ao criar paciente:', error);
+		res.status(500).json({ message: 'Erro interno do servidor ao criar paciente.' });
+	}
+};
+
+// @desc    Obter todos os pacientes
+// @route   GET /api/patients
+// @access  Privado (Admin, Doctor)
 export const getAllPatients = async (req: Request, res: Response) => {
 	try {
 		const patients = await prisma.user.findMany({
@@ -28,10 +92,10 @@ export const getAllPatients = async (req: Request, res: Response) => {
 		});
 	}
 };
+
 // @desc    Obter os dados de um paciente específico
 // @route   GET /api/patients/:id
 // @access  Privado (Admin, Doctor)
-
 export const getPatientById = async (req: Request, res: Response) => {
 	const { id } = req.params;
 
@@ -68,7 +132,6 @@ export const getPatientById = async (req: Request, res: Response) => {
 // @desc    Atualizar os dados de um paciente
 // @route   PUT /api/patients/:id
 // @access  Privado (Admin)
-
 export const updatePatient = async (req: Request, res: Response) => {
 	const { id } = req.params;
 	const { name, email, phone, birthDate, gender, insurance, insuranceNumber, imageUrl } = req.body;
@@ -126,7 +189,6 @@ export const updatePatient = async (req: Request, res: Response) => {
 // @desc    Apagar um paciente
 // @route   DELETE /api/patients/:id
 // @access  Privado (Admin)
-
 export const deletePatient = async (req: Request, res: Response) => {
 	const { id } = req.params;
 
