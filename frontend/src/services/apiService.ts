@@ -158,3 +158,17 @@ export const updateDoctor = async (
 export const deleteDoctor = async (id: string): Promise<void> => {
 	await apiClient.delete(`/doctors/${id}`);
 };
+
+// marcar consultas
+
+export interface CreateAppointmentData {
+	patientId: string;
+	doctorId: string;
+	date: string;
+}
+
+// Criar (marcar) uma nova consulta
+export const createAppointment = async (data: CreateAppointmentData): Promise<Appointment> => {
+	const response = await apiClient.post('/appointments', data);
+	return response.data;
+};

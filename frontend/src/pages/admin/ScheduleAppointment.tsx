@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 import { Doctor } from '../doctor/doctorType';
+import { Patient } from '../patient/data/typesPatient';
 import toast from 'react-hot-toast';
+import { getDoctors, getPatients, createAppointment } from '../../services/apiService';
 
 export default function ScheduleAppointment() {
+	const [doctors, setDoctors] = useState<Doctor[]>([]);
+	const [patients, setPatients] = useState<Patient[]>([]);
 	const [specialties, setSpecialties] = useState<string[]>([]);
-	const [doctors, setDoctors] = useState<any[]>([]);
-	const [patients, setPatients] = useState<any[]>([]);
 
 	const [selectedPatientId, setSelectedPatientId] = useState('');
 	const [selectedSpecialty, setSelectedSpecialty] = useState('');
@@ -17,26 +19,22 @@ export default function ScheduleAppointment() {
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				const doctorQuery = query(collection(db, 'users'), where('role', '==', 'doctor'));
-				const patientQuery = query(collection(db, 'users'), where('role', '==', 'patient'));
+				const [fetchDoctors, fetchPatients] = await Promise.all([getDoctors(), getPatients()]);
 
-				const [doctorSnap, patientSnap] = await Promise.all([getDocs(doctorQuery), getDocs(patientQuery)]);
-
-				const fetchedDoctors = doctorSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Doctor));
-				const fetchedPatients = patientSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-				setDoctors(fetchedDoctors);
-				setPatients(fetchedPatients);
+				setDoctors(fetchDoctors);
+				setPatients(fetchPatients);
 
 				const specialtiesSet = new Set<string>();
-				fetchedDoctors.forEach(doctor => {
+				fetchDoctors.forEach(doctor => {
 					if (Array.isArray(doctor.specialty)) {
 						doctor.specialty.forEach((spec: string) => specialtiesSet.add(spec));
 					}
 				});
+
 				setSpecialties(Array.from(specialtiesSet));
 			} catch (error) {
 				console.error('Erro ao buscar dados:', error);
+				toast.error('Não foi possível carregar os dados necessários.');
 			}
 		};
 
@@ -55,33 +53,17 @@ export default function ScheduleAppointment() {
 		setStatus('loading');
 
 		try {
-			const doctorDoc = await getDoc(doc(db, 'users', selectedDoctorId));
-			if (!doctorDoc.exists()) {
-				toast.error('Dados do médico não encontrados!');
-				setStatus('error');
-				return;
-			}
-			const doctorData = doctorDoc.data();
-
-			const patientDoc = await getDoc(doc(db, 'users', selectedPatientId));
-			if (!patientDoc.exists()) {
-				toast.error('Dados do paciente não encontrados!');
-				setStatus('error');
-				return;
-			}
-			const patientData = patientDoc.data();
-
-			await addDoc(collection(db, 'Appointments'), {
+			const appointmentData = {
 				doctorId: selectedDoctorId,
-				doctorName: doctorData?.name || 'Desconhecido',
-				specialty: Array.isArray(doctorData?.specialty) ? selectedSpecialty : 'N/A',
 				patientId: selectedPatientId,
-				patientName: patientData?.name || patientData?.email || 'Desconhecido',
-				date: Timestamp.fromDate(new Date(appointmentDate)),
-			});
+				date: new Date(appointmentDate).toISOString(),
+			};
+
+			await createAppointment(appointmentData);
 
 			setStatus('success');
 			toast.success('Consulta marcada com sucesso!');
+
 			setSelectedSpecialty('');
 			setSelectedDoctorId('');
 			setSelectedPatientId('');
@@ -90,6 +72,8 @@ export default function ScheduleAppointment() {
 			console.error('Erro ao marcar consulta:', error);
 			setStatus('error');
 			toast.error('Erro ao marcar consulta.');
+		} finally {
+			setStatus('idle');
 		}
 	};
 
@@ -139,7 +123,7 @@ export default function ScheduleAppointment() {
 							<option value=''>Selecione um médico</option>
 							{availableDoctors.map(doc => (
 								<option key={doc.id} value={doc.id}>
-									{doc.name} - {doc.specialty.join(', ')}
+									{doc.name} - {doc.specialty?.join(', ')}
 								</option>
 							))}
 						</select>
