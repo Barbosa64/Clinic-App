@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { Patient } from '../pages/patient/data/typesPatient';
 import { Receita } from '../types';
-import { Appointment } from '../types';
 import { LabResult } from '../types';
 import { Doctor } from '../pages/doctor/doctorType';
 
@@ -172,3 +171,13 @@ export const createAppointment = async (data: CreateAppointmentData): Promise<Ap
 	const response = await apiClient.post('/appointments', data);
 	return response.data;
 };
+
+export interface Appointment {
+	id: string;
+	date: string; // A API devolve a data como uma string ISO
+	patientId: string;
+	patientName: string; // Nome do paciente incluído
+	doctorId: string;
+	doctorName: string; // Nome do médico incluído
+	specialty?: string; // Especialidade incluída
+}

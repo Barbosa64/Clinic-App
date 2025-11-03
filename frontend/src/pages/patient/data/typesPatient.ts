@@ -1,15 +1,3 @@
-/*export type Patient = {
-	id: string;
-	name: string;
-	gender: string;
-	role: string;
-	phone: string;
-	insurance?: string;
-	insuranceNumber?: string;
-	birthDate: string;
-	imageUrl?: string;
-};*/
-
 export type Patient = {
 	id: string;
 	UID: string;
@@ -22,4 +10,4 @@ export type Patient = {
 	insurance: string;
 	insuranceNumber: string;
 	imageUrl?: string;
-} 
+};

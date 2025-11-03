@@ -1,82 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import { CalendarCheck, History, Search } from 'lucide-react';
+import { getAppointments, getMe } from '../../services/apiService';
+import { Appointment } from '../../types';
 
-interface Consulta {
-	id: string;
+interface AgendaAppointment extends Omit<Appointment, 'date'> {
 	date: Date;
-	patientName: string;
-	doctorName: string;
-	specialty?: string;
 }
 
 const Agenda: React.FC = () => {
-	const [upcoming, setUpcoming] = useState<Consulta[]>([]);
-	const [past, setPast] = useState<Consulta[]>([]);
+	const [upcoming, setUpcoming] = useState<AgendaAppointment[]>([]);
+	const [past, setPast] = useState<AgendaAppointment[]>([]);
 	const [searchTerm, setSearchTerm] = useState('');
 	const [filterSpecialty, setFilterSpecialty] = useState('');
 	const [startDate, setStartDate] = useState('');
 	const [endDate, setEndDate] = useState('');
 	const [loading, setLoading] = useState(true);
+	const [allSpecialties, setAllSpecialties] = useState<string[]>([]);
 
 	useEffect(() => {
 		const fetchConsultas = async () => {
 			try {
-				const auth = getAuth();
-				const currentUser = auth.currentUser;
-				if (!currentUser) return;
+				const currentUser = await getMe();
+				if (!currentUser) throw new Error('Utilizador não autenticado');
 
-				const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-				if (!userDoc.exists()) throw new Error('Usuário não encontrado');
-				const userData = userDoc.data() as any;
-
-				let q;
-				if (userData.role === 'admin') {
-					q = collection(db, 'Appointments');
-				} else if (userData.role === 'doctor') {
-					q = query(collection(db, 'Appointments'), where('doctorId', '==', currentUser.uid));
-				} else if (userData.role === 'patient') {
-					q = query(collection(db, 'Appointments'), where('patientId', '==', currentUser.uid));
-				} else {
-					setLoading(false);
-					return;
+				let filters: { doctorId?: string; patientId?: string } = {};
+				if (currentUser.role === 'DOCTOR') {
+					filters = { doctorId: currentUser.id };
+				} else if (currentUser.role === 'PATIENT') {
+					filters = { patientId: currentUser.id };
 				}
 
-				const querySnapshot = await getDocs(q);
+				const appointmentsFromApi = await getAppointments(filters);
+
 				const now = new Date();
+				const upcomingAppointments: AgendaAppointment[] = [];
+				const pastAppointments: AgendaAppointment[] = [];
+				const specialtiesSet = new Set<string>();
 
-				const upcomingAppointments: Consulta[] = [];
-				const pastAppointments: Consulta[] = [];
+				appointmentsFromApi.forEach(appt => {
+					const date = new Date(appt.date);
+					const processedAppointment: AgendaAppointment = { ...appt, date };
 
-				for (const docSnap of querySnapshot.docs) {
-					const data = docSnap.data();
-					const apptDate: Date = data.date.toDate();
-
-					const patientDoc = await getDoc(doc(db, 'users', data.patientId));
-					const doctorDoc = await getDoc(doc(db, 'users', data.doctorId));
-					const patientName = patientDoc.exists() ? patientDoc.data().name || 'Desconhecido' : 'Desconhecido';
-					const doctorName = doctorDoc.exists() ? doctorDoc.data().name || 'Desconhecido' : 'Desconhecido';
-					const specialty = doctorDoc.exists() ? doctorDoc.data().specialty || 'N/A' : 'N/A';
-
-					const consulta: Consulta = {
-						id: docSnap.id,
-						date: apptDate,
-						patientName,
-						doctorName,
-						specialty,
-					};
-
-					if (apptDate >= now) {
-						upcomingAppointments.push(consulta);
+					if (date >= now) {
+						upcomingAppointments.push(processedAppointment);
 					} else {
-						pastAppointments.push(consulta);
+						pastAppointments.push(processedAppointment);
 					}
-				}
+
+					if (appt.specialty) {
+						specialtiesSet.add(appt.specialty);
+					}
+				});
 
 				upcomingAppointments.sort((a, b) => a.date.getTime() - b.date.getTime());
 				pastAppointments.sort((a, b) => b.date.getTime() - a.date.getTime());
 
 				setUpcoming(upcomingAppointments);
 				setPast(pastAppointments);
+				setAllSpecialties(Array.from(specialtiesSet));
 			} catch (error) {
 				console.error('Erro ao buscar consultas:', error);
 			} finally {
@@ -87,33 +68,27 @@ const Agenda: React.FC = () => {
 		fetchConsultas();
 	}, []);
 
-	const filteredUpcoming = upcoming.filter(consulta => {
-		const consultaDate = consulta.date;
-		const start = startDate ? new Date(startDate) : null;
-		const end = endDate ? new Date(endDate) : null;
-		const specialty = consulta.specialty ? String(consulta.specialty).toLowerCase().trim() : '';
+	const applyFilters = (appointments: AgendaAppointment[]) => {
+		return appointments.filter(consulta => {
+			const consultaDate = consulta.date;
+			const start = startDate ? new Date(startDate) : null;
+			if (start) start.setHours(0, 0, 0, 0);
 
-		return (
-			(consulta.patientName.toLowerCase().includes(searchTerm.toLowerCase()) || consulta.doctorName.toLowerCase().includes(searchTerm.toLowerCase())) &&
-			(!filterSpecialty || specialty === filterSpecialty.toLowerCase().trim()) &&
-			(!start || consultaDate >= start) &&
-			(!end || consultaDate <= end)
-		);
-	});
+			const end = endDate ? new Date(endDate) : null;
+			if (end) end.setHours(23, 59, 59, 999);
 
-	const filteredPast = past.filter(consulta => {
-		const consultaDate = consulta.date;
-		const start = startDate ? new Date(startDate) : null;
-		const end = endDate ? new Date(endDate) : null;
-		const specialty = consulta.specialty ? String(consulta.specialty).toLowerCase().trim() : '';
+			return (
+				(consulta.patientName.toLowerCase().includes(searchTerm.toLowerCase()) || consulta.doctorName.toLowerCase().includes(searchTerm.toLowerCase())) &&
+				(!filterSpecialty || consulta.specialty === filterSpecialty) &&
+				(!start || consultaDate >= start) &&
+				(!end || consultaDate <= end)
+			);
+		});
+	};
 
-		return (
-			(consulta.patientName.toLowerCase().includes(searchTerm.toLowerCase()) || consulta.doctorName.toLowerCase().includes(searchTerm.toLowerCase())) &&
-			(!filterSpecialty || specialty === filterSpecialty.toLowerCase().trim()) &&
-			(!start || consultaDate >= start) &&
-			(!end || consultaDate <= end)
-		);
-	});
+	const filteredUpcoming = applyFilters(upcoming);
+	const filteredPast = applyFilters(past);
+
 	if (loading)
 		return (
 			<div className='flex justify-center items-center h-32'>
@@ -126,7 +101,7 @@ const Agenda: React.FC = () => {
 
 	return (
 		<div className='bg-white p-6 rounded-lg shadow space-y-10 max-w-5xl mx-auto'>
-			{/* Filtros aprimorados */}
+			{/* Filtros */}
 			<div className='mb-6 bg-gray-100 p-6 rounded-lg shadow-sm'>
 				<h3 className='text-lg font-semibold text-gray-700 mb-4'>🔍 Filtros de Pesquisa</h3>
 				<div className='flex flex-wrap gap-4'>
@@ -140,18 +115,18 @@ const Agenda: React.FC = () => {
 							className='p-2 pl-10 border border-gray-300 rounded w-full bg-white focus:outline-none focus:ring-2 focus:ring-teal-500'
 						/>
 					</div>
-
 					<select
 						value={filterSpecialty}
 						onChange={e => setFilterSpecialty(e.target.value)}
 						className='p-2 border border-gray-300 rounded w-full sm:w-1/3 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500'
 					>
 						<option value=''>Todas as especialidades</option>
-						<option value='Cardiologia'>Cardiologia</option>
-						<option value='Dermatologia'>Dermatologia</option>
-						<option value='Ortopedia'>Ortopedia</option>
+						{allSpecialties.map(spec => (
+							<option key={spec} value={spec}>
+								{spec}
+							</option>
+						))}
 					</select>
-
 					<input
 						type='date'
 						value={startDate}
@@ -173,26 +148,32 @@ const Agenda: React.FC = () => {
 					<CalendarCheck className='w-6 h-6 text-teal-600' />
 					Próximas Consultas
 				</h2>
-				<ul className='grid gap-6 sm:grid-cols-2'>
-					{filteredUpcoming.map(({ id, date, doctorName, patientName, specialty }) => (
-						<li key={id} className='border border-teal-200 rounded-lg p-4 bg-teal-50 shadow-sm hover:shadow-md transition'>
-							<p>
-								<strong>📅 Data:</strong> {formatDateTime(date)}
-							</p>
-							<p>
-								<strong>🩺 Médico:</strong> {doctorName}
-							</p>
-							<p>
-								<strong>🏷️ Especialidade:</strong> {specialty}
-							</p>
-							<p>
-								<strong>🧑 Paciente:</strong> {patientName}
-							</p>
-						</li>
-					))}
-				</ul>
+				{/* ✅ MELHORIA APLICADA AQUI */}
+				{filteredUpcoming.length > 0 ? (
+					<ul className='grid gap-6 sm:grid-cols-2'>
+						{filteredUpcoming.map(({ id, date, doctorName, patientName, specialty }) => (
+							<li key={id} className='border border-teal-200 rounded-lg p-4 bg-teal-50 shadow-sm hover:shadow-md transition'>
+								<p>
+									<strong>📅 Data:</strong> {formatDateTime(date)}
+								</p>
+								<p>
+									<strong>🩺 Médico:</strong> {doctorName}
+								</p>
+								<p>
+									<strong>🏷️ Especialidade:</strong> {specialty || 'N/A'}
+								</p>
+								<p>
+									<strong>🧑 Paciente:</strong> {patientName}
+								</p>
+							</li>
+						))}
+					</ul>
+				) : (
+					<p className='text-gray-500 col-span-2'>Nenhuma consulta futura encontrada com os filtros atuais.</p>
+				)}
 			</section>
 
+			{/* Consultas Passadas */}
 			<section>
 				<h2 className='text-xl font-semibold text-gray-700 mb-4 flex items-center gap-2'>
 					<History className='w-6 h-6 text-gray-600' />
@@ -212,7 +193,7 @@ const Agenda: React.FC = () => {
 									<strong>🩺 Médico:</strong> {doctorName}
 								</p>
 								<p>
-									<strong>🏷️ Especialidade:</strong> {specialty}
+									<strong>🏷️ Especialidade:</strong> {specialty || 'N/A'}
 								</p>
 							</li>
 						))}

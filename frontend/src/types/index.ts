@@ -12,13 +12,11 @@ export interface Receita {
 export interface Appointment {
 	id: string;
 	date: string;
-	specialty: string;
-	doctor: {
-		name: string;
-	};
-	patient: {
-		name: string;
-	};
+	specialty?: string;
+	doctorId: string;
+	doctorName: string;
+	patientId: string;
+	patientName: string;
 }
 export interface LabResult {
 	id: string;
