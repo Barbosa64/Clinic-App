@@ -187,3 +187,23 @@ export interface Appointment {
 export const deleteAppointment = async (id: string): Promise<void> => {
 	await apiClient.delete(`/appointments/${id}`);
 };
+
+// Settings
+
+export interface UpdateUserData {
+	name?: string;
+	email?: string;
+	imageUrl?: string;
+	insurance?: string;
+	insuranceNumber?: string;
+	birthDate?: string;
+	currentPassword?: string;
+	newPassword?: string;
+}
+
+// Atualizar os dados do utilizador logado
+
+export const updateMe = async (data: UpdateUserData): Promise<any> => {
+	const response = await apiClient.put('/auth/me', data);
+	return response.data;
+};

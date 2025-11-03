@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 type Role = 'ADMIN' | 'DOCTOR' | 'PATIENT' | null;
 
@@ -15,6 +15,7 @@ interface AuthContextType {
 	role: Role;
 	imageUrl: string | null;
 	loading: boolean;
+	setUser: React.Dispatch<React.SetStateAction<User | null>>;
 	login: (email: string, password: string) => Promise<boolean>;
 	logout: () => void;
 	register: (data: { name: string; email: string; password: string; role?: Role }) => Promise<boolean>;
@@ -64,7 +65,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		fetchUser();
 	}, []);
 
-	// 🔑 Login (recebe email e password)
+	// Login (recebe email e password)
 	const login = async (email: string, password: string) => {
 		try {
 			const res = await fetch('http://localhost:3001/api/auth/login', {
@@ -90,7 +91,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		}
 	};
 
-	// 🧾 Registo de utilizador
+	// Registo de utilizador
 	const register = async (data: { name: string; email: string; password: string; role?: Role }) => {
 		try {
 			const res = await fetch('http://localhost:3001/api/auth/register', {
@@ -119,7 +120,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		setImageUrl(null);
 	};
 
-	return <AuthContext.Provider value={{ user, role, imageUrl, loading, login, logout, register }}>{children}</AuthContext.Provider>;
+	return <AuthContext.Provider value={{ user, setUser, role, imageUrl, loading, login, logout, register }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
