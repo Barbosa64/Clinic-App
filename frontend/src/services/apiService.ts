@@ -174,10 +174,16 @@ export const createAppointment = async (data: CreateAppointmentData): Promise<Ap
 
 export interface Appointment {
 	id: string;
-	date: string; // A API devolve a data como uma string ISO
+	date: string;
 	patientId: string;
-	patientName: string; // Nome do paciente incluído
+	patientName: string;
 	doctorId: string;
-	doctorName: string; // Nome do médico incluído
-	specialty?: string; // Especialidade incluída
+	doctorName: string;
+	specialty?: string;
 }
+
+//cancelar consulta
+
+export const deleteAppointment = async (id: string): Promise<void> => {
+	await apiClient.delete(`/appointments/${id}`);
+};

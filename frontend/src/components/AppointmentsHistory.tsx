@@ -1,34 +1,42 @@
-// frontend/src/components/AppointmentsHistory.tsx
-
 import { useEffect, useState } from 'react';
 import { CalendarCheck, History } from 'lucide-react';
-
-// 1. Importar a nossa função de API e o tipo
-import { getAppointments } from '../services/apiService';
+import { getAppointments, deleteAppointment } from '../services/apiService';
 import { Appointment } from '../types';
-import { useAuth } from '../context/AuthContext'; // Precisamos do papel do utilizador
+import { useAuth } from '../context/AuthContext';
 
 interface Props {
-	patientId?: string; // Mantemos para contexto, mas a lógica principal usa o utilizador logado
+	patientId?: string;
 }
 
 export default function AppointmentsHistory({ patientId }: Props) {
 	const [pastAppointments, setPastAppointments] = useState<Appointment[]>([]);
 	const [upcomingAppointments, setUpcomingAppointments] = useState<Appointment[]>([]);
 	const [loading, setLoading] = useState(true);
-	const { role } = useAuth(); // Obter o papel do utilizador a partir do contexto
+	const { role, user } = useAuth();
 
 	useEffect(() => {
 		const fetchAppointmentsData = async () => {
 			setLoading(true);
 			try {
-				const allAppointments = await getAppointments();
+				const filters: { patientId?: string } = {};
+
+				if (role === 'PATIENT') {
+					filters.patientId = user?.id;
+				} else if (patientId) {
+					filters.patientId = patientId;
+				}
+
+				if (!filters.patientId) {
+					setLoading(false);
+					return;
+				}
+
+				const allAppointments = await getAppointments(filters);
 
 				const now = new Date();
 				const upcoming: Appointment[] = [];
 				const past: Appointment[] = [];
 
-				// Filtrar e separar as consultas em futuras e passadas
 				allAppointments.forEach(appt => {
 					if (new Date(appt.date) >= now) {
 						upcoming.push(appt);
@@ -37,7 +45,6 @@ export default function AppointmentsHistory({ patientId }: Props) {
 					}
 				});
 
-				// Ordenar as consultas
 				upcoming.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 				past.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
@@ -51,13 +58,23 @@ export default function AppointmentsHistory({ patientId }: Props) {
 		};
 
 		fetchAppointmentsData();
-	}, [patientId]); // Pode depender do patientId para re-fetch quando muda de paciente no dashboard
+	}, [patientId, role, user]);
 
 	const handleCancelAppointment = async (id: string) => {
-		// AVISO: A API para cancelar ainda não foi adicionada ao apiService
-		// Isto vai precisar da sua própria função no apiService:
-		// await apiClient.delete(`/appointments/${id}`);
-		alert('Funcionalidade de cancelar ainda a ser migrada para a nova API.');
+		if (!confirm('Tem a certeza que deseja cancelar esta consulta?')) {
+			return;
+		}
+
+		try {
+			await deleteAppointment(id);
+
+			setUpcomingAppointments(prev => prev.filter(appt => appt.id !== id));
+
+			alert('Consulta cancelada com sucesso!');
+		} catch (error) {
+			console.error('Erro ao cancelar consulta:', error);
+			alert('Não foi possível cancelar a consulta.');
+		}
 	};
 
 	if (loading)
@@ -68,13 +85,15 @@ export default function AppointmentsHistory({ patientId }: Props) {
 			</div>
 		);
 
+	const patientNameForDisplay = pastAppointments[0]?.patientName || upcomingAppointments[0]?.patientName;
+
 	return (
 		<div className='bg-white p-6 rounded-lg shadow space-y-8'>
 			{/* Próximas Consultas */}
 			<section>
 				<h2 className='text-xl font-semibold text-teal-700 mb-3 flex items-center gap-2'>
 					<CalendarCheck className='w-5 h-5 text-teal-600' />
-					Próximas Consultas
+					Próximas Consultas {role !== 'PATIENT' && patientNameForDisplay ? `de ${patientNameForDisplay}` : ''}
 				</h2>
 				{upcomingAppointments.length === 0 ? (
 					<p className='text-gray-400'>Nenhuma consulta agendada</p>
@@ -86,11 +105,17 @@ export default function AppointmentsHistory({ patientId }: Props) {
 									<span className='font-medium'>📅 Data:</span> {new Date(appt.date).toLocaleString('pt-PT')}
 								</p>
 								<p>
-									<span className='font-medium'>🩺 Médico:</span> {appt.doctor.name}
+									<span className='font-medium'>🩺 Médico:</span> {appt.doctorName}
 								</p>
 								<p>
-									<span className='font-medium'>🏷️ Especialidade:</span> {appt.specialty}
+									<span className='font-medium'>🏷️ Especialidade:</span> {appt.specialty || 'N/A'}
 								</p>
+								{/* Adicionar nome do paciente se for admin/médico */}
+								{role !== 'PATIENT' && (
+									<p>
+										<span className='font-medium'>🧑 Paciente:</span> {appt.patientName}
+									</p>
+								)}
 								{(role === 'DOCTOR' || role === 'ADMIN') && (
 									<button onClick={() => handleCancelAppointment(appt.id)} className='mt-2 px-3 py-1 bg-red-100 text-red-700 text-sm rounded hover:bg-red-200'>
 										Cancelar
@@ -118,11 +143,16 @@ export default function AppointmentsHistory({ patientId }: Props) {
 									<span className='font-medium'>📅 Data:</span> {new Date(appt.date).toLocaleString('pt-PT')}
 								</p>
 								<p>
-									<span className='font-medium'>🩺 Médico:</span> {appt.doctor.name}
+									<span className='font-medium'>🩺 Médico:</span> {appt.doctorName}
 								</p>
 								<p>
-									<span className='font-medium'>🏷️ Especialidade:</span> {appt.specialty}
+									<span className='font-medium'>🏷️ Especialidade:</span> {appt.specialty || 'N/A'}
 								</p>
+								{role !== 'PATIENT' && (
+									<p>
+										<span className='font-medium'>🧑 Paciente:</span> {appt.patientName}
+									</p>
+								)}
 							</li>
 						))}
 					</ul>

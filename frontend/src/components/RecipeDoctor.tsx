@@ -110,7 +110,7 @@ const RecipeDoctor = ({ patientId }: Props) => {
 						{}
 						{consultas.map(consulta => (
 							<option key={consulta.id} value={consulta.id}>
-								{new Date(consulta.date).toLocaleString('pt-PT')} - Dr. {consulta.doctor.name}
+								{new Date(consulta.date).toLocaleString('pt-PT')} - Dr. {consulta.doctorName || 'Desconhecido'}
 							</option>
 						))}
 						{consultas.length === 0 && <option disabled>Nenhuma consulta encontrada para este paciente</option>}

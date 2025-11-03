@@ -70,8 +70,22 @@ export const getAppointments = async (req: Request, res: Response) => {
 			},
 		});
 
-		res.status(200).json(appointments);
+		const formattedAppointments = appointments.map(appt => ({
+			id: appt.id,
+			date: appt.date,
+			specialty: appt.specialty,
+			patientId: appt.patientId,
+			// Extrai o nome do objeto aninhado 'patient'
+			patientName: appt.patient.name,
+			doctorId: appt.doctorId,
+			// Extrai o nome do objeto aninhado 'doctor'
+			doctorName: appt.doctor.name,
+		}));
+
+		// Enviar a lista formatada em vez da original
+		res.status(200).json(formattedAppointments);
 	} catch (error) {
+		console.error('Erro ao buscar consultas:', error); // Adicionar log para debugging
 		res.status(500).json({ message: 'Erro ao listar consultas.' });
 	}
 };

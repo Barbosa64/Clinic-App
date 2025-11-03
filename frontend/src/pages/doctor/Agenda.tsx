@@ -77,8 +77,11 @@ const Agenda: React.FC = () => {
 			const end = endDate ? new Date(endDate) : null;
 			if (end) end.setHours(23, 59, 59, 999);
 
+			const patientName = consulta.patientName || '';
+			const doctorName = consulta.doctorName || '';
+
 			return (
-				(consulta.patientName.toLowerCase().includes(searchTerm.toLowerCase()) || consulta.doctorName.toLowerCase().includes(searchTerm.toLowerCase())) &&
+				(patientName.toLowerCase().includes(searchTerm.toLowerCase()) || doctorName.toLowerCase().includes(searchTerm.toLowerCase())) &&
 				(!filterSpecialty || consulta.specialty === filterSpecialty) &&
 				(!start || consultaDate >= start) &&
 				(!end || consultaDate <= end)
