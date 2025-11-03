@@ -7,7 +7,7 @@ import bcrypt from 'bcryptjs';
 // @route   POST /api/patients
 // @access  Privado (Admin)
 export const createPatient = async (req: Request, res: Response) => {
-	// Nota: Os seus campos eram 'phoneNumber', mas o resto do código usa 'phone'. Ajustei para 'phone' para consistência.
+	
 	const { name, email, password, phone, birthDate, gender, insurance, insuranceNumber, imageUrl } = req.body;
 
 	// Validação básica

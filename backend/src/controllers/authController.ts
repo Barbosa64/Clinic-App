@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 
 export const register = async (req: Request, res: Response) => {
 	// 1. Obter dados do corpo do pedido
-	const { email, password, name, role } = req.body;
+	const { email, password, name } = req.body;
 
 	//  A verficar melhorias
 	if (!email || !password || !name) {
@@ -23,21 +23,21 @@ export const register = async (req: Request, res: Response) => {
 			return res.status(409).json({ message: 'Este email já está em uso.' });
 		}
 
-		// Fazer o hash da password
-		const hashedPassword = await bcrypt.hash(password, 10); // O '10' é o "salt rounds" - um bom valor padrão
+		// hash da password
+		const hashedPassword = await bcrypt.hash(password, 10);
 
 		// Criar o novo utilizador na base de dados
 		const newUser = await prisma.user.create({
 			data: {
+				name: name,
 				email: email,
 				password: hashedPassword,
-				name: name,
-				role: role || 'PATIENT', // Se não for fornecido um papel, assume 'PATIENT'
+				role: 'PATIENT', // Se não for fornecido um papel, assume 'PATIENT'
 			},
 		});
 
-		// 6. Enviar uma resposta de sucesso (sem a password!)
-		// (Mais tardegerar e enviar um token JWT)
+		// Enviar uma resposta de sucesso (sem a password)
+
 		res.status(201).json({
 			message: 'Utilizador criado com sucesso!',
 			user: {
@@ -104,8 +104,6 @@ export const login = async (req: Request, res: Response) => {
 		res.status(500).json({ message: 'Erro interno do servidor.' });
 	}
 };
-
-//getMe
 
 export const getMe = async (req: Request, res: Response) => {
 	const userId = req.user?.userId;
