@@ -3,6 +3,7 @@ import { Patient } from '../pages/patient/data/typesPatient';
 import { Receita } from '../types';
 import { Appointment } from '../types';
 import { LabResult } from '../types';
+import { Doctor } from '../pages/doctor/doctorType';
 
 const apiClient = axios.create({
 	baseURL: 'http://localhost:3001/api',
@@ -133,7 +134,7 @@ export const getDoctors = async (): Promise<Doctor[]> => {
 };
 
 // Criar médico
-export const createDoctor = async (data: { name: string; email: string; password: string; imageUrl?: string; specialty: [] }): Promise<Doctor> => {
+export const createDoctor = async (data: { name: string; email: string; password: string; imageUrl?: string; specialty: string[] }): Promise<Doctor> => {
 	const response = await apiClient.post('/doctors', data);
 	return response.data;
 };
