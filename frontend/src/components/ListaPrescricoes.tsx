@@ -1,29 +1,36 @@
 import { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
+import { getPrescriptionsByPatient } from '../services/apiService';
+import { Receita } from '../types';
 
 interface Props {
 	patientId: string;
 }
 
 const ListaPrescricoes = ({ patientId }: Props) => {
-	const [prescricoes, setPrescricoes] = useState<ListaPrescricao[]>([]);
+	const [prescricoes, setPrescricoes] = useState<Receita[]>([]);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		const q = query(collection(db, 'prescricoes'), where('patientId', '==', patientId), orderBy('criadoEm', 'desc'));
-
-		const unsubscribe = onSnapshot(q, snapshot => {
-			const lista = snapshot.docs.map(doc => ({
-				id: doc.id,
-				...doc.data(),
-			})) as ListaPrescricao[];
-
-			setPrescricoes(lista);
+		if (!patientId) {
 			setLoading(false);
-		});
+			setPrescricoes([]);
+			return;
+		}
 
-		return () => unsubscribe();
+		const fetchPrescricoes = async () => {
+			setLoading(true);
+			try {
+				const data = await getPrescriptionsByPatient(patientId);
+				setPrescricoes(data);
+			} catch (err) {
+				toast.error('Erro ao carregar as prescrições.');
+			} finally {
+				setLoading(false);
+			}
+		};
+		fetchPrescricoes();
 	}, [patientId]);
-
 	if (loading) return <p className='text-white'>A carregar...</p>;
 	if (prescricoes.length === 0) return <p className='text-white'>Nenhuma prescrição encontrada.</p>;
 
@@ -50,7 +57,7 @@ const ListaPrescricoes = ({ patientId }: Props) => {
 								<strong>Observações:</strong> {p.observacoes}
 							</p>
 						)}
-						{p.criadoEm?.toDate && <p className='text-sm text-gray-400'>Prescrito em: {p.criadoEm.toDate().toLocaleString()}</p>}
+						{p.criadoEm && <p className='text-sm text-gray-400'>Prescrito em: {new Date(p.criadoEm).toLocaleDateString('pt-PT', { dateStyle: 'long', timeStyle: 'short' })}</p>}
 					</li>
 				))}
 			</ul>

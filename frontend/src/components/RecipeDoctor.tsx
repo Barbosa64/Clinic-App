@@ -42,7 +42,7 @@ const RecipeDoctor = ({ patientId }: Props) => {
 			fetchConsultas();
 		}
 
-		// Resetar o patientId no formulário se a prop mudar
+		// Resetar o patientId no formulário
 		setForm(prev => ({ ...prev, patientId: patientId }));
 	}, [patientId, user, role]);
 
