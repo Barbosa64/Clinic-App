@@ -2,149 +2,97 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 import { Stethoscope } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 import { Patient } from './typesPatient';
 import { Doctor } from '../../doctor/doctorType';
-
-
-type Appointment = {
-	id: string; 
-	date: Timestamp;
-	doctorId: string; 
-	doctorName: string;
-	patientId: string;
-	patientName: string;
-	specialty: string;
-};
+import { Appointment } from '../../../types';
+import { getDoctors, getMe, getAppointments, createAppointment, CreateAppointmentData } from '../../../services/apiService';
 
 export default function PatientAppointment() {
-
 	const [specialties, setSpecialties] = useState<string[]>([]);
-	const [doctors, setDoctors] = useState<Doctor[]>([]); // Usar o tipo Doctor
+	const [doctors, setDoctors] = useState<Doctor[]>([]);
+	const [patientData, setPatientData] = useState<Patient | null>(null);
+	const [myAppointments, setMyAppointments] = useState<Appointment[]>([]);
+	const [loading, setLoading] = useState(true);
+
+	//formulário
 	const [selectedSpecialty, setSelectedSpecialty] = useState('');
 	const [selectedDoctorId, setSelectedDoctorId] = useState('');
 	const [appointmentDate, setAppointmentDate] = useState('');
-	const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-	const [patientData, setPatientData] = useState<Patient | null>(null); // Usar o tipo Patient
-	const [myAppointments, setMyAppointments] = useState<Appointment[]>([]); // Usar o tipo Appointment
 
 	const { user } = useAuth();
 
-	// --- FUNÇÃO REUTILIZÁVEL PARA BUSCAR CONSULTAS ---
-	const fetchMyAppointments = useCallback(async () => {
-		if (!user?.uid) return;
+	const fetchData = useCallback(async () => {
+		if (!user?.id) return;
+		setLoading(true);
 		try {
-			const appointmentsQuery = query(collection(db, 'Appointments'), where('patientId', '==', user.uid));
-			const appointmentsSnap = await getDocs(appointmentsQuery);
-			const appointmentsList = appointmentsSnap.docs.map(
-				doc =>
-					({
-						id: doc.id,
-						...doc.data(),
-					} as Appointment),
-			);
-			setMyAppointments(appointmentsList);
+			const [fetchedDoctors, fetchedPatient, fetchedAppointments] = await Promise.all([getDoctors(), getMe(), getAppointments({ patientId: user.id })]);
+
+			setDoctors(fetchedDoctors);
+			setPatientData(fetchedPatient);
+			setMyAppointments(fetchedAppointments);
+
+			// Extrair especialidades
+
+			const specialtiesSet = new Set<string>();
+			fetchedDoctors.forEach(doctor => {
+				doctor.specialty?.forEach(spec => specialtiesSet.add(spec));
+			});
+			setSpecialties(Array.from(specialtiesSet));
 		} catch (error) {
-			console.error('Erro ao buscar as minhas consultas:', error);
+			console.error('Erro ao buscar dados:', error);
+			toast.error('Não foi possível carregar os dados necessários.');
+		} finally {
+			setLoading(false);
 		}
 	}, [user]);
 
 	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const doctorQuery = query(collection(db, 'users'), where('role', '==', 'doctor'));
-				const doctorSnap = await getDocs(doctorQuery);
-
-				const fetchedDoctors = doctorSnap.docs.map(
-					doc =>
-						({
-							id: doc.id,
-							...doc.data(),
-						} as Doctor),
-				);
-				setDoctors(fetchedDoctors);
-
-				// Extrair especialidades dos doutores já carregados
-				const specialtiesSet = new Set<string>();
-				fetchedDoctors.forEach(doctor => {
-					if (Array.isArray(doctor.specialty)) {
-						doctor.specialty.forEach((spec: string) => specialtiesSet.add(spec));
-					}
-				});
-				setSpecialties(Array.from(specialtiesSet));
-
-				// Buscar dados do paciente e as suas consultas
-				if (user?.uid) {
-					const patientRef = doc(db, 'users', user.uid);
-					const patientSnap = await getDoc(patientRef);
-					if (patientSnap.exists()) {
-						setPatientData(patientSnap.data() as Patient);
-					}
-					await fetchMyAppointments();
-				}
-			} catch (error) {
-				console.error('Erro ao buscar dados:', error);
-			}
-		};
-
 		fetchData();
-	}, [user, fetchMyAppointments]);
+	}, [fetchData]);
 
-	const availableDoctors = doctors.filter(d => Array.isArray(d.specialty) && d.specialty.includes(selectedSpecialty));
+	// filtro
 
-	// --- FUNÇÃO PARA SUBMETER O FORMULÁRIO ---
+	const availableDoctors = doctors.filter(d => d.specialty?.includes(selectedSpecialty));
+
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!selectedDoctorId || !appointmentDate || !user?.uid || !patientData) {
-			alert('Preencha todos os campos.');
+		if (!selectedDoctorId || !appointmentDate || !user?.id) {
+			toast.error('Preencha todos os campos.');
 			return;
 		}
 
-		const appointmentDateTime = new Date(appointmentDate);
-		if (appointmentDateTime < new Date()) {
-			alert('A data da consulta deve ser no futuro.');
-			return; // Não mude o status para erro aqui, apenas retorne.
+		if (new Date(appointmentDate) < new Date()) {
+			toast.error('A data da consulta deve ser no futuro.');
+			return;
 		}
 
-		setStatus('loading');
+		//objeto de dados para enviar à API
+
+		const appointmentData: CreateAppointmentData = {
+			doctorId: selectedDoctorId,
+			patientId: user.id,
+			date: new Date(appointmentDate).toISOString(),
+		};
 
 		try {
-			// OTIMIZAÇÃO: Não é preciso buscar o médico na BD. Ele já está no estado 'doctors'.
-			const doctorData = doctors.find(doc => doc.id === selectedDoctorId);
-			if (!doctorData) {
-				alert('Dados do médico não encontrados!');
-				setStatus('error');
-				return;
-			}
-
-			await addDoc(collection(db, 'Appointments'), {
-				doctorId: selectedDoctorId,
-				doctorName: doctorData.name || 'Desconhecido',
-				specialty: selectedSpecialty,
-				patientId: user.uid,
-				patientName: patientData.name || 'Paciente Desconhecido', // O seu tipo Patient não tem email
-				date: Timestamp.fromDate(appointmentDateTime),
-				status: 'Scheduled', // É uma boa prática adicionar um status
-			});
-
-			setStatus('success');
-			alert('Consulta marcada com sucesso!');
+			await createAppointment(appointmentData);
+			toast.success('Consulta marcada com sucesso!');
 			setSelectedSpecialty('');
 			setSelectedDoctorId('');
 			setAppointmentDate('');
 
-			await fetchMyAppointments(); // Atualizar a lista de consultas
+			await fetchData();
 		} catch (error) {
 			console.error('Erro ao marcar consulta:', error);
-			setStatus('error');
-			alert('Erro ao marcar consulta.');
-		} finally {
-			// Garante que o estado de 'loading' é sempre limpo
-			if (status !== 'success') {
-				setStatus('idle');
-			}
+			toast.error('Erro ao marcar consulta.');
 		}
 	};
+
+	if (loading) {
+		return <p className='text-center text-gray-500'>A carregar dados...</p>;
+	}
 
 	return (
 		<div className='p-8 max-w-3xl mx-auto'>
@@ -224,7 +172,7 @@ export default function PatientAppointment() {
 								</p>
 								<p className='text-gray-800'>
 									<span className='font-semibold'>📅 Data:</span>{' '}
-									{new Date(appt.date.seconds * 1000).toLocaleString('pt-PT', {
+									{new Date(appt.date).toLocaleString('pt-PT', {
 										dateStyle: 'long',
 										timeStyle: 'short',
 									})}
