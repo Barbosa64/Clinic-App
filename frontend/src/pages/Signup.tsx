@@ -1,62 +1,47 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-hot-toast';
+import { RegisterData } from '../context/AuthContext';
 
 const Signup = () => {
 	const navigate = useNavigate();
-	const { register } = useAuth(); // (rever) usa o método centralizado do contexto
 
-	const [name, setName] = useState('');
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
-	const [phone, setPhone] = useState('');
-	const [birthDate, setBirthDate] = useState('');
-	const [gender, setGender] = useState<'Masculino' | 'Feminino' | 'Outro'>('Outro');
-	const [insurance, setInsurance] = useState('');
-	const [insuranceNumber, setInsuranceNumber] = useState('');
-	const [error, setError] = useState('');
-	const [imageUrl, setImageUrl] = useState('');
+	const { register } = useAuth();
+
+	const [formData, setFormData] = useState<RegisterData>({
+		name: '',
+		email: '',
+		password: '',
+		phone: '',
+		birthDate: '',
+		gender: 'Outro',
+		insurance: '',
+		insuranceNumber: '',
+		imageUrl: '',
+	});
 	const [loading, setLoading] = useState(false);
 
-	const role = 'patient';
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+		const { name, value } = e.target;
+		setFormData(prev => ({ ...prev, [name]: value }));
+	};
 
-	const handleSignup = async () => {
-		setError('');
-
-		if (!name || !email || !password || !phone || !birthDate || !gender) {
-			setError('Por favor, preencha todos os campos obrigatórios.');
-			return;
-		}
-
+	const handleSignup = async (e: React.FormEvent) => {
+		e.preventDefault();
 		setLoading(true);
 
 		try {
-			const res = await fetch('http://localhost:3000/api/register', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
+			const result = await register(formData);
 
-				body: JSON.stringify({
-					name,
-					email,
-					password,
-					phone,
-					birthDate,
-					gender,
-					role,
-					insurance,
-					insuranceNumber,
-					imageUrl,
-				}),
-			});
-			const data = await res.json();
-
-			if (!res.ok) {
-				throw new Error(data.message || 'Erro no registo');
+			if (result.success) {
+				toast.success('Conta criada com sucesso! Por favor, faça login.');
+				navigate('/login');
+			} else {
+				toast.error(result.message || 'Falha no registo. Verifique os seus dados.');
 			}
-
-			navigate('/dashboard/${data.user.id}');
 		} catch (err: any) {
-			setError('Falhou o registo: ' + err.message);
+			toast.error('Ocorreu um erro inesperado.');
 		} finally {
 			setLoading(false);
 		}
@@ -67,74 +52,81 @@ const Signup = () => {
 			<div className="w-full md:w-1/2 h-64 md:h-full flex flex-col items-center justify-center bg-[url('../assets/64.jpg')] bg-cover bg-center"></div>
 
 			<div className='w-full md:w-1/2 h-full bg-teal-600 flex flex-col p-6 md:p-20 justify-center'>
-				<div className='w-full flex flex-col max-w-[450px] mx-auto'>
+				{/* Envolver tudo num <form> para melhor acessibilidade e semântica */}
+				<form onSubmit={handleSignup} className='w-full flex flex-col max-w-[450px] mx-auto'>
 					<div className='w-full flex flex-col mb-10 text-white'>
 						<h3 className='text-lg mb-4'>Crie a sua conta na Clinica* para começar.</h3>
 					</div>
 
 					<div className='w-full flex flex-col mb-6'>
 						<input
+							name='name'
 							type='text'
 							placeholder='Nome'
-							className='w-full bg-transparent text-lg placeholder:text-white border-b text-white border-white py-4 mb-4 outline-none'
-							value={name}
-							onChange={e => setName(e.target.value)}
+							value={formData.name}
+							onChange={handleChange}
 							required
+							className='w-full bg-transparent text-lg placeholder:text-white border-b text-white border-white py-4 mb-4 outline-none'
 						/>
 						<input
+							name='email'
 							type='email'
 							placeholder='Email'
-							className='w-full bg-transparent text-lg placeholder:text-white border-b text-white border-white py-4 mb-4 outline-none'
-							value={email}
-							onChange={e => setEmail(e.target.value)}
+							value={formData.email}
+							onChange={handleChange}
 							required
+							className='w-full bg-transparent text-lg placeholder:text-white border-b text-white border-white py-4 mb-4 outline-none'
 						/>
 						<input
+							name='password'
 							type='password'
 							placeholder='Senha'
-							className='w-full bg-transparent text-lg placeholder:text-white border-b text-white border-white py-4 mb-4 outline-none'
-							value={password}
-							onChange={e => setPassword(e.target.value)}
+							value={formData.password}
+							onChange={handleChange}
 							required
+							className='w-full bg-transparent text-lg placeholder:text-white border-b text-white border-white py-4 mb-4 outline-none'
 						/>
 						<input
+							name='phone'
 							type='text'
 							placeholder='Telefone'
+							value={formData.phone}
+							onChange={handleChange}
 							className='w-full bg-transparent text-lg placeholder:text-white border-b text-white border-white py-4 mb-4 outline-none'
-							value={phone}
-							onChange={e => setPhone(e.target.value)}
-							required
 						/>
 						<input
+							name='birthDate'
 							type='date'
 							placeholder='Data de Nascimento'
+							value={formData.birthDate}
+							onChange={handleChange}
 							className='w-full bg-transparent text-lg placeholder:text-white border-b text-white border-white py-4 mb-4 outline-none'
-							value={birthDate}
-							onChange={e => setBirthDate(e.target.value)}
-							required
 						/>
 						<input
+							name='insurance'
 							type='text'
 							placeholder='Seguro'
+							value={formData.insurance}
+							onChange={handleChange}
 							className='w-full bg-transparent text-lg placeholder:text-white border-b text-white border-white py-4 mb-4 outline-none'
-							value={insurance}
-							onChange={e => setInsurance(e.target.value)}
 						/>
 						<input
+							name='insuranceNumber'
 							type='text'
 							placeholder='Número do Seguro'
+							value={formData.insuranceNumber}
+							onChange={handleChange}
 							className='w-full bg-transparent text-lg placeholder:text-white border-b text-white border-white py-4 mb-4 outline-none'
-							value={insuranceNumber}
-							onChange={e => setInsuranceNumber(e.target.value)}
 						/>
 						<input
+							name='imageUrl'
 							type='url'
 							placeholder='URL da Imagem'
+							value={formData.imageUrl || ''}
+							onChange={handleChange}
 							className='w-full bg-transparent text-lg placeholder:text-white border-b text-white border-white py-4 mb-4 outline-none'
-							value={imageUrl}
-							onChange={e => setImageUrl(e.target.value)}
 						/>
-						<select value={gender} onChange={e => setGender(e.target.value as 'Masculino' | 'Feminino' | 'Outro')} className='bg-transparent border border-white text-white py-3 px-2 rounded mt-2'>
+						<select name='gender' value={formData.gender} onChange={handleChange} className='bg-transparent border border-white text-white py-3 px-2 rounded mt-2'>
 							<option className='bg-black' value='Masculino'>
 								Masculino
 							</option>
@@ -147,19 +139,17 @@ const Signup = () => {
 						</select>
 					</div>
 
-					{error && <div className='text-red-500 mb-4'>{error}</div>}
-
 					<div className='w-full flex flex-col mb-4'>
-						<button onClick={handleSignup} className='w-full bg-transparent border border-white text-white font-semibold rounded py-4 mb-4'>
-							Criar Conta
+						<button type='submit' disabled={loading} className='w-full bg-transparent border border-white text-white font-semibold rounded py-4 mb-4 disabled:opacity-50'>
+							{loading ? 'A criar...' : 'Criar Conta'}
 						</button>
 					</div>
-				</div>
+				</form>
 
 				<div className='w-full flex items-center justify-center mt-10'>
-					<p className='text-sm font-normal text-gray-800'>
+					<p className='text-sm font-normal text-white'>
 						Já tem conta?
-						<span className='text-white ml-1 cursor-pointer' onClick={() => navigate('/login')}>
+						<span className='font-bold ml-1 cursor-pointer' onClick={() => navigate('/login')}>
 							Entrar
 						</span>
 					</p>

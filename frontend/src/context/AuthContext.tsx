@@ -10,6 +10,18 @@ interface User {
 	imageUrl?: string | null;
 }
 
+export interface RegisterData {
+	name: string;
+	email: string;
+	password: string;
+	phone?: string;
+	birthDate?: string;
+	gender?: 'Masculino' | 'Feminino' | 'Outro';
+	insurance?: string;
+	insuranceNumber?: string;
+	imageUrl?: string | null;
+}
+
 interface AuthContextType {
 	user: User | null;
 	role: Role;
@@ -18,7 +30,7 @@ interface AuthContextType {
 	setUser: React.Dispatch<React.SetStateAction<User | null>>;
 	login: (email: string, password: string) => Promise<boolean>;
 	logout: () => void;
-	register: (data: { name: string; email: string; password: string; role?: Role }) => Promise<boolean>;
+	register: (data: RegisterData) => Promise<{ success: boolean; message?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -65,7 +77,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		fetchUser();
 	}, []);
 
-	// Login (recebe email e password)
+	// Login
 	const login = async (email: string, password: string) => {
 		try {
 			const res = await fetch('http://localhost:3001/api/auth/login', {
@@ -92,7 +104,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	};
 
 	// Registo de utilizador
-	const register = async (data: { name: string; email: string; password: string; role?: Role }) => {
+	const register = async (data: RegisterData): Promise<{ success: boolean; message?: string }> => {
 		try {
 			const res = await fetch('http://localhost:3001/api/auth/register', {
 				method: 'POST',
@@ -101,18 +113,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 			});
 
 			if (!res.ok) {
-				console.error('Erro no registo:', res.status);
-				return false;
+				const errorData = await res.json();
+				const message = errorData.message || 'Ocorreu um erro desconhecido no registo.';
+				console.error('Erro no registo:', message);
+				return { success: false, message };
 			}
 
-			return true;
+			return { success: true };
 		} catch (err) {
-			console.error('Erro no registo:', err);
-			return false;
+			console.error('Erro de rede no registo:', err);
+			return { success: false, message: 'Não foi possível ligar ao servidor. Tente mais tarde.' };
 		}
 	};
 
-	// 🚪 Logout
+	// Logout
 	const logout = () => {
 		localStorage.removeItem('authToken');
 		setUser(null);
