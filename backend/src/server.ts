@@ -9,14 +9,22 @@ import prescriptionRoutes from './routes/prescriptionRoutes';
 import labResultsRoutes from './routes/labResultsRoutes';
 
 // Carrega as variáveis de ambiente do ficheiro .env
-dotenv.config();
+
+if (process.env.NODE_ENV !== 'production') {
+	dotenv.config();
+}
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Middlewares
-app.use(cors()); // Permite pedidos de outros domínios do seu frontend)
-app.use(express.json()); // Permite que o servidor entenda JSON no corpo dos pedidos
+
+const corsOptions = {
+	origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+};
+app.use(cors(corsOptions));
+
+app.use(express.json());
 
 // Rotas
 
