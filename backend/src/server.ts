@@ -8,6 +8,8 @@ import appointmentRoutes from './routes/appointmentRoutes';
 import prescriptionRoutes from './routes/prescriptionRoutes';
 import labResultsRoutes from './routes/labResultsRoutes';
 
+console.log('--- INICIANDO DEBUGGING DE VARIÁVEIS DE AMBIENTE ---');
+console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 // Carrega as variáveis de ambiente do ficheiro .env
 
 if (process.env.NODE_ENV !== 'production') {
