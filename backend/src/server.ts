@@ -19,12 +19,8 @@ const PORT = process.env.PORT || 3001;
 
 // Middlewares
 
-const corsOptions = {
-	origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
-};
-app.use(cors(corsOptions));
-
-app.use(express.json());
+app.use(cors()); // Permite pedidos de outros domínios do seu frontend)
+app.use(express.json()); // Permite que o servidor entenda JSON no corpo dos pedidos
 
 // Rotas
 
