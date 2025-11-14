@@ -4,7 +4,7 @@ import { Receita } from '../types';
 import { LabResult } from '../types';
 import { Doctor } from '../pages/doctor/doctorType';
 
-const API_URL = 'https://clinic-api-nigk.onrender.com/api';
+const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
 
 const apiClient = axios.create({
 	baseURL: API_URL,
