@@ -1,10 +1,12 @@
+console.log('✅ API Service v.FINAL.02 carregado. A API é: https://clinic-api-nigk.onrender.com/api');
+
 import axios from 'axios';
 import { Patient } from '../pages/patient/data/typesPatient';
 import { Receita } from '../types';
 import { LabResult } from '../types';
 import { Doctor } from '../pages/doctor/doctorType';
 
-const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+const API_URL = 'https://clinic-api-nigk.onrender.com/api';
 
 const apiClient = axios.create({
 	baseURL: API_URL,
