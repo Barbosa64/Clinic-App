@@ -8,14 +8,13 @@ import { Doctor } from '../pages/doctor/doctorType';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
 
-const apiClient = axios.create({
+export const apiClient = axios.create({
 	baseURL: API_URL,
 });
 
-// Interceptor: Adiciona o token de autenticação
 apiClient.interceptors.request.use(
 	config => {
-		const token = localStorage.getItem('authToken'); // O token será guardado aqui no login
+		const token = localStorage.getItem('authToken');
 		if (token) {
 			config.headers.Authorization = `Bearer ${token}`;
 		}

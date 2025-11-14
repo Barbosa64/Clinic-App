@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { apiClient } from '../services/apiService';
 
 type Role = 'ADMIN' | 'DOCTOR' | 'PATIENT' | null;
 
@@ -51,15 +52,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 		const fetchUser = async () => {
 			try {
-				const res = await fetch('http://localhost:3001/api/auth/me', {
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				});
+				const res = await apiClient.get('/auth/me');
 
-				if (!res.ok) throw new Error('Sessão inválida');
-
-				const data = await res.json();
+				const data = res.data;
 				setUser(data);
 				setRole(data.role?.toUpperCase() || null);
 				setImageUrl(data.imageUrl || null);
@@ -78,20 +73,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	}, []);
 
 	// Login
-	const login = async (email: string, password: string) => {
+	const login = async (email: string, password: string): Promise<boolean> => {
 		try {
-			const res = await fetch('http://localhost:3001/api/auth/login', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ email, password }),
-			});
+			const res = await apiClient.post('/auth/login', { email, password });
 
-			if (!res.ok) {
-				console.error('Login falhou:', res.status);
-				return false;
-			}
-
-			const data = await res.json();
+			const data = res.data;
 			localStorage.setItem('authToken', data.token);
 			setUser(data.user);
 			setRole(data.user.role);
@@ -106,23 +92,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	// Registo de utilizador
 	const register = async (data: RegisterData): Promise<{ success: boolean; message?: string }> => {
 		try {
-			const res = await fetch('http://localhost:3001/api/auth/register', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(data),
-			});
-
-			if (!res.ok) {
-				const errorData = await res.json();
-				const message = errorData.message || 'Ocorreu um erro desconhecido no registo.';
-				console.error('Erro no registo:', message);
-				return { success: false, message };
-			}
+			await apiClient.post('/auth/register', data);
 
 			return { success: true };
-		} catch (err) {
-			console.error('Erro de rede no registo:', err);
-			return { success: false, message: 'Não foi possível ligar ao servidor. Tente mais tarde.' };
+		} catch (err: any) {
+			// Usar 'any' para aceder a 'err.response'
+			const message = err.response?.data?.message || 'Não foi possível ligar ao servidor.';
+			console.error('Erro no registo:', message);
+			return { success: false, message };
 		}
 	};
 
