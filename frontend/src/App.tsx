@@ -1,5 +1,5 @@
 // App.tsx
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, Outlet } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './layouts/Navbar';
 
 import PatientsLista from './pages/admin/Patients';

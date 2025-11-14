@@ -13,7 +13,6 @@ export default function TeamList() {
 	const [selectedSpecialty, setSelectedSpecialty] = useState('');
 	const [showModal, setShowModal] = useState(false);
 	const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(null);
-	const [error, setError] = useState('');
 
 	const specialties = ['Cardiologia', 'Dermatologia', 'Endocrinologia', 'Ginecologia', 'Ortopedia', 'Pediatria', 'Urologia'];
 
@@ -47,7 +46,7 @@ export default function TeamList() {
 			setSelectedSpecialty('');
 			setImageUrl('');
 		}
-		setError('');
+
 		setShowModal(true);
 	};
 
