@@ -29,6 +29,22 @@ const Login = () => {
 
 	return (
 		<div className='w-full h-screen flex flex-col md:flex-row'>
+			<div
+				style={{
+					backgroundColor: 'red',
+					color: 'white',
+					padding: '10px',
+					textAlign: 'center',
+					fontWeight: 'bold',
+					position: 'fixed',
+					top: '10px',
+					left: '10px',
+					right: '10px',
+					zIndex: 9999,
+				}}
+			>
+				DEBUG MODE - API URL: {import.meta.env.VITE_API_BASE_URL || 'ERRO: VARIÁVEL NÃO DEFINIDA!'}
+			</div>
 			<div className="w-full md:w-1/2 h-64 md:h-full bg-[url('../assets/17818.jpg')] bg-cover bg-center"></div>
 			<div className='w-full md:w-1/2 h-full bg-teal-600 flex flex-col p-6 md:p-20 justify-center'>
 				<div className='w-full flex flex-col max-w-[450px] mx-auto'>
