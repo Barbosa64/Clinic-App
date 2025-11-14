@@ -20,7 +20,7 @@ export const uploadLabResult = async (req: Request, res: Response) => {
 				patientId,
 				type,
 				fileName: file.originalname,
-				fileUrl: simulatedFileUrl, // Usar o URL retornado pelo serviço de storage
+				fileUrl: simulatedFileUrl,
 			},
 		});
 		res.status(201).json(labResult);

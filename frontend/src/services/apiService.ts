@@ -4,8 +4,10 @@ import { Receita } from '../types';
 import { LabResult } from '../types';
 import { Doctor } from '../pages/doctor/doctorType';
 
+const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+
 const apiClient = axios.create({
-	baseURL: 'http://localhost:3001/api',
+	baseURL: API_URL,
 });
 
 // Interceptor: Adiciona o token de autenticação

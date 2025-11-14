@@ -61,7 +61,7 @@ export const login = async (req: Request, res: Response) => {
 		return res.status(400).json({ message: 'Email e password obrigatórios.' });
 	}
 
-	// 1. Encontrar o utilizador na base de dados pelo email
+	// Encontrar o utilizador na base de dados pelo email
 	try {
 		const user = await prisma.user.findUnique({
 			where: { email },
