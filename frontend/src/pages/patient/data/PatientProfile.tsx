@@ -19,12 +19,10 @@ export default function PatientProfile() {
 				let patientData = null;
 				if (role === 'PATIENT') {
 					patientData = await getMe();
-				} else if ((role === 'ADMIN' || role === 'DOCTOR') && id) {
+				} else if (id) {
 					patientData = await getPatientById(id);
 				}
-				if (patientData) {
-					setPatient(patientData);
-				}
+				setPatient(patientData);
 			} catch (error) {
 				const errorMessage = (error as any).response?.data?.message || 'Não foi possível carregar os dados.';
 				toast.error(errorMessage);
@@ -35,8 +33,6 @@ export default function PatientProfile() {
 		console.log(`[DEBUG] Role atual: ${role}, ID da URL: ${id}`);
 		if (role) {
 			fetchPatientData();
-		} else {
-			setLoading(true);
 		}
 	}, [role, id]);
 
