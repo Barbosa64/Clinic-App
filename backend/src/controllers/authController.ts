@@ -121,6 +121,11 @@ export const getMe = async (req: Request, res: Response) => {
 				name: true,
 				role: true,
 				imageUrl: true,
+				phone: true,
+				birthDate: true,
+				gender: true,
+				insurance: true,
+				insuranceNumber: true,
 			},
 		});
 
