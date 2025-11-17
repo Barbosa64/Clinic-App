@@ -1,5 +1,3 @@
-console.log('✅ API Service v.FINAL.02 carregado. A API é: https://clinic-api-nigk.onrender.com/api');
-
 import axios from 'axios';
 import { Patient } from '../pages/patient/data/typesPatient';
 import { Receita } from '../types';

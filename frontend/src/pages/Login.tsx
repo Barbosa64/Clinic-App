@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
 	const navigate = useNavigate();
-	const { login } = useAuth(); // Função do AuthContext que faz login via API
+	const { login } = useAuth(); // Função do AuthContext login via API
 
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
@@ -44,6 +44,7 @@ const Login = () => {
 							value={email}
 							onChange={e => setEmail(e.target.value)}
 							required
+							autoComplete='email'
 						/>
 						<input
 							type='password'
@@ -52,6 +53,7 @@ const Login = () => {
 							value={password}
 							onChange={e => setPassword(e.target.value)}
 							required
+							autoComplete='current-password'
 						/>
 
 						{error && <div className='text-red-500 mb-4'>{error}</div>}
