@@ -14,8 +14,6 @@ import labResultsRoutes from './routes/labResultsRoutes';
 console.log('--- INICIANDO DEBUGGING DE VARIÁVEIS DE AMBIENTE ---');
 console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 
-// Imprimir a DATABASE_URL para vermos o que a aplicação está a ler
-// Por segurança, vamos mostrar apenas o início e o fim da URL, não a password.
 const dbUrl = process.env.DATABASE_URL;
 if (dbUrl) {
 	console.log('DATABASE_URL encontrada. Host:', dbUrl.split('@')[1]?.split(':')[0]);

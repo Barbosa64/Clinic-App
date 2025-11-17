@@ -6,6 +6,10 @@ const router = Router();
 
 router.use(protect);
 
-router.route('/').post(authorize('ADMIN', 'DOCTOR'), createPrescription).get(getPrescriptions);
+router
+	.route('/')
+
+	.get(getPrescriptions)
+	.post(authorize('ADMIN', 'DOCTOR'), createPrescription);
 
 export default router;
