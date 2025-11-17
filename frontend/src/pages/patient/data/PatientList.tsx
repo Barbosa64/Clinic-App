@@ -120,14 +120,14 @@ export default function PatientList() {
 			<ul className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2'>
 				{filteredPatients.map(patient => (
 					<li key={patient.id} className='bg-white p-4 rounded shadow flex items-center space-x-4 flex-wrap sm:flex-nowrap'>
-						<img src={patient.imageUrl || 'https://placehold.co/100x100?text=Avatar'} alt={patient.name} className='h-16 w-16 rounded-full object-cover flex-shrink-0' />
+						<img src={patient.imageUrl || 'https://placehold.co/100x100?text=Avatar'} alt={patient.name} className='h-16 w-16 rounded-full object-cover flex-0' />
 
 						<div className='flex-1 min-w-0'>
 							<p className='font-semibold truncate'>{patient.name || 'Nome não disponível'}</p>
 							<p className='text-sm text-gray-500 truncate'>{patient.email || 'Sem email'}</p>
 						</div>
 
-						<div className='flex space-x-2 flex-shrink-0'>
+						<div className='flex space-x-2 flex-0'>
 							<button
 								onClick={() => openModal(patient)}
 								className='text-green-600 hover:text-white border border-green-600 hover:bg-green-600 rounded px-3 py-1 text-sm font-semibold transition-colors duration-200 whitespace-nowrap'

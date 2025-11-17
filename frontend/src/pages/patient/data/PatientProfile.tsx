@@ -1,25 +1,32 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useAuth } from '../../../context/AuthContext';
 import { toast } from 'react-hot-toast';
+import { getPatientById, getMe } from '../../../services/apiService';
 import { Patient } from './typesPatient';
-import { getPatientById } from '../../../services/apiService';
 
 export default function PatientProfile() {
 	const { id } = useParams<{ id: string }>();
+	const { user, role } = useAuth();
 	const [patient, setPatient] = useState<Patient | null>(null);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		if (!id) {
-			toast.error('ID do paciente não encontrado.');
-			setLoading(false);
-			return;
-		}
 		const fetchPatient = async () => {
 			setLoading(true);
+			let patientData = null;
+
 			try {
-				// Chamar a nossa função centralizada da apiService
-				const patientData = await getPatientById(id);
+				if (role === 'PATIENT') {
+					patientData = await getMe();
+				} else if (role === 'ADMIN' || role === 'DOCTOR') {
+					if (!id) {
+						toast.error('Paciente não encontrado.');
+						setLoading(false);
+						return;
+					}
+					patientData = await getPatientById(id);
+				}
 
 				if (patientData) {
 					setPatient(patientData);
@@ -27,15 +34,18 @@ export default function PatientProfile() {
 					toast.error('Paciente não encontrado.');
 				}
 			} catch (error) {
-				console.error('Erro ao buscar paciente:', error);
-				toast.error('Não foi possível carregar os dados do paciente.');
+				console.error('Erro ao buscar dados do paciente:', error);
+				const errorMessage = (error as any).response?.data?.message || 'Não foi possível carregar os dados.';
+				toast.error(errorMessage);
 			} finally {
 				setLoading(false);
 			}
 		};
 
-		fetchPatient();
-	}, [id]);
+		if (role) {
+			fetchPatient();
+		}
+	}, [id, role, user]);
 
 	if (loading) {
 		return <p className='text-center text-gray-500'>A carregar ficha do paciente...</p>;
@@ -44,6 +54,7 @@ export default function PatientProfile() {
 	if (!patient) {
 		return <p className='text-center text-red-500'>Não foi possível encontrar os dados deste paciente.</p>;
 	}
+
 	const calculateAge = (birthDateString?: string) => {
 		if (!birthDateString) return 'N/A';
 		const birthDate = new Date(birthDateString);
