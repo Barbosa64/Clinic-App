@@ -1,42 +1,30 @@
-// backend/src/controllers/authController.ts
 import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 export const register = async (req: Request, res: Response) => {
-	// 1. Obter dados do corpo do pedido
-	const { email, password, name } = req.body;
+	const { name, email, password } = req.body;
 
-	//  A verficar melhorias
 	if (!email || !password || !name) {
 		return res.status(400).json({ message: 'Email, password e nome são obrigatórios.' });
 	}
 
 	try {
-		// Verifica se o utilizador já existe
-		const existingUser = await prisma.user.findUnique({
-			where: { email: email },
-		});
-
+		const existingUser = await prisma.user.findUnique({ where: { email } });
 		if (existingUser) {
 			return res.status(409).json({ message: 'Este email já está em uso.' });
 		}
 
-		// hash da password
 		const hashedPassword = await bcrypt.hash(password, 10);
-
-		// Criar o novo utilizador na base de dados
 		const newUser = await prisma.user.create({
 			data: {
-				name: name,
-				email: email,
+				name,
+				email,
 				password: hashedPassword,
-				role: 'PATIENT', // Se não for fornecido um papel, assume 'PATIENT'
+				role: 'PATIENT',
 			},
 		});
-
-		// Enviar uma resposta de sucesso (sem a password)
 
 		res.status(201).json({
 			message: 'Utilizador criado com sucesso!',
@@ -53,7 +41,6 @@ export const register = async (req: Request, res: Response) => {
 	}
 };
 
-// controller indentificar o utilizador
 export const login = async (req: Request, res: Response) => {
 	const { email, password } = req.body;
 
@@ -61,12 +48,8 @@ export const login = async (req: Request, res: Response) => {
 		return res.status(400).json({ message: 'Email e password obrigatórios.' });
 	}
 
-	// Encontrar o utilizador na base de dados pelo email
 	try {
-		const user = await prisma.user.findUnique({
-			where: { email },
-		});
-
+		const user = await prisma.user.findUnique({ where: { email } });
 		if (!user) {
 			return res.status(401).json({ message: 'Credenciais inválidas.' });
 		}
@@ -80,14 +63,7 @@ export const login = async (req: Request, res: Response) => {
 			throw new Error('JWT_SECRET não está definido no .env');
 		}
 
-		const token = jwt.sign(
-			{
-				userId: user.id,
-				role: user.role,
-			},
-			process.env.JWT_SECRET,
-			{ expiresIn: '1h' },
-		);
+		const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
 		res.status(200).json({
 			message: 'Login bem sucedido!',
@@ -97,6 +73,7 @@ export const login = async (req: Request, res: Response) => {
 				email: user.email,
 				name: user.name,
 				role: user.role,
+				imageUrl: user.imageUrl,
 			},
 		});
 	} catch (error) {
@@ -130,12 +107,81 @@ export const getMe = async (req: Request, res: Response) => {
 		});
 
 		if (!user) {
-			return res.status(404).json({ message: 'Utilizador nao encontrado.' });
+			return res.status(404).json({ message: 'Utilizador não encontrado.' });
 		}
 
 		res.status(200).json(user);
 	} catch (error) {
 		console.error('Erro ao obter o utilizador:', error);
+		res.status(500).json({ message: 'Erro interno do servidor.' });
+	}
+};
+
+
+export const updateMe = async (req: Request, res: Response) => {
+	const userId = req.user?.userId;
+	const { name, email, imageUrl, insurance, insuranceNumber, birthDate, phone, gender, currentPassword, newPassword } = req.body;
+
+	if (!userId) {
+		return res.status(401).json({ message: 'Não autorizado.' });
+	}
+
+	try {
+		const user = await prisma.user.findUnique({ where: { id: userId } });
+		if (!user) {
+			return res.status(404).json({ message: 'Utilizador não encontrado.' });
+		}
+
+		const isChangingCredentials = newPassword || (email && email !== user.email);
+
+		if (isChangingCredentials) {
+			if (!currentPassword) {
+				return res.status(400).json({ message: 'A sua password atual é necessária para fazer esta alteração.' });
+			}
+			const isPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
+			if (!isPasswordCorrect) {
+				return res.status(401).json({ message: 'A sua password atual está incorreta.' });
+			}
+		}
+
+		const dataToUpdate: any = {
+			name,
+			imageUrl,
+			insurance,
+			insuranceNumber,
+			birthDate: birthDate ? new Date(birthDate) : undefined,
+			phone,
+			gender,
+		};
+
+		if (email && email !== user.email) {
+			dataToUpdate.email = email;
+		}
+
+		if (newPassword) {
+			dataToUpdate.password = await bcrypt.hash(newPassword, 10);
+		}
+
+		const updatedUser = await prisma.user.update({
+			where: { id: userId },
+			data: dataToUpdate,
+			select: {
+				id: true,
+				name: true,
+				email: true,
+				role: true,
+				imageUrl: true,
+				insurance: true,
+				insuranceNumber: true,
+				birthDate: true,
+				phone: true,
+				gender: true,
+			},
+		});
+
+		res.status(200).json(updatedUser);
+	} catch (error) {
+		console.error('Erro ao atualizar o perfil:', error);
 		res.status(500).json({ message: 'Erro interno do servidor.' });
 	}
 };
