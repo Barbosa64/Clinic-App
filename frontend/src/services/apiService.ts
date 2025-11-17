@@ -199,6 +199,8 @@ export interface UpdateUserData {
 	insurance?: string;
 	insuranceNumber?: string;
 	birthDate?: string;
+	phone?: string;
+	gender?: string;
 	currentPassword?: string;
 	newPassword?: string;
 }
