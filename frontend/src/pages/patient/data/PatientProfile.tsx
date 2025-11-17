@@ -32,7 +32,7 @@ export default function PatientProfile() {
 				setLoading(false);
 			}
 		};
-
+		console.log(`[DEBUG] Role atual: ${role}, ID da URL: ${id}`);
 		if (role) {
 			fetchPatientData();
 		} else {
