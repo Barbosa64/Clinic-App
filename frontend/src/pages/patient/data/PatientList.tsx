@@ -191,6 +191,7 @@ export default function PatientList() {
 									required
 									className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300 sm:text-sm'
 									disabled={!!editingPatient}
+									autoComplete='off'
 								/>
 							</div>
 							<div>
@@ -206,6 +207,7 @@ export default function PatientList() {
 									required={!editingPatient}
 									placeholder={editingPatient ? 'Deixe vazio para não alterar' : 'Password Obrigatória'}
 									className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300 sm:text-sm'
+									autoComplete='new-password'
 								/>
 							</div>
 							<div className='space-y-4'>
