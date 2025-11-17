@@ -7,34 +7,25 @@ import { Patient } from './typesPatient';
 
 export default function PatientProfile() {
 	const { id } = useParams<{ id: string }>();
-	const { user, role } = useAuth();
+	const { role } = useAuth();
 	const [patient, setPatient] = useState<Patient | null>(null);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		const fetchPatientData = async () => {
 			setLoading(true);
-			let patientData = null;
 
 			try {
+				let patientData = null;
 				if (role === 'PATIENT') {
 					patientData = await getMe();
-				} else if (role === 'ADMIN' || role === 'DOCTOR') {
-					if (!id) {
-						toast.error('Paciente não encontrado.');
-						setLoading(false);
-						return;
-					}
+				} else if ((role === 'ADMIN' || role === 'DOCTOR') && id) {
 					patientData = await getPatientById(id);
 				}
-
 				if (patientData) {
 					setPatient(patientData);
-				} else if (role !== 'PATIENT') {
-					toast.error('Paciente não encontrado.');
 				}
 			} catch (error) {
-				console.error('Erro ao buscar dados do paciente:', error);
 				const errorMessage = (error as any).response?.data?.message || 'Não foi possível carregar os dados.';
 				toast.error(errorMessage);
 			} finally {
@@ -47,7 +38,7 @@ export default function PatientProfile() {
 		} else {
 			setLoading(true);
 		}
-	}, [role, id, user]);
+	}, [role, id]);
 
 	if (loading) {
 		return <p className='text-center text-gray-500'>A carregar ficha do paciente...</p>;
