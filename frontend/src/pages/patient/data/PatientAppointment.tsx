@@ -74,6 +74,7 @@ export default function PatientAppointment() {
 			doctorId: selectedDoctorId,
 			patientId: user.id,
 			date: new Date(appointmentDate).toISOString(),
+			specialty: selectedSpecialty,
 		};
 
 		try {

@@ -3,6 +3,7 @@ import { CalendarCheck, History } from 'lucide-react';
 import { getAppointments, deleteAppointment } from '../services/apiService';
 import { Appointment } from '../types';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-hot-toast';
 
 interface Props {
 	patientId?: string;
@@ -52,6 +53,7 @@ export default function AppointmentsHistory({ patientId }: Props) {
 				setPastAppointments(past);
 			} catch (error) {
 				console.error('Erro ao buscar consultas:', error);
+				toast.error('Não foi possível carregar o histórico de consultas.');
 			} finally {
 				setLoading(false);
 			}
@@ -70,10 +72,11 @@ export default function AppointmentsHistory({ patientId }: Props) {
 
 			setUpcomingAppointments(prev => prev.filter(appt => appt.id !== id));
 
-			alert('Consulta cancelada com sucesso!');
+			toast.success('Consulta cancelada com sucesso!');
 		} catch (error) {
 			console.error('Erro ao cancelar consulta:', error);
-			alert('Não foi possível cancelar a consulta.');
+			const errorMessage = (error as any).response?.data?.message || 'Não foi possível cancelar a consulta.';
+			toast.error(errorMessage);
 		}
 	};
 
