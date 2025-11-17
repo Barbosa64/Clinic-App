@@ -118,6 +118,7 @@ export default function Settings() {
 								<label className='block text-sm font-medium text-gray-700'>Nome</label>
 								<input type='text' value={name} onChange={e => setName(e.target.value)} className='w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none' />
 							</div>
+
 							<div>
 								<label className='block text-sm font-medium text-gray-700'>Telefone</label>
 								<input type='tel' value={phone} onChange={e => setPhone(e.target.value)} className='w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none' />
@@ -156,16 +157,79 @@ export default function Settings() {
 					</div>
 
 					<hr className='border-t border-gray-200' />
+
+					{/* Seção: Segurança */}
 					<div>
 						<h3 className='text-lg font-semibold text-gray-700 mb-2'>Segurança</h3>
-						{/* ... */}
+						<div className='space-y-4'>
+							<div>
+								<label className='block text-sm font-medium text-gray-700'>Email</label>
+								<input
+									type='email'
+									value={email}
+									onChange={e => setEmail(e.target.value)}
+									autoComplete='email'
+									className='w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none'
+								/>
+							</div>
+							<div>
+								<label className='block text-sm font-medium text-gray-700'>Nova Password</label>
+								<input
+									type='password'
+									value={newPassword}
+									onChange={e => setNewPassword(e.target.value)}
+									autoComplete='new-password'
+									placeholder='Deixe vazio para não alterar'
+									className='w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none'
+								/>
+							</div>
+							<div>
+								<label className='block text-sm font-medium text-gray-700'>
+									Password Atual <span className='text-gray-500'>(obrigatória p/ mudar email/password)</span>
+								</label>
+								<input
+									type='password'
+									value={currentPassword}
+									onChange={e => setCurrentPassword(e.target.value)}
+									autoComplete='current-password'
+									className='w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none'
+								/>
+							</div>
+						</div>
 					</div>
+
 					<hr className='border-t border-gray-200' />
+
+					{/* Secção: Seguro */}
 					<div>
 						<h3 className='text-lg font-semibold text-gray-700 mb-2'>Informações do Seguro</h3>
-						{/* ... */}
+						<div className='space-y-4'>
+							<div>
+								<label className='block text-sm font-medium text-gray-700'>Seguro</label>
+								<input
+									type='text'
+									value={insurance}
+									onChange={e => setInsurance(e.target.value)}
+									placeholder='Ex: ADSE, Multicare, etc.'
+									className='w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none'
+								/>
+							</div>
+							<div>
+								<label className='block text-sm font-medium text-gray-700'>Número do Seguro</label>
+								<input
+									type='text'
+									value={insuranceNumber}
+									onChange={e => setInsuranceNumber(e.target.value)}
+									placeholder='Número do Seguro'
+									className='w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none'
+								/>
+							</div>
+						</div>
 					</div>
+
 					<hr className='border-t border-gray-200' />
+
+					{/* Botão Final */}
 					<button type='submit' className='w-full bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-200'>
 						Salvar Alterações
 					</button>
