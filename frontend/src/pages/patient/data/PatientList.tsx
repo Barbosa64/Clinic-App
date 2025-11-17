@@ -14,9 +14,11 @@ export default function PatientList() {
 	const [imageUrl, setImageUrl] = useState('');
 	const [insurance, setInsurance] = useState('');
 	const [insuranceNumber, setInsuranceNumber] = useState('');
+	const [phone, setPhone] = useState('');
+	const [gender, setGender] = useState('');
+	const [birthDate, setBirthDate] = useState('');
 	const [showModal, setShowModal] = useState(false);
 	const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
-
 	const fetchPatients = async () => {
 		try {
 			const data = await getPatients();
@@ -39,6 +41,10 @@ export default function PatientList() {
 			setInsurance(patient.insurance || '');
 			setInsuranceNumber(patient.insuranceNumber || '');
 			setImageUrl(patient.imageUrl || '');
+			setPassword('');
+			setPhone(patient.phone || '');
+			setGender(patient.gender || '');
+			setBirthDate(patient.birthDate ? patient.birthDate.substring(0, 10) : '');
 		} else {
 			setEditingPatient(null);
 			setName('');
@@ -47,6 +53,9 @@ export default function PatientList() {
 			setInsurance('');
 			setInsuranceNumber('');
 			setImageUrl('');
+			setPhone('');
+			setGender('');
+			setBirthDate('');
 		}
 		setShowModal(true);
 	};
@@ -67,6 +76,9 @@ export default function PatientList() {
 				insurance,
 				insuranceNumber,
 				imageUrl,
+				phone,
+				gender,
+				birthDate: birthDate || null,
 			};
 
 			if (password) {
@@ -209,6 +221,29 @@ export default function PatientList() {
 									className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300 sm:text-sm'
 									autoComplete='new-password'
 								/>
+							</div>
+							<div>
+								<label htmlFor='phone' className='block text-sm font-medium text-gray-700'>
+									Telefone
+								</label>
+								<input type='tel' id='phone' value={phone} onChange={e => setPhone(e.target.value)} className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm' />
+							</div>
+							<div>
+								<label htmlFor='birthDate' className='block text-sm font-medium text-gray-700'>
+									Data de Nascimento
+								</label>
+								<input type='date' id='birthDate' value={birthDate} onChange={e => setBirthDate(e.target.value)} className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm' />
+							</div>
+							<div>
+								<label htmlFor='gender' className='block text-sm font-medium text-gray-700'>
+									Género
+								</label>
+								<select id='gender' value={gender} onChange={e => setGender(e.target.value)} className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-white'>
+									<option value=''>Selecione</option>
+									<option value='Masculino'>Masculino</option>
+									<option value='Feminino'>Feminino</option>
+									<option value='Outro'>Outro</option>
+								</select>
 							</div>
 							<div className='space-y-4'>
 								<div>
