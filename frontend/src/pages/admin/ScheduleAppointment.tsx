@@ -45,7 +45,7 @@ export default function ScheduleAppointment() {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!selectedDoctorId || !appointmentDate || !selectedPatientId) {
+		if (!selectedDoctorId || !appointmentDate || !selectedPatientId || !selectedSpecialty) {
 			toast.error('Preencha todos os campos.');
 			return;
 		}
@@ -57,6 +57,7 @@ export default function ScheduleAppointment() {
 				doctorId: selectedDoctorId,
 				patientId: selectedPatientId,
 				date: new Date(appointmentDate).toISOString(),
+				specialty: selectedSpecialty,
 			};
 
 			await createAppointment(appointmentData);

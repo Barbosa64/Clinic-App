@@ -165,6 +165,7 @@ export interface CreateAppointmentData {
 	patientId: string;
 	doctorId: string;
 	date: string;
+	specialty: string;
 }
 
 // Criar (marcar) uma nova consulta
