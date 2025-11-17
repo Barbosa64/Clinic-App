@@ -14,7 +14,7 @@ export const createPrescription = async (req: Request, res: Response) => {
 	}
 
 	try {
-		const appointment = await prisma.prescription.findUnique({
+		const appointment = await prisma.appointment.findUnique({
 			where: { id: appointmentId },
 		});
 
@@ -34,7 +34,7 @@ export const createPrescription = async (req: Request, res: Response) => {
 				observacoes: observacoes || '',
 				patientId,
 				appointmentId,
-				doctorId: currentUser!.userId,
+				doctorId: appointment.doctorId,
 			},
 		});
 
@@ -53,7 +53,7 @@ export const getPrescriptions = async (req: Request, res: Response) => {
 	const { patientId } = req.query;
 	const currentUser = req.user;
 
-	if (!patientId) {
+	if (!patientId || typeof patientId !== 'string') {
 		return res.status(400).json({ message: 'ID do paciente obrigatório.' });
 	}
 
@@ -63,12 +63,12 @@ export const getPrescriptions = async (req: Request, res: Response) => {
 	}
 
 	try {
-		if (currentUser?.role === 'PATIENT' && currentUser.userId !== patientIdStr) {
+		if (currentUser?.role === 'PATIENT' && currentUser.userId !== patientId) {
 			return res.status(403).json({ message: 'Acesso negado. Só pode ver suas prescrições.' });
 		}
 		const prescriptions = await prisma.prescription.findMany({
 			where: {
-				patientId: patientIdStr,
+				patientId: patientId,
 			},
 			include: {
 				doctor: { select: { name: true } },
