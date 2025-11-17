@@ -2,37 +2,45 @@ import { useEffect, useState } from 'react';
 import { Patient } from '../pages/patient/data/typesPatient';
 import { CalendarIcon, PhoneIcon, ShieldCheckIcon } from 'lucide-react';
 import { calcularIdade } from '../lib/utilsIdade';
-import { getPatientById } from '../services/apiService';
+import { getPatientById, getMe } from '../services/apiService';
+import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-hot-toast';
 
 type Props = {
-	id: string;
+	id?: string;
 };
 
 export default function PatientProfileCard({ id }: Props) {
 	const [patient, setPatient] = useState<Patient | null>(null);
 	const [loading, setLoading] = useState(true);
+	const { role } = useAuth();
 
 	useEffect(() => {
-		if (!id) {
-			setLoading(false);
-			setPatient(null);
-			return;
-		}
-
-		const fetchPatient = async () => {
+		const fetchPatientData = async () => {
 			setLoading(true);
+
 			try {
-				const fetchedPatient = await getPatientById(id);
+				let fetchedPatient: Patient | null = null;
+
+				if (role === 'PATIENT') {
+					fetchedPatient = await getMe();
+				} else if ((role === 'ADMIN' || role === 'DOCTOR') && id) {
+					fetchedPatient = await getPatientById(id);
+				}
+
 				setPatient(fetchedPatient);
 			} catch (error) {
-				console.error('Falha ao carregar os dados do paciente');
+				console.error('Erro ao buscar paciente:', error);
+				toast.error('Erro foi possível carregar o perfil do paciente.');
 			} finally {
 				setLoading(false);
 			}
 		};
 
-		fetchPatient();
-	}, [id]);
+		if (role) {
+			fetchPatientData();
+		}
+	}, [role, id]);
 
 	if (loading) return <p className='text-center mt-10'>A carregar...</p>;
 	if (!patient) return <p className='text-center mt-10 text-red-600 font-semibold'>Paciente não encontrado</p>;
