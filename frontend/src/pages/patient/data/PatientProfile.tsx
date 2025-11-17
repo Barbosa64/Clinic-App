@@ -12,7 +12,7 @@ export default function PatientProfile() {
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		const fetchPatient = async () => {
+		const fetchPatientData = async () => {
 			setLoading(true);
 			let patientData = null;
 
@@ -30,7 +30,7 @@ export default function PatientProfile() {
 
 				if (patientData) {
 					setPatient(patientData);
-				} else {
+				} else if (role !== 'PATIENT') {
 					toast.error('Paciente não encontrado.');
 				}
 			} catch (error) {
@@ -43,9 +43,11 @@ export default function PatientProfile() {
 		};
 
 		if (role) {
-			fetchPatient();
+			fetchPatientData();
+		} else {
+			setLoading(true);
 		}
-	}, [id, role, user]);
+	}, [role, id, user]);
 
 	if (loading) {
 		return <p className='text-center text-gray-500'>A carregar ficha do paciente...</p>;
