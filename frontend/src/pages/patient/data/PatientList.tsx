@@ -53,7 +53,7 @@ export default function PatientList() {
 
 	const handleCancel = () => setShowModal(false);
 
-	// 🔹 Criar ou atualizar paciente
+	// Criar ou atualizar paciente
 	const handleSave = async () => {
 		try {
 			if (!name || !email || (!editingPatient && !password)) {
@@ -61,11 +61,23 @@ export default function PatientList() {
 				return;
 			}
 
+			const data: any = {
+				name,
+				email,
+				insurance,
+				insuranceNumber,
+				imageUrl,
+			};
+
+			if (password) {
+				data.password = password;
+			}
+
 			if (editingPatient) {
-				await updatePatient(editingPatient.id, { name, email, insurance, insuranceNumber, imageUrl });
+				await updatePatient(editingPatient.id, data);
 				toast.success('Paciente atualizado com sucesso!');
 			} else {
-				await createPatient({ name, email, password, insurance, insuranceNumber, imageUrl });
+				await createPatient(data);
 				toast.success('Paciente criado com sucesso!');
 			}
 
@@ -73,11 +85,12 @@ export default function PatientList() {
 			await fetchPatients();
 		} catch (err: any) {
 			console.error(err);
-			toast.error('Erro ao salvar paciente.');
+			const errorMessage = err.response?.data?.message || 'Erro ao salvar paciente.';
+			toast.error(errorMessage);
 		}
 	};
 
-	// 🔹 Deletar paciente
+	//  Delete paciente
 	const handleDelete = async (id: string) => {
 		if (!confirm('Tem certeza que deseja eliminar este paciente?')) return;
 		try {
@@ -85,11 +98,13 @@ export default function PatientList() {
 			toast.success('Paciente eliminado com sucesso!');
 			await fetchPatients();
 		} catch (err: any) {
-			toast.error('Erro ao eliminar paciente.');
+			console.error('Erro ao eliminar paciente:', err);
+			const errorMessage = err.response?.data?.message || 'Erro ao eliminar paciente.';
+			toast.error(errorMessage);
 		}
 	};
 
-	// 🔹 Pesquisar
+	// Pesquisar
 	const handleSearch = (value: string) => {
 		const search = value.toLowerCase();
 		setFilteredPatients(patients.filter(p => p.name.toLowerCase().includes(search) || p.email.toLowerCase().includes(search)));
@@ -182,15 +197,15 @@ export default function PatientList() {
 								<label htmlFor='password' className='block text-sm font-medium text-gray-700'>
 									Password
 								</label>
+
 								<input
 									type='password'
 									id='password'
 									value={password}
 									onChange={e => setPassword(e.target.value)}
 									required={!editingPatient}
-									placeholder={editingPatient ? 'Deixe vazio para manter a senha' : ''}
+									placeholder={editingPatient ? 'Deixe vazio para não alterar' : 'Password Obrigatória'}
 									className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300 sm:text-sm'
-									disabled={!!editingPatient}
 								/>
 							</div>
 							<div className='space-y-4'>
@@ -216,24 +231,15 @@ export default function PatientList() {
 									/>
 								</div>
 							</div>
-
 							<div>
-								<label htmlFor='imageUpload' className='block text-sm font-medium text-gray-700'>
-									Upload da Imagem (opcional)
-								</label>
+								<label className='block text-sm font-medium text-gray-700'>URL da Imagem</label>
 								<input
-									type='file'
-									id='imageUpload'
-									accept='image/*'
-									className='mt-1 block w-full text-sm text-gray-500
-                    file:mr-4 file:py-2 file:px-4
-                    file:rounded file:border-0
-                    file:text-sm file:font-semibold
-                    file:bg-blue-50 file:text-blue-700
-                    hover:file:bg-blue-100
-                  '
+									type='text'
+									value={imageUrl}
+									onChange={e => setImageUrl(e.target.value)}
+									placeholder='https://...'
+									className='w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none'
 								/>
-								{imageUrl && <img src={imageUrl} alt='Imagem do médico' className='mt-2 rounded max-h-40' />}
 							</div>
 
 							<div className='flex justify-end space-x-3 pt-4'>

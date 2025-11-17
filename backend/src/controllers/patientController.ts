@@ -2,21 +2,17 @@ import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
 import bcrypt from 'bcryptjs';
 
-// ✅ FUNÇÃO ADICIONADA AQUI
 // @desc    Criar um novo paciente
 // @route   POST /api/patients
 // @access  Privado (Admin)
 export const createPatient = async (req: Request, res: Response) => {
-	
 	const { name, email, password, phone, birthDate, gender, insurance, insuranceNumber, imageUrl } = req.body;
 
-	// Validação básica
 	if (!name || !email || !password) {
 		return res.status(400).json({ message: 'Nome, e-mail e password são obrigatórios.' });
 	}
 
 	try {
-		// Verificar se o e-mail já existe na base de dados
 		const userExists = await prisma.user.findUnique({
 			where: { email },
 		});
@@ -25,10 +21,8 @@ export const createPatient = async (req: Request, res: Response) => {
 			return res.status(400).json({ message: 'Este e-mail já está em uso.' });
 		}
 
-		// Encriptar a password antes de a guardar
 		const hashedPassword = await bcrypt.hash(password, 10);
 
-		// Criar o novo utilizador com o papel de 'PATIENT'
 		const newPatient = await prisma.user.create({
 			data: {
 				name,
@@ -134,7 +128,7 @@ export const getPatientById = async (req: Request, res: Response) => {
 // @access  Privado (Admin)
 export const updatePatient = async (req: Request, res: Response) => {
 	const { id } = req.params;
-	const { name, email, phone, birthDate, gender, insurance, insuranceNumber, imageUrl } = req.body;
+	const { name, email, phone, birthDate, gender, insurance, insuranceNumber, imageUrl, password } = req.body;
 
 	try {
 		const patient = await prisma.user.findUnique({
@@ -145,27 +139,23 @@ export const updatePatient = async (req: Request, res: Response) => {
 			return res.status(404).json({ message: 'Paciente não encontrado.' });
 		}
 
-		if (email && email !== patient.email) {
-			const emailExists = await prisma.user.findUnique({ where: { email } });
-			if (emailExists) {
-				return res.status(409).json({
-					message: 'Este email já está a ser utilizado.',
-				});
-			}
+		const dataToUpdate: any = {
+			name,
+			phone,
+			birthDate: birthDate ? new Date(birthDate) : undefined,
+			gender,
+			insurance,
+			insuranceNumber,
+			imageUrl,
+		};
+
+		if (password) {
+			dataToUpdate.password = await bcrypt.hash(password, 10);
 		}
 
 		const updatedPatient = await prisma.user.update({
 			where: { id },
-			data: {
-				name: name ?? patient.name,
-				email: email ?? patient.email,
-				phone: phone ?? patient.phone,
-				birthDate: birthDate ? new Date(birthDate) : patient.birthDate,
-				gender: gender ?? patient.gender,
-				insurance: insurance ?? patient.insurance,
-				insuranceNumber: insuranceNumber ?? patient.insuranceNumber,
-				imageUrl: imageUrl ?? patient.imageUrl,
-			},
+			data: dataToUpdate,
 			select: {
 				id: true,
 				name: true,
