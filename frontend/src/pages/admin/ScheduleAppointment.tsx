@@ -117,7 +117,7 @@ export default function ScheduleAppointment() {
 		}
 	};
 
-	const isCurrentSlotBooked = new Date(appointmentDate).toISOString() === new Date().toISOString() ? false : bookedSlots.includes(new Date(appointmentDate).toISOString());
+	const isCurrentSlotBooked = false;
 
 	return (
 		<div className='p-8 max-w-3xl mx-auto'>
