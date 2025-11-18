@@ -211,3 +211,7 @@ export const updateMe = async (data: UpdateUserData): Promise<any> => {
 	const response = await apiClient.put('/auth/me', data);
 	return response.data;
 };
+export const getDoctorAvailability = async (doctorId: string): Promise<string[]> => {
+	const response = await apiClient.get(`/doctors/${doctorId}/availability`);
+	return response.data;
+};

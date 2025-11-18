@@ -179,3 +179,29 @@ export const deleteDoctor = async (req: Request, res: Response) => {
 		res.status(500).json({ message: 'Erro ao apagar médico.' });
 	}
 };
+
+// @desc    Obter os horários ocupados de um médico
+export const getDoctorAvailability = async (req: Request, res: Response) => {
+	const { id } = req.params;
+
+	try {
+		const appointments = await prisma.appointment.findMany({
+			where: {
+				doctorId: id,
+				date: {
+					gte: new Date(),
+				},
+			},
+			select: {
+				date: true,
+			},
+		});
+
+		const bookedSlots = appointments.map(appt => appt.date.toISOString());
+
+		res.status(200).json(bookedSlots);
+	} catch (error) {
+		console.error('Erro ao buscar disponibilidade do médico:', error);
+		res.status(500).json({ message: 'Erro interno do servidor.' });
+	}
+};
