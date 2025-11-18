@@ -4,6 +4,7 @@ import { Doctor } from '../doctor/doctorType';
 import { Patient } from '../patient/data/typesPatient';
 import toast from 'react-hot-toast';
 import { getDoctors, getPatients, createAppointment, getDoctorAvailability } from '../../services/apiService';
+import { useAuth } from '../../context/AuthContext';
 
 export default function ScheduleAppointment() {
 	const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -17,6 +18,8 @@ export default function ScheduleAppointment() {
 	const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
 	const [bookedSlots, setBookedSlots] = useState<string[]>([]);
+
+	const { role } = useAuth();
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -71,10 +74,15 @@ export default function ScheduleAppointment() {
 			return;
 		}
 
-		if (new Date(appointmentDate) < new Date()) {
+		/*if (new Date(appointmentDate) < new Date()) {
+			toast.error('A data da consulta deve ser no futuro.');
+			return;
+		}*/
+		if (role === 'PATIENT' && new Date(appointmentDate) < new Date()) {
 			toast.error('A data da consulta deve ser no futuro.');
 			return;
 		}
+
 		const selectedDateISO = new Date(appointmentDate).toISOString();
 		if (bookedSlots.includes(selectedDateISO)) {
 			toast.error('Este horário já está ocupado. Por favor, escolha outra data/hora.');
@@ -87,23 +95,23 @@ export default function ScheduleAppointment() {
 			const appointmentData = {
 				doctorId: selectedDoctorId,
 				patientId: selectedPatientId,
-				date: new Date(appointmentDate).toISOString(),
+				date: selectedDateISO,
 				specialty: selectedSpecialty,
 			};
 
 			await createAppointment(appointmentData);
 
 			setStatus('success');
-			toast.success('Consulta marcada com sucesso!');
+			toast.success('Consulta registada com sucesso!');
 
 			setSelectedSpecialty('');
 			setSelectedDoctorId('');
 			setSelectedPatientId('');
 			setAppointmentDate('');
 		} catch (error) {
-			console.error('Erro ao marcar consulta:', error);
+			console.error('Erro ao registar consulta:', error);
 			setStatus('error');
-			toast.error('Erro ao marcar consulta.');
+			toast.error('Erro ao registar consulta.');
 		} finally {
 			setStatus('idle');
 		}
