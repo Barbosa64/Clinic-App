@@ -72,6 +72,8 @@ export default function AppointmentsHistory({ patientId }: Props) {
 
 			setUpcomingAppointments(prev => prev.filter(appt => appt.id !== id));
 
+			setPastAppointments(prev => prev.filter(appt => appt.id !== id));
+
 			toast.success('Consulta cancelada com sucesso!');
 		} catch (error) {
 			console.error('Erro ao cancelar consulta:', error);
@@ -155,6 +157,11 @@ export default function AppointmentsHistory({ patientId }: Props) {
 									<p>
 										<span className='font-medium'>🧑 Paciente:</span> {appt.patientName}
 									</p>
+								)}
+								{role === 'ADMIN' && (
+									<button onClick={() => handleCancelAppointment(appt.id)} className='mt-2 px-3 py-1 bg-red-100 text-red-700 text-sm rounded hover:bg-red-200'>
+										Apagar Registo
+									</button>
 								)}
 							</li>
 						))}
