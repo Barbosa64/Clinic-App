@@ -2,9 +2,7 @@ import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
 import bcrypt from 'bcryptjs';
 
-// @desc    Criar um novo paciente
-// @route   POST /api/patients
-// @access  Privado (Admin)
+//    Criar um novo paciente
 export const createPatient = async (req: Request, res: Response) => {
 	const { name, email, password, phone, birthDate, gender, insurance, insuranceNumber, imageUrl } = req.body;
 
@@ -36,7 +34,7 @@ export const createPatient = async (req: Request, res: Response) => {
 				insuranceNumber,
 				imageUrl,
 			},
-			// Selecionar os campos a devolver (para não expor a password)
+
 			select: {
 				id: true,
 				name: true,
@@ -57,9 +55,7 @@ export const createPatient = async (req: Request, res: Response) => {
 	}
 };
 
-// @desc    Obter todos os pacientes
-// @route   GET /api/patients
-// @access  Privado (Admin, Doctor)
+//  Obter todos os pacientes
 export const getAllPatients = async (req: Request, res: Response) => {
 	try {
 		const patients = await prisma.user.findMany({
@@ -87,9 +83,7 @@ export const getAllPatients = async (req: Request, res: Response) => {
 	}
 };
 
-// @desc    Obter os dados de um paciente específico
-// @route   GET /api/patients/:id
-// @access  Privado (Admin, Doctor)
+//  Obter os dados de um paciente específico
 export const getPatientById = async (req: Request, res: Response) => {
 	const { id } = req.params;
 
@@ -123,9 +117,7 @@ export const getPatientById = async (req: Request, res: Response) => {
 	}
 };
 
-// @desc    Atualizar os dados de um paciente
-// @route   PUT /api/patients/:id
-// @access  Privado (Admin)
+// Atualizar os dados de um paciente
 export const updatePatient = async (req: Request, res: Response) => {
 	const { id } = req.params;
 	const { name, email, phone, birthDate, gender, insurance, insuranceNumber, imageUrl, password } = req.body;
@@ -176,9 +168,7 @@ export const updatePatient = async (req: Request, res: Response) => {
 	}
 };
 
-// @desc    Apagar um paciente
-// @route   DELETE /api/patients/:id
-// @access  Privado (Admin)
+// Apagar um paciente
 export const deletePatient = async (req: Request, res: Response) => {
 	const { id } = req.params;
 

@@ -2,8 +2,6 @@ import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
 
 // @desc    Criar uma nova consulta
-// @route   POST /api/appointments
-// @access  Privado (Admin, Patient)
 
 export const createAppointment = async (req: Request, res: Response) => {
 	const { doctorId, patientId, date, specialty } = req.body;
@@ -32,8 +30,6 @@ export const createAppointment = async (req: Request, res: Response) => {
 	}
 };
 // @desc    Listar consultas
-// @route   GET /api/appointments
-// @access  Privado (Admin, Doctor, Patient)
 
 export const getAppointments = async (req: Request, res: Response) => {
 	const currentUser = req.user;
@@ -42,7 +38,6 @@ export const getAppointments = async (req: Request, res: Response) => {
 	try {
 		const whereClause: any = {};
 
-		// REGRA DE NEGÓCIO: Aplicar filtros com base no papel do utilizador
 		if (currentUser?.role === 'PATIENT') {
 			// Paciente só pode ver as suas próprias consultas
 			whereClause.patientId = currentUser.userId;
@@ -90,9 +85,7 @@ export const getAppointments = async (req: Request, res: Response) => {
 	}
 };
 
-// @desc    Cancelar (apagar) uma consulta
-// @route   DELETE /api/appointments/:id
-// @access  Privado (Admin, Doctor)
+// Cancelar (apagar) uma consulta
 
 export const cancelAppointment = async (req: Request, res: Response) => {
 	const { id } = req.params;
@@ -102,14 +95,28 @@ export const cancelAppointment = async (req: Request, res: Response) => {
 		const appointment = await prisma.appointment.findUnique({
 			where: { id },
 		});
+
 		if (!appointment) {
 			return res.status(404).json({ message: 'Consulta não encontrada.' });
 		}
 
-		// REGRA DE NEGÓCIO: Um médico só pode cancelar as suas próprias consultas.
-
 		if (currentUser?.role === 'DOCTOR' && appointment.doctorId !== currentUser.userId) {
-			return res.status(403).json({ message: 'Acesso negado. Médicos só podem cancelar suas proprias consultas.' });
+			return res.status(403).json({ message: 'Acesso negado. Médicos só podem cancelar suas próprias consultas.' });
+		}
+
+		if (currentUser?.role === 'PATIENT' && appointment.patientId !== currentUser.userId) {
+			return res.status(403).json({ message: 'Acesso negado.' });
+		}
+
+		const now = new Date();
+		const appointmentDate = new Date(appointment.date);
+
+		if (appointmentDate < now) {
+			if (currentUser?.role !== 'ADMIN') {
+				return res.status(403).json({
+					message: 'Não é possível cancelar consultas passadas. Contacte a administração.',
+				});
+			}
 		}
 
 		await prisma.appointment.delete({
@@ -118,6 +125,7 @@ export const cancelAppointment = async (req: Request, res: Response) => {
 
 		res.status(200).json({ message: 'Consulta cancelada com sucesso.' });
 	} catch (error) {
+		console.error(error);
 		res.status(500).json({ message: 'Erro ao cancelar consulta.' });
 	}
 };

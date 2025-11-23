@@ -2,8 +2,6 @@ import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
 
 // @desc    Criar uma nova prescrição
-// @route   POST /api/prescriptions
-// @access  Privado (Admin, Doctor)
 
 export const createPrescription = async (req: Request, res: Response) => {
 	const { patientId, appointmentId, farmaco, dose, frequencia, observacoes } = req.body;
@@ -46,8 +44,6 @@ export const createPrescription = async (req: Request, res: Response) => {
 };
 
 // @desc    Listar as prescrições de um paciente
-// @route   GET /api/prescriptions?patientId=<id>
-// @access  Privado (Admin, Doctor, Patient)
 
 export const getPrescriptions = async (req: Request, res: Response) => {
 	const { patientId } = req.query;
