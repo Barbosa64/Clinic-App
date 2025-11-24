@@ -1,4 +1,4 @@
-# my-clinic-app
+# Clinic App
  Projeto Final Back-End Flag
 
 
