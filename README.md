@@ -2,12 +2,12 @@
 
 Pré-requisitos
 Node.js (v18+)
-Docker Desktop (Recomendado para a Base de Dados)
+Docker Desktop
 
 1. Clonar Repositório
    code
    Bash
-   git clone https://github.com/teu-utilizador/clinic-management-pern.git
+   git clone
    cd clinic-management-pern
    
 3. Configurar a Base de Dados (Docker)
