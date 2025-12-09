@@ -25,4 +25,8 @@ app.get('/api/test', (req, res) => {
 	res.json({ message: 'Olá do backend da Clínica!' });
 });
 
+app.get('/', (req, res) => {
+	res.send('API Clinic-App is running correctly 🚀');
+});
+
 export default app;
