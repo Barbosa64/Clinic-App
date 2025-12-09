@@ -15,7 +15,9 @@ Docker Desktop (Recomendado para a Base de Dados)
 
 # Na raiz do projeto
 
-docker-compose up -d 3. Configurar o Backend
+docker-compose up -d 
+
+3. Configurar o Backend
 code
 Bash
 cd backend
