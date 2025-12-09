@@ -8,7 +8,8 @@ Docker Desktop (Recomendado para a Base de Dados)
    Bash
    git clone https://github.com/teu-utilizador/clinic-management-pern.git
    cd clinic-management-pern
-2. Configurar a Base de Dados (Docker) 🐳
+   
+3. Configurar a Base de Dados (Docker) 🐳
    Utilizamos o Docker para subir uma instância limpa do PostgreSQL.
    code
    Bash
@@ -42,7 +43,9 @@ code
 Env
 DATABASE_URL="postgresql://user:password@localhost:5432/clinic_db?schema=public"
 JWT_SECRET="chave_secreta_segura"
-PORT=3001 4. Configurar o Frontend
+PORT=3001 
+
+4. Configurar o Frontend
 code
 Bash
 
