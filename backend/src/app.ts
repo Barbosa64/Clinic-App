@@ -26,7 +26,7 @@ app.get('/api/test', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-	res.send('API Clinic-App is running correctly 🚀');
+	res.status(200).send('API Clinic-App is running correctly 🚀');
 });
 
 export default app;
