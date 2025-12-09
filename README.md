@@ -1,4 +1,5 @@
-🛠️ Instalação e Configuração
+# Instalação e Configuração
+
 Pré-requisitos
 Node.js (v18+)
 Docker Desktop (Recomendado para a Base de Dados)
@@ -9,7 +10,7 @@ Docker Desktop (Recomendado para a Base de Dados)
    git clone https://github.com/teu-utilizador/clinic-management-pern.git
    cd clinic-management-pern
    
-3. Configurar a Base de Dados (Docker) 🐳
+3. Configurar a Base de Dados (Docker)
    Utilizamos o Docker para subir uma instância limpa do PostgreSQL.
    code
    Bash
