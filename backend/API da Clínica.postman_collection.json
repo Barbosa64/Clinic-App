@@ -1,0 +1,953 @@
+{
+	"info": {
+		"_postman_id": "e6735094-e475-4b85-bec7-5e03aee4ff52",
+		"name": "API da Clínica",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49241876"
+	},
+	"item": [
+		{
+			"name": "Médicos",
+			"item": [
+				{
+					"name": "Criar Novo Médico",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWg2aWRiN2gwMDAwdDQ0Y2cxODc1c2Q1Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzYxNDEwNjMxLCJleHAiOjE3NjE0MTQyMzF9.FQFcDK0xL88tcRFO_i7NW-aea1uYjamE02YRs6woth8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Cristina Silva\",\r\n  \"email\": \"cristina.silva@email.com\",\r\n  \"password\": \"password123\",\r\n  \"specialty\": [\"Cardiologia\"],\r\n  \"imageUrl\": \"https://url.da.imagem/cristina.jpg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3001/api/doctors",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"api",
+								"doctors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Todos os Médicos",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWg2aWRiN2gwMDAwdDQ0Y2cxODc1c2Q1Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzYxNDIwMzc2LCJleHAiOjE3NjE0MjM5NzZ9.pgINo1ZUX2l60yuVV8s66fqfQOX0KHOrq3yUn2099Uk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cache-Control",
+								"value": "no-cache",
+								"name": "cache-control",
+								"type": "text"
+							},
+							{
+								"key": "Postman-Token",
+								"value": "<calculated when request is sent>",
+								"name": "postman-token",
+								"type": "text"
+							},
+							{
+								"key": "Host",
+								"value": "<calculated when request is sent>",
+								"name": "host",
+								"type": "text"
+							},
+							{
+								"key": "User-Agent",
+								"value": "PostmanRuntime/7.39.1",
+								"name": "user-agent",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "*/*",
+								"name": "accept",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Encoding",
+								"value": "gzip, deflate, br",
+								"name": "accept-encoding",
+								"type": "text"
+							},
+							{
+								"key": "Connection",
+								"value": "keep-alive",
+								"name": "connection",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "text"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3001/api/doctors",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"api",
+								"doctors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Apagar Médico",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWg2aWRiN2gwMDAwdDQ0Y2cxODc1c2Q1Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzYxNDIwNjIxLCJleHAiOjE3NjE0MjQyMjF9.p4yE3jRAXoSIk4cM_FlZj1lnbtYasUUSYZQLSntMvBo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3001/api/doctors/cmh6igv9c0001t44cot6e41mf",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"api",
+								"doctors",
+								"cmh6igv9c0001t44cot6e41mf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Médico",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWg2aWRiN2gwMDAwdDQ0Y2cxODc1c2Q1Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzYxNDIwNjIxLCJleHAiOjE3NjE0MjQyMjF9.p4yE3jRAXoSIk4cM_FlZj1lnbtYasUUSYZQLSntMvBo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Cristina Rodrigues\",\r\n  \"specialty\": [\"Medicina Geral\"],\r\n}",
+							"options": {
+								"raw": {
+									"language": "text"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3001/api/doctors/cmh6igv9c0001t44cot6e41mf",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"api",
+								"doctors",
+								"cmh6igv9c0001t44cot6e41mf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ID médico Consulta",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3001/api/doctors/cmh5l7jf80000t48oa81uui7m",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"api",
+								"doctors",
+								"cmh5l7jf80000t48oa81uui7m"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Pacientes",
+			"item": [
+				{
+					"name": "Lista Pacientes (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWg2aWRiN2gwMDAwdDQ0Y2cxODc1c2Q1Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzYxNzgxMzk2LCJleHAiOjE3NjE3ODQ5OTZ9.uaXOlf2AV6NFZcFrKUjb7DwgW63K8QsbTXbrA7XAMIM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3001/api/patients",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"api",
+								"patients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Lista Pacientes (Doutor)",
+					"request": {
+						"auth": {
+							"type": "inherit"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3001/api/patients",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"api",
+								"patients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obter Paciente por ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWg2aWRiN2gwMDAwdDQ0Y2cxODc1c2Q1Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzYxNzgxMTIxLCJleHAiOjE3NjE3ODQ3MjF9.ktlW4UMNrI-h0fmOfOwU3l61iYmA67WGzuTap8VIYdg",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3001/api/patients/cmhcmw6a50000t48s31yen0ut",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"api",
+								"patients",
+								"cmhcmw6a50000t48s31yen0ut"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Atualizar Paciente",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWg2aWRiN2gwMDAwdDQ0Y2cxODc1c2Q1Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzYxNzgxMzk2LCJleHAiOjE3NjE3ODQ5OTZ9.uaXOlf2AV6NFZcFrKUjb7DwgW63K8QsbTXbrA7XAMIM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"João Paciente (Atualizado)\",\r\n  \"phone\": \"939876543\",\r\n  \"insurance\": \"Multicare\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3001/api/patients/cmhcmw6a50000t48s31yen0ut",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"api",
+								"patients",
+								"cmhcmw6a50000t48s31yen0ut"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Apagar Paciente",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWg2aWRiN2gwMDAwdDQ0Y2cxODc1c2Q1Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzYxNzgxMzk2LCJleHAiOjE3NjE3ODQ5OTZ9.uaXOlf2AV6NFZcFrKUjb7DwgW63K8QsbTXbrA7XAMIM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3001/api/patients/cmgqwe0qu0000t4qssh7zde2a",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"api",
+								"patients",
+								"cmgqwe0qu0000t4qssh7zde2a"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Criar Paciente",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWg2aWRiN2gwMDAwdDQ0Y2cxODc1c2Q1Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzYyMjExMDQ4LCJleHAiOjE3NjIyMTQ2NDh9.xt9B-AKldBRRD_dfe5CWUiltbueUfDbEqLe18woI_2U",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Leonor Pereira\",\r\n    \"email\": \"leonor.pereira@email.com\",\r\n    \"password\": \"passpatient123\",\r\n    \"imageUrl\": \"https://randomuser.me/api/portraits/men/32.jpg\",\r\n    \"insurance\": \"ADSE\",\r\n    \"insuranceNumber\": \"1122334455\",\r\n    \"phone\": \"912345678\",\r\n    \"gender\": \"Feminino\",\r\n    \"birthDate\": \"1995-10-20\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3001/api/patients",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"api",
+								"patients"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Consultas",
+			"item": [
+				{
+					"name": "Criar Consulta",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWhjbXc2YTUwMDAwdDQ4czMxeWVuMHV0Iiwicm9sZSI6IlBBVElFTlQiLCJpYXQiOjE3NjE3ODQ3NTIsImV4cCI6MTc2MTc4ODM1Mn0.JCJ2VpoXJMJQgBus4KUDyRFhaYABhliCuLF2-IbrYqg",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"doctorId\": \"cmh5l7jf80000t48oa81uui7m\",\r\n  \"patientId\": \"cmhcmw6a50000t48s31yen0ut\",\r\n  \"date\": \"2025-11-03T15:00:00.000Z\",\r\n  \"specialty\": \"Cardiologia\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3001/api/appointments/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"api",
+								"appointments",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Consultas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3001/api/appointments/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"api",
+								"appointments",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancelar Consulta",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWg2aWRiN2gwMDAwdDQ0Y2cxODc1c2Q1Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzYxOTU1NjM3LCJleHAiOjE3NjE5NTkyMzd9.uNcXfthE4WHZrXU9-X1LtjZ7n7FbKP_-wiLRKY3dcQE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3001/api/appointments/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"api",
+								"appointments",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Prescrições",
+			"item": [
+				{
+					"name": "Lista Receitas",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWhjbXc2YTUwMDAwdDQ4czMxeWVuMHV0Iiwicm9sZSI6IlBBVElFTlQiLCJpYXQiOjE3NjE5Njg0ODQsImV4cCI6MTc2MTk3MjA4NH0.FR2d-8ncx7VBhg7Y5yqfo1tj6Fmwvc2B_M9N4DUFSIs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3001/api/prescriptions?patientId=cmhcmw6a50000t48s31yen0ut",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"api",
+								"prescriptions"
+							],
+							"query": [
+								{
+									"key": "patientId",
+									"value": "cmhcmw6a50000t48s31yen0ut"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Resultados Laboratório",
+			"item": [
+				{
+					"name": "Upload",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWg2aWRiN2gwMDAwdDQ0Y2cxODc1c2Q1Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzYyMDIyNDMzLCJleHAiOjE3NjIwMjYwMzN9.w2c9hbXY-AqGhAAUvWdKmV4ol04SkLcEnuh7BvNl0-g",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "c:\\Users\\ruiba\\Downloads\\Orçamento-Varanda Suculenta.pdf"
+								},
+								{
+									"key": "patientId",
+									"value": "cmhcmw6a50000t48s31yen0ut",
+									"type": "text"
+								},
+								{
+									"key": "type",
+									"value": "Análises ao Sangue",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3001/api/lab-results",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"api",
+								"lab-results"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Deploy back-end",
+			"item": [
+				{
+					"name": "TESTE ONLINE API LOGIN",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"paciente@email.com\",\r\n    \"password\": \"password123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://clinic-api-nigk.onrender.com/api/auth/login",
+							"protocol": "https",
+							"host": [
+								"clinic-api-nigk",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Criar novo paciente",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Paciente\",\r\n    \"email\": \"paciente@email.com\",\r\n    \"password\": \"password123\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://clinic-api-nigk.onrender.com/api/auth/register",
+							"protocol": "https",
+							"host": [
+								"clinic-api-nigk",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Registar Utilizador",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Cache-Control",
+						"value": "no-cache",
+						"name": "cache-control",
+						"type": "text"
+					},
+					{
+						"key": "Postman-Token",
+						"value": "<calculated when request is sent>",
+						"name": "postman-token",
+						"type": "text"
+					},
+					{
+						"key": "Content-Length",
+						"value": "0",
+						"name": "content-length",
+						"type": "text"
+					},
+					{
+						"key": "Host",
+						"value": "<calculated when request is sent>",
+						"name": "host",
+						"type": "text"
+					},
+					{
+						"key": "User-Agent",
+						"value": "PostmanRuntime/7.39.1",
+						"name": "user-agent",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "*/*",
+						"name": "accept",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Encoding",
+						"value": "gzip, deflate, br",
+						"name": "accept-encoding",
+						"type": "text"
+					},
+					{
+						"key": "Connection",
+						"value": "keep-alive",
+						"name": "connection",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"hacker@test.com\",\r\n  \"password\": \"password123\",\r\n  \"name\": \"Utilizador Malicioso\",\r\n  \"role\": \"ADMIN\"\r\n   }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/api/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"auth",
+						"register"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						},
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						},
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obter Utilizador Autenticado",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWdxd2UwcXUwMDAwdDRxc3NoN3pkZTJhIiwicm9sZSI6IlBBVElFTlQiLCJpYXQiOjE3NjA0NjcxODksImV4cCI6MTc2MDQ3MDc4OX0.MC8Iqnzn90_JC7kJIk2UusUIa-TVkDGQPFBhfgeazz0",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cache-Control",
+						"value": "no-cache",
+						"name": "cache-control",
+						"type": "text"
+					},
+					{
+						"key": "Postman-Token",
+						"value": "<calculated when request is sent>",
+						"name": "postman-token",
+						"type": "text"
+					},
+					{
+						"key": "Host",
+						"value": "<calculated when request is sent>",
+						"name": "host",
+						"type": "text"
+					},
+					{
+						"key": "User-Agent",
+						"value": "PostmanRuntime/7.39.1",
+						"name": "user-agent",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "*/*",
+						"name": "accept",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Encoding",
+						"value": "gzip, deflate, br",
+						"name": "accept-encoding",
+						"type": "text"
+					},
+					{
+						"key": "Connection",
+						"value": "keep-alive",
+						"name": "connection",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWdwdmZ2cGQwMDAwdDRudzNvYzIwZDJ3Iiwicm9sZSI6IlBBVElFTlQiLCJpYXQiOjE3NjA0NjQxNzQsImV4cCI6MTc2MDQ2Nzc3NH0.-LQS27Vz2sMEEvY6CCuYkXAugMvNy22woFbroL2ZU5U",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"teste@exemplo.com\",\r\n  \"password\": \"password123\",\r\n  \"name\": \"Utilizador Teste\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/api/auth/me",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"auth",
+						"me"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login de Utilizador",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"carlos.costa@email.com\",\r\n    \"password\": \"passpatient123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/api/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWdwdmZ2cGQwMDAwdDRudzNvYzIwZDJ3Iiwicm9sZSI6IlBBVElFTlQiLCJpYXQiOjE3NjA0NTc5MjksImV4cCI6MTc2MDQ2MTUyOX0.u-QvNZHQrxwAyxyfk4DHzN2xr6yDCLYjAXlVBS_YD88",
+				"type": "string"
+			}
+		]
+	}
+}
