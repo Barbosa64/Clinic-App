@@ -2,16 +2,15 @@
 
 Pré-requisitos
 Node.js (v18+)
-Docker Desktop (Recomendado para a Base de Dados)
+Docker Desktop
 
-1. Clonar o Repositório
+1. Clonar Repositório
    code
    Bash
-   git clone https://github.com/teu-utilizador/clinic-management-pern.git
+   git clone
    cd clinic-management-pern
    
 3. Configurar a Base de Dados (Docker)
-   Utilizamos o Docker para subir uma instância limpa do PostgreSQL.
    code
    Bash
 
@@ -19,7 +18,7 @@ Docker Desktop (Recomendado para a Base de Dados)
 
 docker-compose up -d 
 
-3. Configurar o Backend
+3. Configurar Backend
 code
 Bash
 cd backend
@@ -36,7 +35,7 @@ cp .env.example .env
 
 npx prisma migrate dev --name init
 
-# Iniciar o servidor em modo de desenvolvimento
+# Iniciar servidor
 
 npm run dev
 Exemplo de .env:
@@ -46,19 +45,15 @@ DATABASE_URL="postgresql://user:password@localhost:5432/clinic_db?schema=public"
 JWT_SECRET="chave_secreta_segura"
 PORT=3001 
 
-4. Configurar o Frontend
+4. Configurar Frontend
 code
 Bash
-
-# Noutro terminal, a partir da raiz
-
-cd frontend
 
 # Instalar dependências
 
 npm install
 
-# Iniciar a aplicação
+# Iniciar aplicação
 
 npm run dev
 Aceder via browser: http://localhost:5173
