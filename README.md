@@ -42,7 +42,7 @@ Exemplo de .env:
 code
 Env
 DATABASE_URL="postgresql://user:password@localhost:5432/clinic_db?schema=public"
-JWT_SECRET="chave_secreta_segura"
+JWT_SECRET="password"
 PORT=3001 
 
 4. Configurar Frontend
