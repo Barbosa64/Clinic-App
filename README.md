@@ -25,10 +25,6 @@ The project includes:
 
 ---
 
-
-
----
-
 ```
 
 ## 📁 Project Structure
@@ -66,32 +62,45 @@ Clinic-App/
 ## 🛠️ Installation & Setup
 
 ### 1. Clone the repository
-
+```
 git clone https://github.com/Barbosa64/Clinic-App.git
 cd Clinic-App
-
+```
 ### 2. Start PostgreSQL (Docker)
+```
 docker-compose up -d
-
+```
 ### 3. Backend Setup
+```
 cd backend
+```
+```
 npm install
+```
 
 #### Create the environment file:
+```
 cp .env.example .env
-
+```
 #### Run Prisma migrations:
+```
 npx prisma migrate dev --name init
-
+```
 #### Start the backend server:
+```
 npm run dev
+```
 
 ### 4. Frontend Setup
+```
 cd ../frontend
-
+```
+```
 npm install
-
+```
+```
 npm run dev
+```
 
 ## 📚 Documentation & Help
 Backend deployment:
