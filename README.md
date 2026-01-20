@@ -1,43 +1,47 @@
-📌 Overview
+# Clinic App
+
+## 📌 Overview
+
 Clinic App is a full‑stack application designed to manage clinical operations such as patient records, appointments, authentication, and administrative workflows.
+
 The project includes:
 
-A backend (Node.js + Express + Prisma + PostgreSQL)
+- **Backend** (Node.js + Express + Prisma + PostgreSQL)
+- **Frontend** (JavaScript/TypeScript stack)
+- **Docker‑based database environment**
+- **Backend deployment on Vercel**
 
-A frontend (modern JavaScript/TypeScript stack)
+---
 
-A Docker‑based database environment
+## ⭐ Key Features
 
-A Vercel deployment for the backend
+- JWT‑based authentication and authorization  
+- PostgreSQL database managed with Prisma ORM  
+- Docker‑managed database environment  
+- Modular backend architecture  
+- Frontend application for interacting with the API  
+- Environment‑based configuration  
+- Production‑ready deployment setup  
 
-This repository is structured for developers who want to run, extend, or contribute to the project.
+---
 
-⭐ Key Features
-User Authentication & Authorization (JWT‑based)
 
-PostgreSQL Database with Prisma ORM
 
-Docker‑managed database environment
+---
 
-Modular Backend Architecture
+```
 
-Frontend App for interacting with the API
+## 📁 Project Structure
 
-Environment‑based configuration
-
-Production‑ready deployment setup
-
-📁 Project Structure
-Código
 Clinic-App/
 │
-├── backend/          # Node.js + Express + Prisma API
-│   ├── prisma/       # Schema, migrations
-│   ├── src/          # Controllers, routes, services
+├── backend/                 # Node.js  + Express + Prisma API
+│   ├── prisma/              # Schema, migrations
+│   ├── src/                 # Controllers, routes, services
 │   ├── .env.example
 │   └── package.json
 │
-├── frontend/         # Frontend application Vite/React
+├── frontend/                # Frontend application (Vite/React)
 │   ├── src/
 │   └── package.json
 │
@@ -45,48 +49,50 @@ Clinic-App/
 ├── LICENSE
 └── README.md
 
-🚀 Getting Started
-Prerequisites
-Node.js  v18+
+```
 
-Docker Desktop
+---
 
-npm (bundled with Node)
+## 🚀 Getting Started
 
+### Prerequisites
 
-🛠️ Installation & Setup
-1. Clone the repository
-bash
+- Node.js v18+  
+- Docker Desktop  
+- npm (bundled with Node)
+
+---
+
+## 🛠️ Installation & Setup
+
+### 1. Clone the repository
+
 git clone https://github.com/Barbosa64/Clinic-App.git
 cd Clinic-App
 
-
-2. Start the PostgreSQL database (Docker)
-From the project root:
-
-bash
+### 2. Start PostgreSQL (Docker)
 docker-compose up -d
 
-
-3. Backend Setup
-bash
+### 3. Backend Setup
 cd backend
 npm install
 
+#### Create the environment file:
+cp .env.example .env
 
-Run Prisma migrations
-bash
+#### Run Prisma migrations:
 npx prisma migrate dev --name init
 
-4. Frontend Setup
-bash
-cd ../frontend
-npm install
+#### Start the backend server:
 npm run dev
 
+### 4. Frontend Setup
+cd ../frontend
 
-📚 Documentation & Help
+npm install
 
+npm run dev
 
-Deployment (backend):
-https://clinic-app-eta-ten.vercel.app/ (clinic-app-eta-ten.vercel.app in Bing)
+## 📚 Documentation & Help
+Backend deployment:
+https://clinic-app-eta-ten.vercel.app/
